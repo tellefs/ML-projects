@@ -1,5 +1,5 @@
-# ML-projects
-ML-projects collaborated with @jvevik
+# Machine Learning-projects
+ML-projects for the course FYS-STK4155 at UiO. Collaborated with @jvevik
 
 
 Project 1:
