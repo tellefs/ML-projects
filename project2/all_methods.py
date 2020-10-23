@@ -23,11 +23,11 @@ from print_and_plot import *
 from regression_methods import fitting
 from resampling_methods import resampling
 
-PolyDeg = 7
+PolyDeg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.01 
+lamb = 0.01
 
 regression_method ="OLS" # "OLS", "Ridge"
 minimization_method = "matrix_inv" # "SGD", "GD", "SGD_SKL"
@@ -38,6 +38,7 @@ FrankeData.SetGridFrankeFunction(N,N,False)
 FrankeData.SetFrankeFunction()
 FrankeData.AddNoise(alpha, seed)
 
+
 # Scaling data
 FrankeData.DataScaling()
 
@@ -46,6 +47,7 @@ FrankeData.DesignMatrix(PolyDeg)
 FrankeData.TestTrainSplit(0.2)
 
 fit = fitting(FrankeData)
+
 
 if (regression_method == "OLS"):
 	fit.OLS()
@@ -116,7 +118,7 @@ FrankeData.DataRescaling()
 
 print("--------Stochastic GD skl-------")
 print("Beta:")
-print(fit.beta)  
+print(fit.beta)
 print("Scores:")
 PrintErrors(FrankeData.z_train,fit.z_tilde,FrankeData.z_test,fit.z_predict)
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
@@ -130,8 +132,8 @@ FrankeData.DataScaling()
 FrankeData.DesignMatrix(PolyDeg)
 FrankeData.TestTrainSplit(0.2)
 
-eta = 0.001
-Niterations = 10000
+eta = 0.01
+Niterations = 100000
 fit.GD(Niterations, eta, seed, regression_method, lamb)
 FrankeData.z_scaled = fit.z_plot
 
@@ -140,17 +142,18 @@ FrankeData.DataRescaling()
 
 print("-------- GD -------")
 print("Beta:")
-print(fit.beta)  
+print(fit.beta)
 print("Scores:")
 PrintErrors(FrankeData.z_train,fit.z_tilde,FrankeData.z_test,fit.z_predict)
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
 
 #-------------------------------------- CV ----------------------------------
 
+
 FrankeData.DataScaling()
 
 model = resampling(FrankeData)
-model.Cross_Validation(5, n_epochs, t0, t1, seed, eta, minimization_method, regression_method, PolyDeg, lamb, Min, Niterations)
+model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
 
 FrankeData.z_scaled = model.z_plot
 FrankeData.DataRescaling()
@@ -173,7 +176,7 @@ SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, Fra
 FrankeData.DataScaling()
 
 model = resampling(FrankeData)
-model.NoResampling( n_epochs, t0, t1, seed, eta, minimization_method, regression_method, PolyDeg, lamb, Min, Niterations)
+model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
 
 FrankeData.z_scaled = model.z_plot
 FrankeData.DataRescaling()

@@ -27,19 +27,19 @@ PolyDeg = 7
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.01 
+lamb = 0.001
 
 Min = 5 #size of each minibatch
 n_epochs = 1000 #number of epochs
 t0, t1 = 1, 1000
 
 # For SGD_SKL and GD
-eta = 0.001
+eta = 0.01
 Niterations = 10000
 
 resampling_method = "cv" # "cv", "no resampling "
 regression_method ="Ridge" # "OLS", "Ridge"
-minimization_method = "matrix_inv" # "matrix_inv", "SGD", "GD", "SGD_SKL"
+minimization_method = "GD" # "matrix_inv", "SGD", "GD", "SGD_SKL"
 
 # Setting Data
 FrankeData = data()
@@ -54,10 +54,11 @@ model = resampling(FrankeData)
 
 if(resampling_method == "cv"):
 
-	model.Cross_Validation(5, n_epochs, t0, t1, seed, eta, minimization_method, regression_method, PolyDeg, lamb, Min, Niterations)
+	model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+	#model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, lamb=lamb)
 elif(resampling_method == "no resampling"):
 
-	model.NoResampling( n_epochs, t0, t1, seed, eta, minimization_method, regression_method, PolyDeg, lamb, Min, Niterations)
+	model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
 
 FrankeData.z_scaled = model.z_plot # This is for plotting
 
@@ -76,4 +77,3 @@ print("Test R2:")
 print(model.R2_test)
 
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
-
