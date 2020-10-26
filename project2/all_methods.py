@@ -27,7 +27,7 @@ PolyDeg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.01
+lamb = 0.01 
 
 regression_method ="OLS" # "OLS", "Ridge"
 minimization_method = "matrix_inv" # "SGD", "GD", "SGD_SKL"
@@ -118,7 +118,7 @@ FrankeData.DataRescaling()
 
 print("--------Stochastic GD skl-------")
 print("Beta:")
-print(fit.beta)
+print(fit.beta)  
 print("Scores:")
 PrintErrors(FrankeData.z_train,fit.z_tilde,FrankeData.z_test,fit.z_predict)
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
@@ -142,7 +142,7 @@ FrankeData.DataRescaling()
 
 print("-------- GD -------")
 print("Beta:")
-print(fit.beta)
+print(fit.beta)  
 print("Scores:")
 PrintErrors(FrankeData.z_train,fit.z_tilde,FrankeData.z_test,fit.z_predict)
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)

@@ -34,9 +34,9 @@ class resampling():
 		inst = self.inst
 
 		inst.DesignMatrix(PolyDeg)
-
+	
 		inst.SplitMinibatch(False, nrk)
-
+	
 		MSError_test_CV = np.zeros(nrk)
 		MSError_train_CV = np.zeros(nrk)
 		R2_test_CV = np.zeros(nrk)
@@ -47,21 +47,21 @@ class resampling():
 		z_predict_stored = np.zeros(int(len(inst.z_scaled)/nrk))
 
 		fit = fitting(inst)
-
+	
 		for k in range(nrk):
 
 			inst.X_test = inst.split_matrix[k]
 			inst.z_test = inst.split_z[k]
-
+	
 			X_train = inst.split_matrix
 			X_train = np.delete(X_train,k,0)
 			inst.X_train = np.concatenate(X_train)
-
+	
 			z_train = inst.split_z
 			z_train = np.delete(z_train,k,0)
 			inst.z_train = np.ravel(z_train)
 
-			if(minimization_method == "matrix_inv"):
+			if(minimization_method == "matrix_inv"):	
 				if(regression_method == "Ridge"):
 					fit.Ridge(lamb)
 				elif(regression_method == "OLS"):
@@ -95,15 +95,15 @@ class resampling():
 
 
 	def NoResampling(self, seed, minimization_method, regression_method, PolyDeg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, Min=5, Niterations=10000):
-
+		
 		np.random.seed(seed)
 
 		inst = self.inst
 		inst.DesignMatrix(PolyDeg)
 		inst.TestTrainSplit(0.2)
 		fit = fitting(inst)
-
-		if(minimization_method == "matrix_inv"):
+	
+		if(minimization_method == "matrix_inv"):	
 			if(regression_method == "Ridge"):
 				fit.Ridge(lamb)
 			elif(regression_method == "OLS"):
@@ -124,3 +124,5 @@ class resampling():
 		self.z_predict = fit.z_predict
 		self.z_tilde = fit.z_tilde
 		self.z_plot = fit.z_plot
+
+

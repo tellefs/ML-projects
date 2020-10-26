@@ -22,12 +22,14 @@ from data_processing import data
 from print_and_plot import *
 from regression_methods import fitting
 from resampling_methods import resampling
+from neuralnetwork import NeuralNetwork
+from activation_functions import *
 
-PolyDeg = 7
+PolyDeg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.001
+lamb = 0.001 
 
 Min = 5 #size of each minibatch
 n_epochs = 1000 #number of epochs
@@ -38,8 +40,8 @@ eta = 0.01
 Niterations = 10000
 
 resampling_method = "cv" # "cv", "no resampling "
-regression_method ="Ridge" # "OLS", "Ridge"
-minimization_method = "GD" # "matrix_inv", "SGD", "GD", "SGD_SKL"
+regression_method ="OLS" # "OLS", "Ridge"
+minimization_method = "SGD" # "matrix_inv", "SGD", "GD", "SGD_SKL"
 
 # Setting Data
 FrankeData = data()
@@ -49,7 +51,7 @@ FrankeData.AddNoise(alpha, seed)
 
 # Scaling data
 FrankeData.DataScaling()
-
+"""
 model = resampling(FrankeData)
 
 if(resampling_method == "cv"):
@@ -77,3 +79,36 @@ print("Test R2:")
 print(model.R2_test)
 
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
+"""
+# -----------------------------------------------NN---------------------------------------------
+
+FrankeData.DesignMatrix(PolyDeg)
+FrankeData.TestTrainSplit(0.2)
+
+NumHiddLayers = 1
+NodesInHiddLayers = [50]
+
+NN = NeuralNetwork(FrankeData.X_train, FrankeData.z_train, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers)
+data_indices = np.arange(NN.n_inputs)
+chosen_datapoints = np.random.choice(data_indices, NN.batch_size, replace=False)
+NN.X_data = NN.X_data_full[chosen_datapoints]
+NN.Y_data = NN.Y_data_full[chosen_datapoints]
+NN.train()
+z_predict = np.ravel(NN.predict(FrankeData.X_test))
+z_tilde = np.ravel(NN.predict(FrankeData.X_train))
+z_plot = np.ravel(NN.predict(FrankeData.X))
+
+print("Scores:")
+print("Training MSE:")
+print(MSE(FrankeData.z_train, z_tilde))
+print("Training R2:")
+print(R2(FrankeData.z_train, z_tilde))
+print("Test MSE:")
+print(MSE(FrankeData.z_test, z_predict))
+print("Test R2:")
+print(R2(FrankeData.z_test, z_predict))
+
+FrankeData.z_scaled = z_plot # This is for plotting
+FrankeData.DataRescaling()
+SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
+

@@ -46,7 +46,8 @@ class fitting():
 				elif(regression_method == "Ridge"):
 					gradients = 2/inst.Min * Xk.T @ ((Xk @ beta)-zk)+2*lamb*beta
 
-				eta = t0/(epoch*inst.NumMin+i+t1)
+				#eta = t0/(epoch*inst.NumMin+i+t1)
+				eta = t0/(t1)
 				beta = beta - eta*gradients
 
 		self.z_tilde  = inst.X_train.dot(beta)
@@ -79,14 +80,17 @@ class fitting():
 		len_beta = len(inst.X_train[0,:])
 		beta = np.ones(len_beta)
 		len_z_train = len(inst.z_train)
+		y = inst.z_train[:,np.newaxis]
 
 		for i in range(Niterations):
 			if(regression_method == "OLS"):
 				gradients = 2.0/len_z_train*inst.X_train.T @ ((inst.X_train @ beta)-inst.z_train)
+				#gradients = 2.0/len_z_train*inst.X_train.T.dot(inst.X_train.dot(beta)-inst.z_train)
 			elif(regression_method == "Ridge"):
 				gradients = 2.0/len_z_train*inst.X_train.T @ ((inst.X_train @ beta)-inst.z_train)+2*lamb*beta
-
+				#gradients = 2.0/len_z_train*inst.X_train.T.dot(inst.X_train.dot(beta)-inst.z_train)+2*lamb*beta
 			beta = beta - eta*gradients
+
 		self.z_tilde  = inst.X_train.dot(beta)
 		self.z_predict = inst.X_test.dot(beta)
 		self.z_plot = inst.X.dot(beta)

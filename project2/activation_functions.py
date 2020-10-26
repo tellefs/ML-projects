@@ -6,7 +6,10 @@ def Sigmoid(x):
 	return 1.0/(1.0 + np.exp(-x))
 
 def ReLU(x):
-	return numpy.max(0,x)
+	return np.maximum(0,x)
+
+def Leaky_ReLU(x):
+	return np.where(x<=0, 0.001*x, x)
 
 def Softmax(x):
 	exp_term = np.exp(x)
@@ -20,6 +23,8 @@ def ActivationFunction(x, activation_function):
 		return Sigmoid(x)
 	elif(activation_function =="relu"):
 		return ReLU(x)
+	elif(activation_function =="leaky relu"):
+		return Leaky_ReLU(x)
 	elif(activation_function =="tanh"):
 		return np.tanh(x)
 	elif(activation_function =="linear"):
@@ -33,6 +38,8 @@ def ActivationFunctionDeriv(x, activation_function):
 		return Sigmoid(x)*(1-Sigmoid(x))
 	elif(activation_function =="relu"):
 		return np.heaviside(x, 0)
+	elif(activation_function == "leaky relu"):
+		return np.where(x<=0, 0.001, 1)
 	elif(activation_function =="tanh"):
 		return 1-np.tanh(x)**2
 	elif(activation_function =="linear"):
