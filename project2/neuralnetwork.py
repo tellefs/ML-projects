@@ -15,7 +15,7 @@ class NeuralNetwork:
             HiddenActFunc = "sigmoid",
             OutActFunc= "linear",
             lmbd=0.0):
-        # Leaky ReLU, tanh and ReLU eta=0.00001, epochs=10000, sigmoid - 0.001, 100
+        # Leaky ReLU, tanh and ReLU eta=0.00001, epochs=10000 (100000 for better results), sigmoid - 0.001, 1000
         self.X_data_full = X_data
         self.Y_data_full = Y_data
 
