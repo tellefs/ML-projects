@@ -29,6 +29,8 @@ def ActivationFunction(x, activation_function):
 		return np.tanh(x)
 	elif(activation_function =="linear"):
 		return x
+	elif(activation_function =="binary step"):
+		return np.heaviside(x, 0)
 
 def ActivationFunctionDeriv(x, activation_function):
 
@@ -44,3 +46,5 @@ def ActivationFunctionDeriv(x, activation_function):
 		return 1-np.tanh(x)**2
 	elif(activation_function =="linear"):
 		return 1
+	elif(activation_function =="binary step"):
+		return np.where(x==0, nan, 0)

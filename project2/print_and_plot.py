@@ -160,12 +160,12 @@ def Plot_heatmaps_coarse():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(r21,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("Ridge, $R^2$ for the training set")
+    axs[0].set_title("$R^2$ for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("Ridge, $R^2$ for the test set")
+    axs[1].set_title("$R^2$ for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/Ridge_R2.pdf')
@@ -184,12 +184,12 @@ def Plot_heatmaps_coarse():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(mse1, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("Ridge, MSE for the training set")
+    axs[0].set_title("MSE for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(mse2, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("Ridge, MSE for the test set")
+    axs[1].set_title("MSE for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/Ridge_MSE.pdf')
@@ -215,12 +215,12 @@ def Plot_heatmaps_fine():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(r21,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("Ridge, $R^2$ for the training set")
+    axs[0].set_title("$R^2$ for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("Ridge, $R^2$ for the test set")
+    axs[1].set_title("$R^2$ for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/Ridge_R2_fine.pdf')
@@ -239,12 +239,12 @@ def Plot_heatmaps_fine():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(mse1, vmin = 0, vmax =0.45, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("Ridge, MSE for the training set")
+    axs[0].set_title("MSE for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(mse2, vmin = 0, vmax =0.45, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("Ridge, MSE for the test set")
+    axs[1].set_title("MSE for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/Ridge_MSE_fine.pdf')
@@ -308,6 +308,54 @@ def NN_layers():
     plt.legend(fontsize=12)
     plt.show()
 
+def Class_layers():
+
+    file = np.loadtxt("Files/Class_hidd_layers.txt", skiprows=1)
+    layers  = file[:,0]   
+    acc_train  = file[:,1]  
+    acc_test  = file[:,2]  
+
+    plt.xlabel("Number of hidden layers",fontsize=12)
+    plt.ylabel("Accuracy",fontsize=12)
+    plt.title("Accuracy for the test and train datasets vs number of hidden layers", fontsize=12)
+    plt.plot(layers, acc_train, label="Train",color="navy")
+    plt.plot(layers, acc_test, label="Test",color="orangered")
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
+def Class_neurons():
+
+    file = np.loadtxt("Files/Class_hidd_neurons.txt", skiprows=1)
+    neurons  = file[:,0]   
+    acc_train  = file[:,1]  
+    acc_test  = file[:,2]  
+
+    plt.xlabel("Number of neurons",fontsize=12)
+    plt.ylabel("Accuracy",fontsize=12)
+    plt.title("Accuracy for the test and train datasets vs number of neurons", fontsize=12)
+    plt.plot(neurons, acc_train, label="Train",color="navy")
+    plt.plot(neurons, acc_test, label="Test",color="orangered")
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
+def Class_epochs():
+
+    file = np.loadtxt("Files/Class_epochs.txt", skiprows=1)
+    epochs  = file[:,0]   
+    acc_train  = file[:,1]  
+    acc_test  = file[:,2]  
+
+    plt.xlabel("Number of epochs",fontsize=12)
+    plt.ylabel("Accuracy",fontsize=12)
+    plt.title("Accuracy for the test and train datasets vs number of epochs", fontsize=12)
+    plt.plot(epochs, acc_train, label="Train",color="navy")
+    plt.plot(epochs, acc_test, label="Test",color="orangered")
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
 def Plot_heatmaps_NN():
     file = np.loadtxt("Files/NN_Ridge_MSE.txt", skiprows=1)
     mse_train  = file[:,2]
@@ -333,12 +381,12 @@ def Plot_heatmaps_NN():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(r2_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis",fmt=".3")
-    axs[0].set_title("Ridge, $R^2$ for the training set")
+    axs[0].set_title("$R^2$ for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
-    axs[1].set_title("Ridge, $R^2$ for the test set")
+    axs[1].set_title("$R^2$ for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/NN_Ridge_R2.pdf')
@@ -348,16 +396,101 @@ def Plot_heatmaps_NN():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
     axs = axes.ravel()
     ax=sns.heatmap(mse_train, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("Ridge, MSE for the training set")
+    axs[0].set_title("MSE for the training set")
     axs[0].set_xlabel("$\log_{10}\eta$")
     axs[0].set_ylabel("$\lambda$")
 
     ax=sns.heatmap(mse_test, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("Ridge, MSE for the test set")
+    axs[1].set_title("MSE for the test set")
     axs[1].set_xlabel("$\log_{10}\eta$")
     axs[1].set_ylabel("$\lambda$")    
     plt.savefig('Figures/NN_Ridge_MSE.pdf')
     plt.show()
+
+def Plot_heatmaps_class():
+    file = np.loadtxt("Files/Class_Ridge_grid_search_tanh.txt", skiprows=1)
+    acc_train  = file[:,2]
+    acc_test  = file[:,3]
+    acc_train = acc_train[:,np.newaxis]
+    acc_test = acc_test[:,np.newaxis]
+    acc_train=np.reshape(acc_train,(8,6))
+    acc_test=np.reshape(acc_test,(8,6))
+
+    lambdas = [0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
+    #etas = [0.001, 0.0001, 0.00001, 0.000001,0.0000001]
+    etas = [0.1, 0.01, 0.001,0.0001,0.00001,0.000001]
+
+    x = np.log10(etas)
+    y = lambdas
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    axs = axes.ravel()
+    ax=sns.heatmap(acc_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis",fmt=".3")
+    axs[0].set_title("Accuracy for the training set")
+    axs[0].set_xlabel("$\log_{10}\eta$")
+    axs[0].set_ylabel("$\lambda$")
+
+    ax=sns.heatmap(acc_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
+    axs[1].set_title("Accuracy for the test set")
+    axs[1].set_xlabel("$\log_{10}\eta$")
+    axs[1].set_ylabel("$\lambda$")    
+    plt.savefig('Figures/Class_Ridge_1_layer_tanh.pdf')
+    plt.show()
+
+
+def Plot_Franke_Test_Train(z_test,z_train, X_test, X_train, scaler, x, y, z_noise):
+    abs_train = np.zeros(np.int(len(X_train[:,0])))
+    ord_train = np.zeros(np.int(len(X_train[:,0])))
+    for i in range(np.int(len(X_train[:,0]))):
+        abs_train[i]=X_train[i,1]
+        ord_train[i]=X_train[i,2]
+    
+    dataset_scaled = np.stack((abs_train, ord_train, z_train))
+    dataset_rescaled = scaler.inverse_transform(dataset_scaled.T)
+    abs_train_resc = dataset_rescaled[:,0]
+    ord_train_resc = dataset_rescaled[:,1]
+    z_train_resc = dataset_rescaled[:,2]
+    
+    
+    abs_test = np.zeros(np.int(len(X_test[:,0])))
+    ord_test = np.zeros(np.int(len(X_test[:,0])))
+    for i in range(np.int(len(X_test[:,0]))):
+        abs_test[i]=X_test[i,1]
+        ord_test[i]=X_test[i,2]
+    
+    dataset_scaled = np.stack((abs_test, ord_test, z_test))
+    dataset_rescaled = scaler.inverse_transform(dataset_scaled.T)
+    abs_test_resc = dataset_rescaled[:,0]
+    ord_test_resc = dataset_rescaled[:,1]
+    z_test_resc = dataset_rescaled[:,2]
+    
+    fig = plt.figure(figsize=(15,5))
+    
+    axs = fig.add_subplot(1, 3, 1, projection='3d')
+    surf = axs.plot_surface(x, y, z_noise, cmap="viridis",linewidth=0, antialiased=False)
+    axs.zaxis.set_major_locator(LinearLocator(10))
+    axs.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    axs.set_title(r"a) Franke's function with noise", fontsize=12)
+    axs.set_xlabel("x", fontsize=12)
+    axs.set_ylabel("y", fontsize=12)
+    axs.set_zlabel("z", fontsize=12)
+    axs.set_zlim(-0.1,1.2)
+    #plt.colorbar(surf, shrink=0.5, aspect=20)
+    
+    axs = fig.add_subplot(1, 3, 2, projection='3d')
+    axs.scatter(abs_train_resc, ord_train_resc, z_train_resc, color = "navy")
+    axs.set_title(r"b) Fitted train data", fontsize=12)
+    axs.set_xlabel("x", fontsize=12)
+    axs.set_ylabel("y", fontsize=12)
+    axs.set_zlabel("z", fontsize=12)
+    
+    axs = fig.add_subplot(1, 3, 3, projection='3d')
+    axs.scatter(abs_test_resc, ord_test_resc, z_test_resc, color = "orangered")
+    axs.set_title(r"c) Fitted test data", fontsize=12)
+    axs.set_xlabel("x", fontsize=12)
+    axs.set_ylabel("y", fontsize=12)
+    axs.set_zlabel("z", fontsize=12)
+    axs.set_zlim(-0.1,1.25)
+    plt.show() 
 
 #Plot_R2()
 #Plot_MSE()
@@ -370,3 +503,8 @@ def Plot_heatmaps_NN():
 #NN_epochs()
 #NN_layers()
 #Plot_heatmaps_NN()
+#Class_layers()
+#Class_neurons()
+#Class_epochs()
+#Plot_heatmaps_class()
+

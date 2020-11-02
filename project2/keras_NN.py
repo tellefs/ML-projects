@@ -13,7 +13,7 @@ from tensorflow.keras.utils import to_categorical   #This allows using categoric
 from sklearn.model_selection import train_test_split
 
 
-def Create_NeuralNetwork_Keras(n_neurons_layer1, n_neurons_layer2,
+def Create_NeuralNetwork_Keras(n_neurons_layer1, n_neurons_layer2, n_neurons_layer3,
                                 n_categories, eta ,lmbd, activation,
                                 activation_layers):
 
@@ -22,9 +22,12 @@ def Create_NeuralNetwork_Keras(n_neurons_layer1, n_neurons_layer2,
                     kernel_regularizer=regularizers.l2(lmbd)))
     model.add(Dense(n_neurons_layer2, activation=activation_layers,
                     kernel_regularizer=regularizers.l2(lmbd)))
+    model.add(Dense(n_neurons_layer3, activation=activation_layers,
+                    kernel_regularizer=regularizers.l2(lmbd)))
     model.add(Dense(n_categories, activation=activation))
 
     sgd = optimizers.SGD(lr=eta)
+    #adam = optimizers.Adam(lr=eta)
     model.compile(loss='categorical_crossentropy', optimizer=sgd,
                     metrics=['accuracy'])
 

@@ -62,7 +62,7 @@ FrankeData.DataScaling()
 
 activation_function_hidd = "tanh" # "tanh", "relu" or "leaky reku"
 # -----------------------------------------------NN---------------------------------------------
-
+ 
 FrankeData.DesignMatrix(PolyDeg)
 FrankeData.TestTrainSplit(0.2)
 
@@ -92,4 +92,34 @@ FrankeData.z_scaled = z_plot # This is for plotting
 FrankeData.DataRescaling()
 SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
 
+
+""" # This can be used to plot Franke's function
+FrankeData.DesignMatrix(PolyDeg)
+FrankeData.TestTrainSplit(0.2)
+
+NumHiddLayers = 3
+NodesInHiddLayers = [50,50,50]
+
+NN = NeuralNetwork(FrankeData.X_train, FrankeData.z_train, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, epochs =n_epochs, eta = eta)
+NN.train()
+z_predict = np.ravel(NN.predict(FrankeData.X_test))
+z_tilde = np.ravel(NN.predict(FrankeData.X_train))
+z_plot = np.ravel(NN.predict(FrankeData.X))
+
+print("Scores:")
+print("Training MSE:")
+print(MSE(FrankeData.z_train, z_tilde))
+print("Training R2:")
+print(R2(FrankeData.z_train, z_tilde))
+print("Test MSE:")
+print(MSE(FrankeData.z_test, z_predict))
+print("Test R2:")
+print(R2(FrankeData.z_test, z_predict))
+
+FrankeData.z_scaled = z_plot # This is for plotting
+FrankeData.DataRescaling()
+SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
+
+#Plot_Franke_Test_Train(FrankeData.z_test,FrankeData.z_train, FrankeData.X_test, FrankeData.X_train, FrankeData.scaler, FrankeData.x_mesh, FrankeData.y_mesh, FrankeData.z_mesh)
+"""
 

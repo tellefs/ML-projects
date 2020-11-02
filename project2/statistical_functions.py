@@ -25,3 +25,6 @@ def  ols_svd(x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 def BetaVar(X, alpha, sigma):
     return  sigma**2*np.diag(alpha**2*np.linalg.pinv(X.T.dot(X)))
+
+def accuracy_score(Y_test, Y_pred):
+	return np.sum(Y_test == Y_pred) / len(Y_test)+0.0

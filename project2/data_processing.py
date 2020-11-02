@@ -104,3 +104,12 @@ class data():
 			self.split_matrix = np.split(shuffled_matrix,NumMin)
 			self.split_z = np.split(shuffled_z,NumMin)
 
+			# one-hot in numpy
+	def to_categorical_numpy(self, integer_vector):
+		
+		n_inputs = len(integer_vector)
+		n_categories = np.max(integer_vector) + 1
+		onehot_vector = np.zeros((n_inputs, n_categories))
+		onehot_vector[range(n_inputs), integer_vector] = 1
+    
+		return onehot_vector

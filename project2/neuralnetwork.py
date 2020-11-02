@@ -68,10 +68,15 @@ class NeuralNetwork:
         self.z_o = np.matmul(self.hidden_layers[self.n_hidden_layers-1].a_h, self.output_weights) + self.output_bias
         self.a_o = ActivationFunction(self.z_o, self.OutActFunc)
 
+
     def backpropagation(self):
 
         # This line will be different for classification
-        error_output = self.a_o - self.Y_data[:,np.newaxis]
+        if(self.OutActFunc=="linear"):
+            error_output = self.a_o - self.Y_data[:,np.newaxis]
+        else:
+            error_output = self.a_o - self.Y_data
+            
         self.error_output = error_output
 
         # Calculate gradients for the output layer
@@ -136,23 +141,12 @@ class NeuralNetwork:
         self.feed_forward()
         return self.a_o
 
-    """
+    def predict_class(self, X):
 
-    def predict_probabilities(self, X):
-        probabilities = self.feed_forward_out(X)
-        return probabilities
+        self.X_data = X
+        self.feed_forward()
+        return np.argmax(self.a_o, axis=1)
 
-    def feed_forward_out(self, X):
-        # feed-forward for output
-        z_h = np.matmul(X, self.hidden_weights) + self.hidden_bias
-        a_h = sigmoid(z_h)
-
-        z_o = np.matmul(a_h, self.output_weights) + self.output_bias
-
-        exp_term = np.exp(z_o)
-        probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
-        return probabilities
-    """
 
 
 class HiddenLayer:
@@ -170,3 +164,4 @@ class HiddenLayer:
     def create_biases_and_weights(self):
         self.hidden_weights = np.random.randn(self.n_features, self.n_hidden_neurons)
         self.hidden_bias = np.zeros(self.n_hidden_neurons) + 0.01
+
