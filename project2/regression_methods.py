@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 import sklearn.linear_model as skl
 from statistical_functions import *
+from activation_functions import *
 from sklearn.linear_model import SGDRegressor
 
 class fitting():
@@ -85,16 +86,63 @@ class fitting():
 		for i in range(Niterations):
 			if(regression_method == "OLS"):
 				gradients = 2.0/len_z_train*inst.X_train.T @ ((inst.X_train @ beta)-inst.z_train)
-				#gradients = 2.0/len_z_train*inst.X_train.T.dot(inst.X_train.dot(beta)-inst.z_train)
 			elif(regression_method == "Ridge"):
 				gradients = 2.0/len_z_train*inst.X_train.T @ ((inst.X_train @ beta)-inst.z_train)+2*lamb*beta
-				#gradients = 2.0/len_z_train*inst.X_train.T.dot(inst.X_train.dot(beta)-inst.z_train)+2*lamb*beta
 			beta = beta - eta*gradients
 
 		self.z_tilde  = inst.X_train.dot(beta)
 		self.z_predict = inst.X_test.dot(beta)
 		self.z_plot = inst.X.dot(beta)
 		self.beta = beta
+
+	def Logistic_Regression(self, X, X_test, y, Niterations = 100000, eta = 0.001, option = "GD", epochs = 100, lamb = 0.001):
+
+		x1 = X.shape[0]
+		x2 = X.shape[1]
+	
+		y1 = y.shape[0]
+		y2 = y.shape[1]
+
+		beta = np.ones((x2,y2))
+
+		if(option == "GD"):
+	
+			for i in range(Niterations):
+				y_curr = X @ beta
+				probability = Softmax(y_curr)
+				inv_probability = 1 - Softmax(y_curr)
+				gradients =  - X.T @ (y - probability) + 2*lamb*beta
+				beta -= eta*gradients * 2./(y1*y2)
+	
+			y_tilde = Softmax(X @ beta)
+			y_pred = Softmax(X_test @ beta)
+			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
+		
+		if(option == "SGD"):
+
+			n_inputs = X.shape[0]
+			batch_size = 50
+
+			iterations = n_inputs // batch_size
+
+			data_indices = np.arange(n_inputs)
+
+			for i in range(epochs):
+				for j in range(iterations):
+					chosen_datapoints = np.random.choice(data_indices, batch_size, replace=False)
+					X_iter = X[chosen_datapoints]
+					y_iter = y[chosen_datapoints]
+					y_curr = X_iter @ beta
+					probability = Softmax(y_curr)
+					inv_probability = 1 - Softmax(y_curr)
+					gradients =  - X_iter.T @ (y_iter - probability) + 2*lamb*beta
+					beta -= eta*gradients * 2./(batch_size*y2)
+			y_tilde = Softmax(X @ beta)
+			y_pred = Softmax(X_test @ beta)
+			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
+
+
+
 
 """ Uncomment if we need something else
 
