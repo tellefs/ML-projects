@@ -12,10 +12,11 @@ class NeuralNetwork:
             epochs=1000,
             batch_size=5,
             eta=0.001,
-            HiddenActFunc = "sigmoid",
-            OutActFunc= "linear",
+            hidden_act_func = "sigmoid",
+            out_act_func= "linear",
             lmbd=0.0):
-        # Leaky ReLU, tanh and ReLU eta=0.00001, epochs=10000 (100000 for better results), sigmoid - 0.001, 1000
+        # hidden_act_func takes values "sigmoid", "tanh", "relu", "leaky relu",Leaky ReLU,ReLU eta=0.00001, epochs=10000 (100000 for better results), sigmoid and tanh - 0.001, 1000
+        # out_act_func = "linear" or "softmax"
         self.X_data_full = X_data
         self.Y_data_full = Y_data
 
@@ -25,8 +26,8 @@ class NeuralNetwork:
         self.n_hidden_neurons = n_hidden_neurons
         self.n_categories = n_categories
         self.hidden_layers = []
-        self.HiddenActFunc = HiddenActFunc
-        self.OutActFunc = OutActFunc
+        self.hidden_act_func = hidden_act_func
+        self.out_act_func = out_act_func
 
         self.epochs = epochs
         self.batch_size = batch_size
@@ -36,9 +37,9 @@ class NeuralNetwork:
 
         for i in range(self.n_hidden_layers):
             if(i==0):
-                layer = HiddenLayer(self.n_hidden_neurons[i], self.n_features, self.HiddenActFunc)
+                layer = HiddenLayer(self.n_hidden_neurons[i], self.n_features, self.hidden_act_func)
             else:
-                layer = HiddenLayer(self.n_hidden_neurons[i], self.n_hidden_neurons[i-1], self.HiddenActFunc)
+                layer = HiddenLayer(self.n_hidden_neurons[i], self.n_hidden_neurons[i-1], self.hidden_act_func)
             layer.create_biases_and_weights()
             self.hidden_layers.append(layer)
 
@@ -62,17 +63,17 @@ class NeuralNetwork:
                 a_in = self.hidden_layers[i-1].a_h
 
             layer.z_h = np.matmul(a_in, layer.hidden_weights) + layer.hidden_bias
-            layer.a_h = layer.HiddActFunction(layer.z_h)
+            layer.a_h = layer.hidd_act_function(layer.z_h)
 
         # Output layer
         self.z_o = np.matmul(self.hidden_layers[self.n_hidden_layers-1].a_h, self.output_weights) + self.output_bias
-        self.a_o = ActivationFunction(self.z_o, self.OutActFunc)
+        self.a_o = set_activation_function(self.z_o, self.out_act_func)
 
 
     def backpropagation(self):
 
         # This line will be different for classification
-        if(self.OutActFunc=="linear"):
+        if(self.out_act_func=="linear"):
             error_output = self.a_o - self.Y_data[:,np.newaxis]
         else:
             error_output = self.a_o - self.Y_data
@@ -99,7 +100,7 @@ class NeuralNetwork:
                 forward_error = self.hidden_layers[i+1].error
                 forward_weights = self.hidden_layers[i+1].hidden_weights
 
-            layer.error = np.matmul(forward_error, forward_weights.T) * layer.HiddActFunctionDeriv(layer.z_h)
+            layer.error = np.matmul(forward_error, forward_weights.T) * layer.hidd_act_function_deriv(layer.z_h)
 
             if(i == 0):
                 backward_a = self.X_data
@@ -155,11 +156,11 @@ class HiddenLayer:
         self.n_features = n_features
         self.activation_function = activation_function
 
-    def HiddActFunction(self, x):
-        return(ActivationFunction(x, self.activation_function))
+    def hidd_act_function(self, x):
+        return(set_activation_function(x, self.activation_function))
 
-    def HiddActFunctionDeriv(self, x):
-        return(ActivationFunctionDeriv(x, self.activation_function))
+    def hidd_act_function_deriv(self, x):
+        return(set_activation_function_deriv(x, self.activation_function))
 
     def create_biases_and_weights(self):
         self.hidden_weights = np.random.randn(self.n_features, self.n_hidden_neurons)

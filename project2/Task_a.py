@@ -18,24 +18,25 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from sklearn.linear_model import SGDRegressor
 
 from statistical_functions import *
-from data_processing import data
+from data_processing import Data
 from print_and_plot import *
-from regression_methods import fitting
-from resampling_methods import resampling
+from regression_methods import Fitting
+from resampling_methods import Resampling
 
-PolyDeg = 5
+# Setting the Franke's function
+poly_deg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.001 
+lamb = 0.001
 
-Min = 5 #size of each minibatch
-n_epochs = 1000 #number of epochs
-t0, t1 = 1, 1000
+min_size = 5 #size of each minibatch
+n_epochs = 1000 # number of epochs
+t0, t1 = 1, 1000 # initial parameters for eta adjustable
 
 # For SGD_SKL and GD
-eta = 0.001
-Niterations = 100000
+eta = 0.001 # constant eta
+n_iterations = 100000 # number of iterations
 
 resampling_method = "cv" # "cv", "no resampling "
 regression_method ="Ridge" # "OLS", "Ridge"
@@ -43,27 +44,27 @@ minimization_method = "SGD" # "matrix_inv", "SGD", "GD", "SGD_SKL"
 study = "simple analysis" # "learning rate", "epochs", "minibatches", "simple analysis", "Ridge grid search"
 
 # Setting Data
-FrankeData = data()
-FrankeData.SetGridFrankeFunction(N,N,False)
-FrankeData.SetFrankeFunction()
-FrankeData.AddNoise(alpha, seed)
+franke_data = Data()
+franke_data.set_grid_franke_function(N,N,False)
+franke_data.set_franke_function()
+franke_data.add_noise(alpha, seed)
 
 # Scaling data
-FrankeData.DataScaling()
+franke_data.data_scaling()
 
-model = resampling(FrankeData)
+model = Resampling(franke_data)
 
 
 if(study == "learning rate"): 
 # -------------------------------------------------Learning rate OLS -----------------------------------------------
 # Simple study of R2 and MSE dependence on the learning rate
 
-	filename_1 = "Files/OLS_SGD_R2.txt"
+	filename_1 = "Files/Ridge_SGD_R2_0_1.txt"
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
 	
-	filename_2 = "Files/OLS_SGD_MSE.txt"
+	filename_2 = "Files/Ridge_SGD_MSE_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
@@ -76,9 +77,9 @@ if(study == "learning rate"):
 	for t1 in t1_array:
 		eta = t0/t1
 		if(resampling_method == "cv"):
-			model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)	
+			model.cross_validation(5, seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)	
 		elif(resampling_method == "no resampling"):
-			model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+			model.no_resampling(seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 		f_1.write("{0} {1} {2}\n".format(eta, model.R2_train, model.R2_test))
 		f_2.write("{0} {1} {2}\n".format(eta, model.MSE_train, model.MSE_test))
 	f_1.close()
@@ -88,12 +89,12 @@ elif(study == "minibatches"):
 # ------------------------------------------------ Minibatch size -------------------------------------------------
 # Study of R2 and MSE dependence on the minibatch size
 
-	filename_1 = "Files/OLS_SGD_R2_minibatch.txt"
+	filename_1 = "Files/Ridge_SGD_R2_minibatch_0_1.txt"
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
 	
-	filename_2 = "Files/OLS_SGD_MSE_minibatch.txt"
+	filename_2 = "Files/Ridge_SGD_MSE_minibatch_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
@@ -103,14 +104,14 @@ elif(study == "minibatches"):
 	f_1 = open(filename_1, "a")
 	f_2 = open(filename_2, "a")
 
-	for Min in minibatches:
+	for min_size in minibatches:
 
 		if(resampling_method == "cv"):
-			model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+			model.cross_validation(5, seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 		elif(resampling_method == "no resampling"):
-			model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
-		f_1.write("{0} {1} {2}\n".format(Min, model.R2_train, model.R2_test))
-		f_2.write("{0} {1} {2}\n".format(Min, model.MSE_train, model.MSE_test))
+			model.no_resampling(seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
+		f_1.write("{0} {1} {2}\n".format(min_size, model.R2_train, model.R2_test))
+		f_2.write("{0} {1} {2}\n".format(min_size, model.MSE_train, model.MSE_test))
 	f_1.close()
 	f_2.close()
 
@@ -118,12 +119,12 @@ elif(study == "epochs"):
 # ------------------------------------------------ Number of epochs -------------------------------------------------
 # Study of R2 and MSE dependence on the number of epochs
 
-	filename_1 = "Files/OLS_SGD_R2_epoch.txt"
+	filename_1 = "Files/Ridge_SGD_R2_epoch_0_1.txt"
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
 	
-	filename_2 = "Files/OLS_SGD_MSE_epoch.txt"
+	filename_2 = "Files/Ridge_SGD_MSE_epoch_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
@@ -136,11 +137,12 @@ elif(study == "epochs"):
 	for n_epochs in epochs_array:
 
 		if(resampling_method == "cv"):
-			model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+			model.cross_validation(5, seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 		elif(resampling_method == "no resampling"):
-			model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+			model.no_resampling(seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 		f_1.write("{0} {1} {2}\n".format(n_epochs, model.R2_train, model.R2_test))
 		f_2.write("{0} {1} {2}\n".format(n_epochs, model.MSE_train, model.MSE_test))
+		print(n_epochs)
 	f_1.close()
 	f_2.close()
 
@@ -177,9 +179,9 @@ elif(study == "Ridge grid search"):
 	for lamb in lambdas:
 		for t1 in t1_array:
 			if(resampling_method == "cv"):
-				model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+				model.cross_validation(5, seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 			elif(resampling_method == "no resampling"):
-				model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+				model.no_resampling(seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 			f_1.write("{0} {1} {2}\n".format(lamb, 1.0/t1, model.MSE_test))
 			f_2.write("{0} {1} {2}\n".format(lamb, 1.0/t1, model.R2_test))
 			f_3.write("{0} {1} {2}\n".format(lamb, 1.0/t1, model.MSE_train))
@@ -196,14 +198,14 @@ elif(study == "simple analysis"):
 
 
 	if(resampling_method == "cv"):
-		model.Cross_Validation(5, seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+		model.cross_validation(5, seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 	elif(resampling_method == "no resampling"):
-		model.NoResampling(seed, minimization_method, regression_method, PolyDeg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, Min=Min, Niterations=Niterations)
+		model.no_resampling(seed, minimization_method, regression_method, poly_deg, n_epochs=n_epochs, t0=t0, t1=t1, eta=eta, lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 
-	FrankeData.z_scaled = model.z_plot # This is for plotting all data points at once
+	franke_data.z_scaled = model.z_plot # This is for plotting all data points at once
 
 	# Rescale data
-	FrankeData.DataRescaling()
+	franke_data.data_rescaling()
 
 	print("-------- ",minimization_method, "+", regression_method," -------")
 	print("Scores:")
@@ -216,6 +218,6 @@ elif(study == "simple analysis"):
 	print("Test R2:")
 	print(model.R2_test)
 	
-	SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
+	surface_plot(franke_data.x_rescaled, franke_data.y_rescaled, franke_data.z_mesh, franke_data.z_rescaled)
 
 

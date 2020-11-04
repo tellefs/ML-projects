@@ -17,10 +17,10 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from sklearn.linear_model import SGDRegressor
 
 from statistical_functions import *
-from data_processing import data
+from data_processing import Data
 from print_and_plot import *
-from regression_methods import fitting
-from resampling_methods import resampling
+from regression_methods import Fitting
+from resampling_methods import Resampling
 from neuralnetwork import NeuralNetwork
 from activation_functions import *
 
@@ -81,7 +81,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(inputs, labels, train_size=0
 n_inputs, n_features = X_train.shape
 
 # Converting into the one-hot representation
-digits = data()
+digits = Data()
 Y_train_onehot, Y_test_onehot = digits.to_categorical_numpy(Y_train), digits.to_categorical_numpy(Y_test)
 
 
@@ -92,22 +92,22 @@ lamb = 0.01
 n_categories = 10
 study = "simple analysis" # "simple analysis", "epochs", "hidden layers", "neurons", "grid search"
 activation_function = "sigmoid" # "sigmoid", "relu", "leaky relu", "tanh"
-network = "self made" # "self made", "skl"
+NN_type = "self made" # "self made", "skl"
 
 # ---------------------------------------------- Simple analysis ---------------------------------------------
 if(study == "simple analysis"):
-	if(network == "self made"):
+	if(NN_type == "self made"):
 
-		NumHiddLayers = 3
-		NodesInHiddLayers = [50, 50, 50]
+		num_hidd_layers = 3
+		nodes_in_hidd_layers = [50, 50, 50]
 		
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, OutActFunc = "softmax", HiddenActFunc=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax", hidden_act_func=activation_function, lmbd=lamb)
 		NN.train()
 		
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
 
-	elif(network == "skl"):
+	elif(NN_type == "skl"):
 
 		NN = MLPClassifier(hidden_layer_sizes=(50,50,50), activation='logistic',alpha=lamb, learning_rate_init=eta, max_iter=1000, solver='sgd', batch_size = batch_size)
 		NN.fit(X_train, Y_train)
@@ -122,31 +122,31 @@ if(study == "simple analysis"):
 if(study == "hidden layers"):
 # ---------------------------------------------- Hidden layers ---------------------------------------------
 
-	NumHiddLayers = 1
-	NodesInHiddLayers = [50]
+	num_hidd_layers = 1
+	nodes_in_hidd_layers = [50]
 	
 	filename = "Files/Class_hidd_layers.txt"
 	f = open(filename, "w")
-	f.write("NumHiddLayers   Acctrain  Acctest\n")
+	f.write("num_hidd_layers   Acctrain  Acctest\n")
 	f.close()
 	
 	f = open(filename, "a")
 	
 	for i in range(12):
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, OutActFunc = "softmax",HiddenActFunc=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
-		f.write("{0} {1} {2}\n".format(NumHiddLayers, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
-		NumHiddLayers=NumHiddLayers+1
-		NodesInHiddLayers.append(50)
+		f.write("{0} {1} {2}\n".format(num_hidd_layers, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
+		num_hidd_layers=num_hidd_layers+1
+		nodes_in_hidd_layers.append(50)
 	
 	f.close()			
 
 if(study == "neurons"):
 # ---------------------------------------------- Number of neurons ---------------------------------------------
-	NumHiddLayers = 1
-	NodesInHiddLayers = [1]
+	num_hidd_layers = 1
+	nodes_in_hidd_layers = [1]
 	neurons = 1
 	
 	filename = "Files/Class_hidd_neurons.txt"
@@ -157,19 +157,19 @@ if(study == "neurons"):
 	f = open(filename, "a")
 	
 	for i in range(50):
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, OutActFunc = "softmax",HiddenActFunc=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
 		f.write("{0} {1} {2}\n".format(neurons, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 		neurons=neurons+1
-		NodesInHiddLayers[0]=neurons
+		nodes_in_hidd_layers[0]=neurons
 	
 	f.close()
 if(study == "epochs"):
 # ---------------------------------------------- Number of epochs ---------------------------------------------
-	NumHiddLayers = 3
-	NodesInHiddLayers = [50,50,50]
+	num_hidd_layers = 3
+	nodes_in_hidd_layers = [50,50,50]
 	
 	filename = "Files/Class_epochs.txt"
 	f = open(filename, "w")
@@ -181,7 +181,7 @@ if(study == "epochs"):
 	f = open(filename, "a")
 	
 	for ep in epochs:
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, n_categories=n_categories, epochs=ep, batch_size=batch_size, eta=eta, OutActFunc = "softmax",HiddenActFunc=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=ep, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
@@ -195,10 +195,10 @@ if(study == "grid search"):
 	lambdas = [0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
 	etas = [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001]
 	
-	NumHiddLayers = 1
-	NodesInHiddLayers = [50]
+	num_hidd_layers = 3
+	nodes_in_hidd_layers = [50,50,50]
 	
-	filename = "Files/Class_Ridge_grid_search.txt"
+	filename = "Files/Class_Ridge_grid_search_3_layers.txt"
 	f = open(filename, "w")
 	f.write("lambda   eta   Acctrain  Acctest\n")
 	f.close()
@@ -207,7 +207,7 @@ if(study == "grid search"):
 	
 	for lamb in lambdas:
 		for eta in etas:
-			NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, OutActFunc = "softmax",HiddenActFunc=activation_function, lmbd=lamb)
+			NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
 			NN.train()
 			Y_predict = NN.predict_class(X_test)
 			Y_tilde = NN.predict_class(X_train)

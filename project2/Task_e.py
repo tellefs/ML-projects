@@ -18,10 +18,10 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import LogisticRegression
 
 from statistical_functions import *
-from data_processing import data
+from data_processing import Data
 from print_and_plot import *
-from regression_methods import fitting
-from resampling_methods import resampling
+from regression_methods import Fitting
+from resampling_methods import Resampling
 from neuralnetwork import NeuralNetwork
 from activation_functions import *
 
@@ -82,7 +82,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(inputs, labels, train_size=0
 n_inputs, n_features = X_train.shape
 
 # Converting into the one-hot representation
-digits = data()
+digits = Data()
 Y_train_onehot, Y_test_onehot = digits.to_categorical_numpy(Y_train), digits.to_categorical_numpy(Y_test)
 
 # For SGD
@@ -93,21 +93,21 @@ lamb = 0.0
 n_categories = 10
 
 #For the GD
-Niterations = 10000
+n_iterations = 100000
 
 option = "SGD" #"SGD", "GD", "SKL Logistic"
 
-model = fitting(digits)
+model = Fitting(digits)
 
 if(option == "GD"):
 
-	y_pred, y_tilde = model.Logistic_Regression(X_train, X_test, Y_train_onehot, Niterations = 100000, eta = 0.001, option = "GD", lamb = lamb)
+	y_pred, y_tilde = model.logistic_regression(X_train, X_test, Y_train_onehot, n_iterations = n_iterations, eta = 0.001, option = "GD", lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
 
 elif(option == "SGD"):
 
-	y_pred, y_tilde = model.Logistic_Regression(X_train, X_test, Y_train_onehot, epochs = 100, eta = 0.01, option = "SGD", lamb = lamb)
+	y_pred, y_tilde = model.logistic_regression(X_train, X_test, Y_train_onehot, epochs = epochs, eta = eta, option = "SGD", lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
 

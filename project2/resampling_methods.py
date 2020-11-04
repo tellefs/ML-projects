@@ -22,20 +22,20 @@ from regression_methods import *
 
 seed = 2021
 
-class resampling():
+class Resampling():
 
 	def __init__(self, inst):
 		self.inst = inst
 
-	def Cross_Validation(self, nrk, seed, minimization_method, regression_method, PolyDeg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, Min=5, Niterations=10000):
+	def cross_validation(self, nrk, seed, minimization_method, regression_method, poly_deg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
 
 		np.random.seed(seed)
 
 		inst = self.inst
 
-		inst.DesignMatrix(PolyDeg)
+		inst.design_matrix(poly_deg)
 	
-		inst.SplitMinibatch(False, nrk)
+		inst.split_minibatch(False, nrk)
 	
 		MSError_test_CV = np.zeros(nrk)
 		MSError_train_CV = np.zeros(nrk)
@@ -46,7 +46,7 @@ class resampling():
 		z_tilde_stored = np.zeros(int(len(inst.z_scaled)*(nrk-1)/nrk))
 		z_predict_stored = np.zeros(int(len(inst.z_scaled)/nrk))
 
-		fit = fitting(inst)
+		fit = Fitting(inst)
 	
 		for k in range(nrk):
 
@@ -63,17 +63,17 @@ class resampling():
 
 			if(minimization_method == "matrix_inv"):	
 				if(regression_method == "Ridge"):
-					fit.Ridge(lamb)
+					fit.ridge(lamb)
 				elif(regression_method == "OLS"):
 					fit.OLS()
 			elif(minimization_method == "SGD"):
-				NumMin = int(len(inst.z_train)/Min)
-				inst.SplitMinibatch(True, NumMin)
+				n_minibatch = int(len(inst.z_train)/min_size)
+				inst.split_minibatch(True, n_minibatch)
 				fit.SGD(n_epochs, t0, t1, seed, regression_method, lamb)
 			elif(minimization_method == "SGD_SKL"):
 				fit.SGD_SKL(eta, seed, regression_method, lamb)
 			elif(minimization_method == "GD"):
-				fit.GD(Niterations, eta, seed, regression_method, lamb)
+				fit.GD(n_iterations, eta, seed, regression_method, lamb)
 
 			z_plot_stored = z_plot_stored + fit.z_plot
 			z_tilde_stored = z_tilde_stored + fit.z_tilde
@@ -94,28 +94,28 @@ class resampling():
 
 
 
-	def NoResampling(self, seed, minimization_method, regression_method, PolyDeg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, Min=5, Niterations=10000):
+	def no_resampling(self, seed, minimization_method, regression_method, poly_deg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
 		
 		np.random.seed(seed)
 
 		inst = self.inst
-		inst.DesignMatrix(PolyDeg)
-		inst.TestTrainSplit(0.2)
-		fit = fitting(inst)
+		inst.design_matrix(poly_deg)
+		inst.test_train_split(0.2)
+		fit = Fitting(inst)
 	
 		if(minimization_method == "matrix_inv"):	
 			if(regression_method == "Ridge"):
-				fit.Ridge(lamb)
+				fit.ridge(lamb)
 			elif(regression_method == "OLS"):
 				fit.OLS()
 		elif(minimization_method == "SGD"):
-			NumMin = int(len(inst.z_train)/Min)
-			inst.SplitMinibatch(True, NumMin)
+			n_minibatch = int(len(inst.z_train)/min_size)
+			inst.split_minibatch(True, m_minibatch)
 			fit.SGD(n_epochs, t0, t1, seed, regression_method, lamb)
 		elif(minimization_method == "SGD_SKL"):
 			fit.SGD_SKL(eta, seed, regression_method, lamb)
 		elif(minimization_method == "GD"):
-			fit.GD(Niterations, eta, seed, regression_method, lamb)
+			fit.GD(n_iterations, eta, seed, regression_method, lamb)
 
 		self.MSE_test = MSE(fit.z_predict,inst.z_test)
 		self.MSE_train = MSE(fit.z_tilde,inst.z_train)

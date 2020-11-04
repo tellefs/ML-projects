@@ -10,11 +10,11 @@ def MSE(z_data,z_model):
 	n = np.size(z_model)
 	return np.sum((z_data-z_model)**2)/n
 
-def Bias(z_data,z_model):
+def bias(z_data,z_model):
 	n = np.size(z_model)
 	return np.sum((z_data-np.sum(z_model)/n)**2)/n
 
-def Variance(z):
+def variance(z):
 	n = np.size(z)
 	return np.sum((z-np.sum(z)/n)**2)/n
 
@@ -23,7 +23,7 @@ def  ols_svd(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     u, s, v = scl.svd(x)
     return v.T @ scl.pinv(scl.diagsvd(s, u.shape[0], v.shape[0])) @ u.T @ y
 
-def BetaVar(X, alpha, sigma):
+def beta_var(X, alpha, sigma):
     return  sigma**2*np.diag(alpha**2*np.linalg.pinv(X.T.dot(X)))
 
 def accuracy_score(Y_test, Y_pred):

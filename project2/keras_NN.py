@@ -13,7 +13,7 @@ from tensorflow.keras.utils import to_categorical   #This allows using categoric
 from sklearn.model_selection import train_test_split
 
 
-def Create_NeuralNetwork_Keras(n_neurons_layer1, n_neurons_layer2, n_neurons_layer3,
+def create_neural_network_Keras(n_neurons_layer1, n_neurons_layer2, n_neurons_layer3,
                                 n_categories, eta ,lmbd, activation,
                                 activation_layers):
 

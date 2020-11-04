@@ -18,10 +18,10 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from sklearn.linear_model import SGDRegressor
 
 from statistical_functions import *
-from data_processing import data
+from data_processing import Data
 from print_and_plot import *
-from regression_methods import fitting
-from resampling_methods import resampling
+from regression_methods import Fitting
+from resampling_methods import Resampling
 from neuralnetwork import NeuralNetwork
 from activation_functions import *
 
@@ -39,87 +39,55 @@ from tensorflow.keras.models import Model
 from tensorflow import keras
 from keras.regularizers import l2
 
-PolyDeg = 5
+poly_deg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.001 
+lamb = 0.0 
 
-Min = 5 #size of each minibatch
+min_size = 5 #size of each minibatch
 n_epochs = 1000 #number of epochs
 eta = 0.001 # learning rate
 
-regression_method ="OLS" # "OLS", "Ridge"
-
 # Setting Data
-FrankeData = data()
-FrankeData.SetGridFrankeFunction(N,N,False)
-FrankeData.SetFrankeFunction()
-FrankeData.AddNoise(alpha, seed)
+franke_data = Data()
+franke_data.set_grid_franke_function(N,N,False)
+franke_data.set_franke_function()
+franke_data.add_noise(alpha, seed)
 
 # Scaling data
-FrankeData.DataScaling()
+franke_data.data_scaling()
 
-activation_function_hidd = "tanh" # "tanh", "relu" or "leaky reku"
+activation_function_hidd = "tanh" # "tanh", "relu" or "leaky relu"
 # -----------------------------------------------NN---------------------------------------------
  
-FrankeData.DesignMatrix(PolyDeg)
-FrankeData.TestTrainSplit(0.2)
+franke_data.design_matrix(poly_deg)
+franke_data.test_train_split(0.2)
 
-NumHiddLayers = 1
-NodesInHiddLayers = [50]
+n_hidd_layers = 1
+nodes_in_hidd_layers = [50]
 
 if(activation_function_hidd=="tanh" or activation_function_hidd=="relu" or activation_function_hidd=="leaky relu"):
-	eta = 0.00001
-	n_epochs = 100000
-NN = NeuralNetwork(FrankeData.X_train, FrankeData.z_train, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, epochs =n_epochs, eta = eta, HiddenActFunc=activation_function_hidd)
+	eta = 0.001
+	n_epochs = 1000
+NN = NeuralNetwork(franke_data.X_train, franke_data.z_train, n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, epochs =n_epochs, eta = eta, hidden_act_func=activation_function_hidd)
 NN.train()
-z_predict = np.ravel(NN.predict(FrankeData.X_test))
-z_tilde = np.ravel(NN.predict(FrankeData.X_train))
-z_plot = np.ravel(NN.predict(FrankeData.X))
+z_predict = np.ravel(NN.predict(franke_data.X_test))
+z_tilde = np.ravel(NN.predict(franke_data.X_train))
+z_plot = np.ravel(NN.predict(franke_data.X))
 
 print("Scores:")
 print("Training MSE:")
-print(MSE(FrankeData.z_train, z_tilde))
+print(MSE(franke_data.z_train, z_tilde))
 print("Training R2:")
-print(R2(FrankeData.z_train, z_tilde))
+print(R2(franke_data.z_train, z_tilde))
 print("Test MSE:")
-print(MSE(FrankeData.z_test, z_predict))
+print(MSE(franke_data.z_test, z_predict))
 print("Test R2:")
-print(R2(FrankeData.z_test, z_predict))
+print(R2(franke_data.z_test, z_predict))
 
-FrankeData.z_scaled = z_plot # This is for plotting
-FrankeData.DataRescaling()
-SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
+franke_data.z_scaled = z_plot # This is for plotting
+franke_data.data_rescaling()
+surface_plot(franke_data.x_rescaled, franke_data.y_rescaled, franke_data.z_mesh, franke_data.z_rescaled)
 
-
-""" # This can be used to plot Franke's function
-FrankeData.DesignMatrix(PolyDeg)
-FrankeData.TestTrainSplit(0.2)
-
-NumHiddLayers = 3
-NodesInHiddLayers = [50,50,50]
-
-NN = NeuralNetwork(FrankeData.X_train, FrankeData.z_train, n_hidden_layers = NumHiddLayers, n_hidden_neurons = NodesInHiddLayers, epochs =n_epochs, eta = eta)
-NN.train()
-z_predict = np.ravel(NN.predict(FrankeData.X_test))
-z_tilde = np.ravel(NN.predict(FrankeData.X_train))
-z_plot = np.ravel(NN.predict(FrankeData.X))
-
-print("Scores:")
-print("Training MSE:")
-print(MSE(FrankeData.z_train, z_tilde))
-print("Training R2:")
-print(R2(FrankeData.z_train, z_tilde))
-print("Test MSE:")
-print(MSE(FrankeData.z_test, z_predict))
-print("Test R2:")
-print(R2(FrankeData.z_test, z_predict))
-
-FrankeData.z_scaled = z_plot # This is for plotting
-FrankeData.DataRescaling()
-SurfacePlot(FrankeData.x_rescaled, FrankeData.y_rescaled, FrankeData.z_mesh, FrankeData.z_rescaled)
-
-#Plot_Franke_Test_Train(FrankeData.z_test,FrankeData.z_train, FrankeData.X_test, FrankeData.X_train, FrankeData.scaler, FrankeData.x_mesh, FrankeData.y_mesh, FrankeData.z_mesh)
-"""
 

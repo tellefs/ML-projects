@@ -5,7 +5,7 @@ from statistical_functions import *
 from activation_functions import *
 from sklearn.linear_model import SGDRegressor
 
-class fitting():
+class Fitting():
 
 	def __init__(self, inst):
 		self.inst = inst
@@ -19,7 +19,7 @@ class fitting():
 		self.z_plot = inst.X.dot(beta)
 		self.beta = beta
 
-	def Ridge(self, lamb):
+	def ridge(self, lamb):
 
 		inst = self.inst
 		I = np.identity(len(inst.X_train[0,:]))
@@ -38,14 +38,14 @@ class fitting():
 		beta = np.ones(len_beta)
 
 		for epoch in range(n_epochs):
-			for i in range(inst.NumMin):
-				k = np.random.randint(inst.NumMin) #Pick the k-th minibatch at random
+			for i in range(inst.n_minibatch):
+				k = np.random.randint(inst.n_minibatch) #Pick the k-th minibatch at random
 				Xk = inst.split_matrix_train[k]
 				zk = inst.split_z_train[k]
 				if(regression_method =="OLS"):
-					gradients = 2/inst.Min * Xk.T @ ((Xk @ beta)-zk)
+					gradients = 2/inst.min_size * Xk.T @ ((Xk @ beta)-zk)
 				elif(regression_method == "Ridge"):
-					gradients = 2/inst.Min * Xk.T @ ((Xk @ beta)-zk)+2*lamb*beta
+					gradients = 2/inst.min_size * Xk.T @ ((Xk @ beta)-zk)+2*lamb*beta
 
 				#eta = t0/(epoch*inst.NumMin+i+t1)
 				eta = t0/(t1)
@@ -95,7 +95,7 @@ class fitting():
 		self.z_plot = inst.X.dot(beta)
 		self.beta = beta
 
-	def Logistic_Regression(self, X, X_test, y, Niterations = 100000, eta = 0.001, option = "GD", epochs = 100, lamb = 0.001):
+	def logistic_regression(self, X, X_test, y, Niterations = 100000, eta = 0.001, option = "GD", epochs = 100, lamb = 0.001):
 
 		x1 = X.shape[0]
 		x2 = X.shape[1]
@@ -109,13 +109,13 @@ class fitting():
 	
 			for i in range(Niterations):
 				y_curr = X @ beta
-				probability = Softmax(y_curr)
-				inv_probability = 1 - Softmax(y_curr)
+				probability = softmax(y_curr)
+				inv_probability = 1 - softmax(y_curr)
 				gradients =  - X.T @ (y - probability) + 2*lamb*beta
 				beta -= eta*gradients * 2./(y1*y2)
 	
-			y_tilde = Softmax(X @ beta)
-			y_pred = Softmax(X_test @ beta)
+			y_tilde = softmax(X @ beta)
+			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
 		
 		if(option == "SGD"):
@@ -133,48 +133,10 @@ class fitting():
 					X_iter = X[chosen_datapoints]
 					y_iter = y[chosen_datapoints]
 					y_curr = X_iter @ beta
-					probability = Softmax(y_curr)
-					inv_probability = 1 - Softmax(y_curr)
+					probability = softmax(y_curr)
+					inv_probability = 1 - softmax(y_curr)
 					gradients =  - X_iter.T @ (y_iter - probability) + 2*lamb*beta
 					beta -= eta*gradients * 2./(batch_size*y2)
-			y_tilde = Softmax(X @ beta)
-			y_pred = Softmax(X_test @ beta)
+			y_tilde = softmax(X @ beta)
+			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
-
-
-
-
-""" Uncomment if we need something else
-
-def OLS_SVD(X_train, z_train, X_test):
-	beta = ols_svd(X_train, z_train)
-	z_predict = X_test.dot(beta)
-	return z_predict
-
-def OLS_SVD_beta(X_train, z_train):
-	return ols_svd(X_train, z_train)
-
-def Ridge(X_train, z_train, X_test, lamb, pol_deg):
-	I = np.identity(int((pol_deg+2)*(pol_deg+1)/2))
-	beta = np.linalg.pinv(X_train.T.dot(X_train)+lamb*I).dot(X_train.T.dot(z_train))
-	z_predict = X_test.dot(beta)
-	return z_predict
-
-def Ridge_beta(X_train, z_train, lamb, pol_deg):
-	I = np.identity(int((pol_deg+2)*(pol_deg+1)/2))
-	return np.linalg.pinv(X_train.T.dot(X_train)+lamb*I).dot(X_train.T.dot(z_train))
-
-
-#def Ridge_SKL_beta():
-
-
-def LASSO_SKL(X_train, z_train, X_test, lamb):
-	lasso_fit = skl.Lasso(alpha=lamb, max_iter=10e5, tol=1e-6, normalize=True, fit_intercept=False).fit(X_train,z_train)
-	z_predict = lasso_fit.predict(X_test)
-	beta = lasso_fit.coef_
-	return z_predict
-
-def LASSO_SKL_beta(X_train, z_train, lamb):
-	lasso_fit = skl.Lasso(alpha=lamb, max_iter=10e5, tol=1e-6, normalize=True, fit_intercept=False).fit(X_train,z_train)
-	return lasso_fit.coef_
-"""

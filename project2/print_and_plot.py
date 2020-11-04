@@ -7,9 +7,9 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from data_processing import *
 import seaborn as sns
 
-from statistical_functions import R2, MSE, ols_svd, BetaVar
+from statistical_functions import *
 
-def SurfacePlot(x,y,z_original,z_predicted):
+def surface_plot(x,y,z_original,z_predicted):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     # Plot the surface.
@@ -24,7 +24,7 @@ def SurfacePlot(x,y,z_original,z_predicted):
 
 
 
-def PrintErrors(z_train,z_tilde,z_test,z_predict):
+def print_errors(z_train,z_tilde,z_test,z_predict):
 	print("Training R2")
 	print(R2(z_train,z_tilde))
 	print("Training MSE")
@@ -34,7 +34,7 @@ def PrintErrors(z_train,z_tilde,z_test,z_predict):
 	print("Test MSE")
 	print(MSE(z_test,z_predict))
 
-def Plot_R2():
+def plot_R2():
 
     file = np.loadtxt("Files/OLS_SGD_R2.txt", skiprows=1)
     eta  = file[:,0]
@@ -50,9 +50,47 @@ def Plot_R2():
     plt.grid(True)
     plt.xscale("log")
     plt.legend(fontsize=12)
+    #plt.xticks(fontsize=12)
+    #plt.yticks(fontsize=12)
     plt.show()
 
-def Plot_MSE():
+def plot_R2_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_R2_0_001.txt", skiprows=1)
+    eta  = file[:,0]
+    trainR2 = file[:,1]
+    testR2 = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_R2_0_01.txt", skiprows=1)
+    trainR2_1 = file_1[:,1]
+    testR2_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_R2_0_1.txt", skiprows=1)
+    trainR2_2 = file_2[:,1]
+    testR2_2 = file_2[:,2]
+
+    plt.plot(eta, trainR2, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(eta, testR2, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(eta, trainR2_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(eta, testR2_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(eta, trainR2_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(eta, testR2_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("$\eta$",fontsize=12)
+    plt.ylabel("$R^2$",fontsize=12)
+    plt.title("Ridge, $R^2$ for the test and train datasets vs $\eta$", fontsize=12)
+    plt.grid(True)
+    plt.xscale("log")
+    #plt.ylim((0.6,1.0))
+    #plt.xlim((0.00001,0.0015))
+    #plt.legend(fontsize=12)
+    #plt.xticks(fontsize=12)
+    #plt.yticks(fontsize=12)
+    plt.show()
+
+def plot_MSE():
 
     file = np.loadtxt("Files/OLS_SGD_MSE.txt", skiprows=1)
     eta  = file[:,0]
@@ -70,7 +108,43 @@ def Plot_MSE():
     plt.legend(fontsize=12)
     plt.show()
 
-def Plot_R2_minibatch():
+def plot_MSE_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_MSE_0_001.txt", skiprows=1)
+    eta  = file[:,0]
+    trainMSE = file[:,1]
+    testMSE = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_MSE_0_01.txt", skiprows=1)
+    eta  = file_1[:,0]
+    trainMSE_1 = file_1[:,1]
+    testMSE_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_MSE_0_1.txt", skiprows=1)
+    eta  = file_2[:,0]
+    trainMSE_2 = file_2[:,1]
+    testMSE_2 = file_2[:,2]
+
+    plt.plot(eta, trainMSE, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(eta, testMSE, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(eta, trainMSE_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(eta, testMSE_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(eta, trainMSE_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(eta, testMSE_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("$\eta$",fontsize=12)
+    plt.ylabel("MSE",fontsize=12)
+    plt.title("Ridge, MSE for the test and train datasets vs $\eta$", fontsize=12)
+    plt.grid(True)
+    plt.xscale("log")
+    plt.legend(fontsize=12)
+    #plt.xticks(fontsize=12)
+    #plt.yticks(fontsize=12)
+    plt.show()
+
+def plot_R2_minibatch():
 
     file = np.loadtxt("Files/OLS_SGD_R2_minibatch.txt", skiprows=1)
     mini  = file[:,0]
@@ -85,9 +159,45 @@ def Plot_R2_minibatch():
     plt.title("OLS, $R^2$ for the test and train datasets vs minibatch size", fontsize=12)
     plt.grid(True)
     plt.legend(fontsize=12)
+    #plt.xticks(fontsize=12)
+    #plt.yticks(fontsize=12)
     plt.show()
 
-def Plot_MSE_minibatch():
+def plot_R2_minibatch_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_R2_minibatch_0_001.txt", skiprows=1)
+    mini  = file[:,0]
+    trainR2 = file[:,1]
+    testR2 = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_R2_minibatch_0_01.txt", skiprows=1)
+    trainR2_1 = file_1[:,1]
+    testR2_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_R2_minibatch_0_1.txt", skiprows=1)
+    trainR2_2 = file_2[:,1]
+    testR2_2 = file_2[:,2]
+
+    plt.plot(mini, trainR2, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(mini, testR2, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(mini, trainR2_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(mini, testR2_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(mini, trainR2_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(mini, testR2_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("Minibatch size",fontsize=12)
+    plt.ylabel("$R^2$",fontsize=12)
+    plt.title("Ridge, $R^2$ for the test and train datasets vs minibatch size", fontsize=12)
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    #plt.xticks(fontsize=12)
+    #plt.yticks(fontsize=12)
+    plt.show()
+
+
+def plot_MSE_minibatch():
 
     file = np.loadtxt("Files/OLS_SGD_MSE_minibatch.txt", skiprows=1)
     mini  = file[:,0]
@@ -104,7 +214,39 @@ def Plot_MSE_minibatch():
     plt.legend(fontsize=12)
     plt.show()
 
-def Plot_MSE_epochs():
+def plot_MSE_minibatch_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_MSE_minibatch_0_001.txt", skiprows=1)
+    mini  = file[:,0]
+    trainMSE = file[:,1]
+    testMSE = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_MSE_minibatch_0_01.txt", skiprows=1)
+    trainMSE_1 = file_1[:,1]
+    testMSE_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_MSE_minibatch_0_1.txt", skiprows=1)
+    trainMSE_2 = file_2[:,1]
+    testMSE_2 = file_2[:,2]
+
+    plt.plot(mini, trainMSE, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(mini, testMSE, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(mini, trainMSE_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(mini, testMSE_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(mini, trainMSE_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(mini, testMSE_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("Minibatch size",fontsize=12)
+    plt.ylabel("MSE",fontsize=12)
+    plt.title("Ridge, MSE for the test and train datasets vs minibatch size", fontsize=12)
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
+
+def plot_MSE_epochs():
 
     file = np.loadtxt("Files/OLS_SGD_MSE_epoch.txt", skiprows=1)
     epochs  = file[:,0]
@@ -122,7 +264,39 @@ def Plot_MSE_epochs():
     plt.legend(fontsize=12)
     plt.show()
 
-def Plot_R2_epochs():
+def plot_MSE_epochs_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_MSE_epoch_0_001.txt", skiprows=1)
+    epochs  = file[:,0]
+    trainMSE = file[:,1]
+    testMSE = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_MSE_epoch_0_01.txt", skiprows=1)
+    trainMSE_1 = file_1[:,1]
+    testMSE_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_MSE_epoch_0_1.txt", skiprows=1)
+    trainMSE_2 = file_2[:,1]
+    testMSE_2 = file_2[:,2]
+
+    plt.plot(epochs, trainMSE, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(epochs, testMSE, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(epochs, trainMSE_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(epochs, testMSE_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(epochs, trainMSE_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(epochs, testMSE_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("Number of epochs",fontsize=12)
+    plt.ylabel("MSE",fontsize=12)
+    plt.title("Ridge, MSE for the test and train datasets vs number of epochs", fontsize=12)
+    plt.grid(True)
+    plt.xscale("log")
+    plt.legend(fontsize=12)
+    plt.show()
+
+def plot_R2_epochs():
 
     file = np.loadtxt("Files/OLS_SGD_R2_epoch.txt", skiprows=1)
     epochs  = file[:,0]
@@ -140,7 +314,39 @@ def Plot_R2_epochs():
     plt.legend(fontsize=12)
     plt.show()
 
-def Plot_heatmaps_coarse():
+def plot_R2_epochs_ridge():
+
+    file = np.loadtxt("Files/Ridge_SGD_R2_epoch_0_001.txt", skiprows=1)
+    epochs  = file[:,0]
+    trainR2 = file[:,1]
+    testR2 = file[:,2]
+
+    file_1 = np.loadtxt("Files/Ridge_SGD_R2_epoch_0_01.txt", skiprows=1)
+    trainR2_1 = file_1[:,1]
+    testR2_1 = file_1[:,2]
+
+    file_2 = np.loadtxt("Files/Ridge_SGD_R2_epoch_0_1.txt", skiprows=1)
+    trainR2_2 = file_2[:,1]
+    testR2_2 = file_2[:,2]
+
+    plt.plot(epochs, trainR2, label="$\lambda=0.001$, Train",color="navy")
+    plt.plot(epochs, testR2, label="$\lambda=0.001$, Test",color="orangered")
+
+    plt.plot(epochs, trainR2_1, label="$\lambda=0.01$, Train",linestyle='--', color="navy")
+    plt.plot(epochs, testR2_1, label="$\lambda=0.01$, Test",linestyle='--',color="orangered")
+
+    plt.plot(epochs, trainR2_2, label="$\lambda=0.1$, Train",linestyle=':', color="navy")
+    plt.plot(epochs, testR2_2, label="$\lambda=0.1$, Test",linestyle=':',color="orangered")
+
+    plt.xlabel("Number of epochs",fontsize=12)
+    plt.ylabel("$R^2$",fontsize=12)
+    plt.title("OLS, $R^2$ for the test and train datasets vs number of epochs", fontsize=12)
+    plt.grid(True)
+    plt.xscale("log")
+    plt.legend(fontsize=12)
+    plt.show()
+
+def plot_heatmaps_coarse():
     file = np.loadtxt("Files/Ridge_train_R2.txt", skiprows=1)
     r21  = file[:,2]
     r21 = r21[:,np.newaxis]
@@ -157,17 +363,23 @@ def Plot_heatmaps_coarse():
         t1_array[i]=1.0/t1_array[i]
     x = np.log10(t1_array)
     y = lambdas
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 11.5))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(r21,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("$R^2$ for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("$R^2$ for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("$R^2$ for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("$R^2$ for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)   
     plt.savefig('Figures/Ridge_R2.pdf')
     plt.show()
 
@@ -181,21 +393,27 @@ def Plot_heatmaps_coarse():
     mse2 = mse2[:,np.newaxis]
     mse2=np.reshape(mse2,(8,5))
 
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 11.5))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(mse1, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("MSE for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("MSE for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(mse2, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("MSE for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("MSE for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)    
     plt.savefig('Figures/Ridge_MSE.pdf')
     plt.show()
 
-def Plot_heatmaps_fine():
+def plot_heatmaps_fine():
     file = np.loadtxt("Files/Ridge_train_R2_fine.txt", skiprows=1)
     r21  = file[:,2]
     r21 = r21[:,np.newaxis]
@@ -212,17 +430,23 @@ def Plot_heatmaps_fine():
         t1_array[i]=1.0/t1_array[i]
     x = [0.005,0.004,0.003,0.002,0.001, 0.0001]
     y = lambdas
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(r21,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("$R^2$ for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("$R^2$ for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("$R^2$ for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("$R^2$ for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)  
     plt.savefig('Figures/Ridge_R2_fine.pdf')
     plt.show()
 
@@ -236,17 +460,23 @@ def Plot_heatmaps_fine():
     mse2 = mse2[:,np.newaxis]
     mse2=np.reshape(mse2,(8,6))
 
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(mse1, vmin = 0, vmax =0.45, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("MSE for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("MSE for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(mse2, vmin = 0, vmax =0.45, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("MSE for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("MSE for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)  
     plt.savefig('Figures/Ridge_MSE_fine.pdf')
     plt.show()
 
@@ -308,7 +538,36 @@ def NN_layers():
     plt.legend(fontsize=12)
     plt.show()
 
-def Class_layers():
+def NN_neurons():
+
+    file = np.loadtxt("Files/NN_MSE_neurons.txt", skiprows=1)
+    epochs  = file[:,0]   
+    mse_train  = file[:,1]  
+    mse_test  = file[:,2]  
+
+    file = np.loadtxt("Files/NN_R2_neurons.txt", skiprows=1) 
+    r2_train  = file[:,1]  
+    r2_test  = file[:,2]  
+
+    plt.xlabel("Number of neurons",fontsize=12)
+    plt.ylabel("MSE",fontsize=12)
+    plt.title("MSE for the test and train datasets vs number of neurons", fontsize=12)
+    plt.plot(epochs, mse_train, label="Train",color="navy")
+    plt.plot(epochs, mse_test, label="Test",color="orangered")
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
+    plt.xlabel("Number of neurons",fontsize=12)
+    plt.ylabel("$R^2$",fontsize=12)
+    plt.title("$R^2$ for the test and train datasets vs number of neurons", fontsize=12)
+    plt.plot(epochs, r2_train, label="Train",color="navy")
+    plt.plot(epochs, r2_test, label="Test",color="orangered")
+    plt.grid(True)
+    plt.legend(fontsize=12)
+    plt.show()
+
+def class_layers():
 
     file = np.loadtxt("Files/Class_hidd_layers.txt", skiprows=1)
     layers  = file[:,0]   
@@ -324,7 +583,7 @@ def Class_layers():
     plt.legend(fontsize=12)
     plt.show()
 
-def Class_neurons():
+def class_neurons():
 
     file = np.loadtxt("Files/Class_hidd_neurons.txt", skiprows=1)
     neurons  = file[:,0]   
@@ -340,7 +599,7 @@ def Class_neurons():
     plt.legend(fontsize=12)
     plt.show()
 
-def Class_epochs():
+def class_epochs():
 
     file = np.loadtxt("Files/Class_epochs.txt", skiprows=1)
     epochs  = file[:,0]   
@@ -356,7 +615,7 @@ def Class_epochs():
     plt.legend(fontsize=12)
     plt.show()
 
-def Plot_heatmaps_NN():
+def plot_heatmaps_NN():
     file = np.loadtxt("Files/NN_Ridge_MSE.txt", skiprows=1)
     mse_train  = file[:,2]
     mse_test  = file[:,3]
@@ -378,37 +637,51 @@ def Plot_heatmaps_NN():
 
     x = np.log10(etas)
     y = lambdas
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(r2_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis",fmt=".3")
-    axs[0].set_title("$R^2$ for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("$R^2$ for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
-    axs[1].set_title("$R^2$ for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("$R^2$ for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14)  
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
+
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/NN_Ridge_R2.pdf')
     plt.show()
 
 
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(mse_train, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis")
-    axs[0].set_title("MSE for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("MSE for the training set", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
     ax=sns.heatmap(mse_test, vmin = 0, vmax =2.5, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
-    axs[1].set_title("MSE for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
+    axs[1].set_title("MSE for the test set", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)    
     plt.savefig('Figures/NN_Ridge_MSE.pdf')
     plt.show()
 
-def Plot_heatmaps_class():
-    file = np.loadtxt("Files/Class_Ridge_grid_search_tanh.txt", skiprows=1)
+def plot_heatmaps_class():
+    file = np.loadtxt("Files/Class_Ridge_grid_search_3_layers.txt", skiprows=1)
     acc_train  = file[:,2]
     acc_test  = file[:,3]
     acc_train = acc_train[:,np.newaxis]
@@ -422,22 +695,30 @@ def Plot_heatmaps_class():
 
     x = np.log10(etas)
     y = lambdas
-    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (6.5, 11))
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
+    sns.set(font_scale=1)
     ax=sns.heatmap(acc_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="viridis",fmt=".3")
-    axs[0].set_title("Accuracy for the training set")
-    axs[0].set_xlabel("$\log_{10}\eta$")
-    axs[0].set_ylabel("$\lambda$")
+    axs[0].set_title("Accuracy for the training set, Sigmoid activation", fontsize=14)
+    axs[0].set_xlabel("$\log_{10}\eta$",fontsize=14)
+    axs[0].set_ylabel("$\lambda$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
+    axs[0].margins(2, 2) 
 
     ax=sns.heatmap(acc_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
-    axs[1].set_title("Accuracy for the test set")
-    axs[1].set_xlabel("$\log_{10}\eta$")
-    axs[1].set_ylabel("$\lambda$")    
-    plt.savefig('Figures/Class_Ridge_1_layer_tanh.pdf')
+    axs[1].set_title("Accuracy for the test set, Sigmoid activation", fontsize=14)
+    axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
+    axs[1].set_ylabel("$\lambda$", fontsize=14)  
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
+    plt.savefig('Figures/Class_Ridge_3.pdf')
     plt.show()
 
 
-def Plot_Franke_Test_Train(z_test,z_train, X_test, X_train, scaler, x, y, z_noise):
+def plot_franke_test_train(z_test,z_train, X_test, X_train, scaler, x, y, z_noise):
     abs_train = np.zeros(np.int(len(X_train[:,0])))
     ord_train = np.zeros(np.int(len(X_train[:,0])))
     for i in range(np.int(len(X_train[:,0]))):
@@ -463,7 +744,7 @@ def Plot_Franke_Test_Train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     ord_test_resc = dataset_rescaled[:,1]
     z_test_resc = dataset_rescaled[:,2]
     
-    fig = plt.figure(figsize=(15,5))
+    fig = plt.figure(figsize=(12,5))
     
     axs = fig.add_subplot(1, 3, 1, projection='3d')
     surf = axs.plot_surface(x, y, z_noise, cmap="viridis",linewidth=0, antialiased=False)
@@ -478,6 +759,7 @@ def Plot_Franke_Test_Train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     
     axs = fig.add_subplot(1, 3, 2, projection='3d')
     axs.scatter(abs_train_resc, ord_train_resc, z_train_resc, color = "navy")
+    axs.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
     axs.set_title(r"b) Fitted train data", fontsize=12)
     axs.set_xlabel("x", fontsize=12)
     axs.set_ylabel("y", fontsize=12)
@@ -485,26 +767,34 @@ def Plot_Franke_Test_Train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     
     axs = fig.add_subplot(1, 3, 3, projection='3d')
     axs.scatter(abs_test_resc, ord_test_resc, z_test_resc, color = "orangered")
+    axs.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
     axs.set_title(r"c) Fitted test data", fontsize=12)
     axs.set_xlabel("x", fontsize=12)
     axs.set_ylabel("y", fontsize=12)
     axs.set_zlabel("z", fontsize=12)
     axs.set_zlim(-0.1,1.25)
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.97,left=0.03)
     plt.show() 
 
-#Plot_R2()
-#Plot_MSE()
-#Plot_R2_minibatch()
-#Plot_MSE_minibatch()
-#Plot_R2_epochs()
-#Plot_MSE_epochs()
-#Plot_heatmaps_coarse()
-#Plot_heatmaps_fine()
+# Uncomment required plot
+#plot_R2()
+#plot_MSE()
+#plot_R2_minibatch()
+#plot_MSE_minibatch()
+#plot_R2_epochs()
+#plot_MSE_epochs()
+#plot_heatmaps_coarse()
+#plot_heatmaps_fine()
 #NN_epochs()
 #NN_layers()
-#Plot_heatmaps_NN()
-#Class_layers()
-#Class_neurons()
-#Class_epochs()
-#Plot_heatmaps_class()
-
+#plot_heatmaps_NN()
+#class_layers()
+#class_neurons()
+#class_epochs()
+#plot_heatmaps_class()
+#plot_MSE_ridge()
+#plot_R2_minibatch_ridge()
+#plot_MSE_minibatch_ridge()
+#plot_MSE_epochs_ridge()
+#plot_R2_epochs_ridge()
+#NN_neurons()
