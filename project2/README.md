@@ -1,3 +1,5 @@
 ## Project 2
 
-Collaboration between @tellefs, @jvevik and @sagora123.
+Collaboration between Tellef Storebakken (@tellefs), Julian E. Vevik (@jvevik) and Maria L. Markova (@sagora123 / @markmarko).
+
+
