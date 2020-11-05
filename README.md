@@ -7,6 +7,7 @@ The report, as well as code, datafiles and figures are located in the project1 f
 
 
 Project 2:
+All files, example runs, code, report and figures are found in the project2 folder.
 
 
 Project 3:
