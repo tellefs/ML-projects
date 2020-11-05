@@ -161,7 +161,6 @@ if(study == "epochs"):
 	nodes_in_hidd_layers = [50,50,50]
 
 	for n_epochs in epochs:
-
 		NN = NeuralNetwork(franke_data.X_train, franke_data.z_train, n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, epochs = n_epochs, batch_size = min_size, eta = eta, lmbd=lamb)
 		NN.train()
 		z_predict = np.ravel(NN.predict(franke_data.X_test))

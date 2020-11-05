@@ -124,7 +124,6 @@ elif(study == "minibatches"):
 	f_2 = open(filename_2, "a")
 
 	for min_size in minibatches:
-
 		if(resampling_method == "cv"):
 			model.cross_validation(
 				5, seed, minimization_method, 
@@ -165,7 +164,6 @@ elif(study == "epochs"):
 	f_2 = open(filename_2, "a")
 
 	for n_epochs in epochs_array:
-
 		if(resampling_method == "cv"):
 			model.cross_validation(
 				5, seed, minimization_method, regression_method, 
@@ -246,7 +244,6 @@ elif(study == "Ridge grid search"):
 # MSE and R2 for the initially chosen parameters
 	
 elif(study == "simple analysis"):
-
 
 	if(resampling_method == "cv"):
 		model.cross_validation(
