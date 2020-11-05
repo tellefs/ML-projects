@@ -1,5 +1,3 @@
-# This program contains all plotting functions
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
@@ -8,6 +6,8 @@ from data_processing import *
 import seaborn as sns
 
 from statistical_functions import *
+
+''' This program contains all plotting functions'''
 
 def surface_plot(x,y,z_original,z_predicted):
     fig = plt.figure()
@@ -21,8 +21,6 @@ def surface_plot(x,y,z_original,z_predicted):
     # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
-
-
 
 def print_errors(z_train,z_tilde,z_test,z_predict):
 	print("Training R2")

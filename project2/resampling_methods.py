@@ -23,18 +23,22 @@ from regression_methods import *
 seed = 2021
 
 class Resampling():
-
 	def __init__(self, inst):
+		''' Resampling class containing k-fold cross-validation or no-resampling option''' 
 		self.inst = inst
 
-	def cross_validation(self, nrk, seed, minimization_method, regression_method, poly_deg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
-
+	def cross_validation(
+		self, nrk, seed, minimization_method, 
+		regression_method, poly_deg, n_epochs=1000, t0=1, 
+		t1=1000, eta=0.001, lamb=0.001, min_size=5, 
+		n_iterations=10000):
+		''' k-fold cross-validation
+		minimization_method takes values "matrix_inv", "SGD", "GD",  "SGD_SKL"
+		regression_method takes values "OLS" and "Ridge" '''
 		np.random.seed(seed)
 
 		inst = self.inst
-
 		inst.design_matrix(poly_deg)
-	
 		inst.split_minibatch(False, nrk)
 	
 		MSError_test_CV = np.zeros(nrk)
@@ -48,6 +52,7 @@ class Resampling():
 
 		fit = Fitting(inst)
 	
+		# loop over folds
 		for k in range(nrk):
 
 			inst.X_test = inst.split_matrix[k]
@@ -61,6 +66,7 @@ class Resampling():
 			z_train = np.delete(z_train,k,0)
 			inst.z_train = np.ravel(z_train)
 
+			# refression
 			if(minimization_method == "matrix_inv"):	
 				if(regression_method == "Ridge"):
 					fit.ridge(lamb)
@@ -79,6 +85,7 @@ class Resampling():
 			z_tilde_stored = z_tilde_stored + fit.z_tilde
 			z_predict_stored = z_predict_stored + fit.z_predict
 
+			# Calculating scores
 			R2_test_CV[k] = R2(inst.z_test,fit.z_predict)
 			R2_train_CV[k] = R2(inst.z_train,fit.z_tilde)
 			MSError_test_CV[k] = MSE(fit.z_predict,inst.z_test)
@@ -94,15 +101,22 @@ class Resampling():
 
 
 
-	def no_resampling(self, seed, minimization_method, regression_method, poly_deg, n_epochs=1000, t0=1, t1=1000, eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
-		
+	def no_resampling(
+		self, seed, minimization_method, regression_method, 
+		poly_deg, n_epochs=1000, t0=1, t1=1000, 
+		eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
+		''' No resampling
+		minimization_method takes values "matrix_inv", "SGD", "GD",  "SGD_SKL"
+		regression_method takes values "OLS" and "Ridge" '''
+
 		np.random.seed(seed)
 
 		inst = self.inst
 		inst.design_matrix(poly_deg)
 		inst.test_train_split(0.2)
 		fit = Fitting(inst)
-	
+		
+		# regression
 		if(minimization_method == "matrix_inv"):	
 			if(regression_method == "Ridge"):
 				fit.ridge(lamb)

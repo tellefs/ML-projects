@@ -1,20 +1,6 @@
-# The main program is used to collecting results for the Franke's function
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 from random import random, seed
-from imageio import imread
-
-from sklearn.model_selection import train_test_split
-import scipy.linalg as scl
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.utils import resample
-from sklearn.linear_model import LinearRegression
-import sklearn.linear_model as skl
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from sklearn.linear_model import SGDRegressor
 
 from statistical_functions import *
 from data_processing import Data
@@ -25,26 +11,25 @@ from neuralnetwork import NeuralNetwork
 from activation_functions import *
 
 from sklearn.neural_network import MLPClassifier #For Classification
-from sklearn.neural_network import MLPRegressor #For Regression
-from keras_NN import Create_NeuralNetwork_Keras
-
-import tensorflow as tf
-from tensorflow.keras.layers import Input
-from tensorflow.keras.models import Sequential      #This allows appending layers to existing models
-from tensorflow.keras.layers import Dense           #This allows defining the characteristics of a particular layer
-from tensorflow.keras import optimizers             #This allows using whichever optimiser we want (sgd,adam,RMSprop)
-from tensorflow.keras import regularizers           #This allows using whichever regularizer we want (l1,l2,l1_l2)
-from tensorflow.keras.utils import to_categorical   #This allows using categorical cross entropy as the cost function
-from tensorflow.keras.models import Model
-from tensorflow import keras
-from keras.regularizers import l2
 
 from sklearn import datasets # MNIST dataset
 
+''' Task d
+
+	The following file contains the code used to perform all studies 
+	for the task d of the project. User defines which type of NN 
+	will be used (self made NN, SKL).
+
+	Depending on choice of study, either study of accuracy is run for 
+	different number of hidden layers ("hidden layers"), number of epochs ("epochs"),
+	number of neurons ("neurons"), or gridd search ("grid search")
+
+	study: "simple analysis", "epochs", "hidden layers", "neurons", "grid search"
+	activation_function: "sigmoid", "relu", "leaky relu", "tanh"
+	NN_type = "self made", "skl"
+''' 
+
 # -----------------------------------------------NN---------------------------------------------
-
-from sklearn import datasets
-
 
 # Ensure the same random numbers appear every time
 np.random.seed(2020)
@@ -84,32 +69,46 @@ n_inputs, n_features = X_train.shape
 digits = Data()
 Y_train_onehot, Y_test_onehot = digits.to_categorical_numpy(Y_train), digits.to_categorical_numpy(Y_test)
 
-
+# user defined settings
 epochs = 100
 batch_size = 50
 eta = 0.01
 lamb = 0.01
 n_categories = 10
-study = "simple analysis" # "simple analysis", "epochs", "hidden layers", "neurons", "grid search"
-activation_function = "sigmoid" # "sigmoid", "relu", "leaky relu", "tanh"
-NN_type = "self made" # "self made", "skl"
+
+study = "simple analysis" 
+activation_function = "sigmoid" 
+NN_type = "self made" 
 
 # ---------------------------------------------- Simple analysis ---------------------------------------------
+# Simple study of accuracy for different NN
 if(study == "simple analysis"):
 	if(NN_type == "self made"):
 
+		# Setting number of hidden layers and neurons in each layer
 		num_hidd_layers = 3
 		nodes_in_hidd_layers = [50, 50, 50]
 		
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax", hidden_act_func=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(
+			X_train, Y_train_onehot, 
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
+			n_categories=n_categories, epochs=epochs, 
+			batch_size=batch_size, eta=eta, 
+			out_act_func = "softmax", hidden_act_func=activation_function, 
+			lmbd=lamb)
+
 		NN.train()
-		
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
 
 	elif(NN_type == "skl"):
 
-		NN = MLPClassifier(hidden_layer_sizes=(50,50,50), activation='logistic',alpha=lamb, learning_rate_init=eta, max_iter=1000, solver='sgd', batch_size = batch_size)
+		NN = MLPClassifier(
+			hidden_layer_sizes=(50,50,50), activation='logistic',
+			alpha=lamb, learning_rate_init=eta, 
+			max_iter=1000, solver='sgd', 
+			batch_size = batch_size)
+
 		NN.fit(X_train, Y_train)
 		Y_predict = NN.predict(X_test) 
 		Y_tilde = NN.predict(X_train)
@@ -119,12 +118,15 @@ if(study == "simple analysis"):
 	print("Accuracy score on training set: ", accuracy_score(Y_train, Y_tilde))
 	print("%.4f" % accuracy_score(Y_train, Y_tilde))
 
-if(study == "hidden layers"):
 # ---------------------------------------------- Hidden layers ---------------------------------------------
+# Study of accuracy dependence on the number of hidden layers
+if(study == "hidden layers"):
 
+	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 1
 	nodes_in_hidd_layers = [50]
 	
+	# Setting files
 	filename = "Files/Class_hidd_layers.txt"
 	f = open(filename, "w")
 	f.write("num_hidd_layers   Acctrain  Acctest\n")
@@ -133,22 +135,34 @@ if(study == "hidden layers"):
 	f = open(filename, "a")
 	
 	for i in range(12):
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(
+			X_train, Y_train_onehot, 
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
+			n_categories=n_categories, epochs=epochs, 
+			batch_size=batch_size, eta=eta, 
+			out_act_func = "softmax",hidden_act_func=activation_function, 
+			lmbd=lamb)
+
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
+
 		f.write("{0} {1} {2}\n".format(num_hidd_layers, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 		num_hidd_layers=num_hidd_layers+1
 		nodes_in_hidd_layers.append(50)
 	
 	f.close()			
 
-if(study == "neurons"):
 # ---------------------------------------------- Number of neurons ---------------------------------------------
+# Study of R2 and MSE dependence on the number of neurons
+if(study == "neurons"):
+
+	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 1
 	nodes_in_hidd_layers = [1]
 	neurons = 1
 	
+	# Setting files
 	filename = "Files/Class_hidd_neurons.txt"
 	f = open(filename, "w")
 	f.write("NumNeurons   Acctrain  Acctest\n")
@@ -157,10 +171,18 @@ if(study == "neurons"):
 	f = open(filename, "a")
 	
 	for i in range(50):
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(
+			X_train, Y_train_onehot, 
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
+			n_categories=n_categories, epochs=epochs, 
+			batch_size=batch_size, eta=eta, 
+			out_act_func = "softmax",hidden_act_func=activation_function, 
+			lmbd=lamb)
+
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
+
 		f.write("{0} {1} {2}\n".format(neurons, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 		neurons=neurons+1
 		nodes_in_hidd_layers[0]=neurons
@@ -168,9 +190,13 @@ if(study == "neurons"):
 	f.close()
 if(study == "epochs"):
 # ---------------------------------------------- Number of epochs ---------------------------------------------
+# Study of accuracy dependence on the number of epochs
+
+	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 3
 	nodes_in_hidd_layers = [50,50,50]
 	
+	# Setting files
 	filename = "Files/Class_epochs.txt"
 	f = open(filename, "w")
 	f.write("epochs   Acctrain  Acctest\n")
@@ -181,10 +207,19 @@ if(study == "epochs"):
 	f = open(filename, "a")
 	
 	for ep in epochs:
-		NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=ep, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
+		NN = NeuralNetwork(
+			X_train, Y_train_onehot, 
+			n_hidden_layers = num_hidd_layers, 
+			n_hidden_neurons = nodes_in_hidd_layers, 
+			n_categories=n_categories, epochs=ep, 
+			batch_size=batch_size, eta=eta, 
+			out_act_func = "softmax",hidden_act_func=activation_function, 
+			lmbd=lamb)
+
 		NN.train()
 		Y_predict = NN.predict_class(X_test)
 		Y_tilde = NN.predict_class(X_train)
+
 		f.write("{0} {1} {2}\n".format(ep, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 	
 	f.close()
@@ -194,10 +229,12 @@ if(study == "grid search"):
 
 	lambdas = [0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
 	etas = [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001]
-	
+
+	# Setting number of hidden layers and neurons in each layer	
 	num_hidd_layers = 3
 	nodes_in_hidd_layers = [50,50,50]
 	
+	# Setting files
 	filename = "Files/Class_Ridge_grid_search_3_layers.txt"
 	f = open(filename, "w")
 	f.write("lambda   eta   Acctrain  Acctest\n")
@@ -207,11 +244,20 @@ if(study == "grid search"):
 	
 	for lamb in lambdas:
 		for eta in etas:
-			NN = NeuralNetwork(X_train, Y_train_onehot, n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, n_categories=n_categories, epochs=epochs, batch_size=batch_size, eta=eta, out_act_func = "softmax",hidden_act_func=activation_function, lmbd=lamb)
+			NN = NeuralNetwork(
+				X_train, Y_train_onehot, 
+				n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
+				n_categories=n_categories, epochs=epochs, 
+				batch_size=batch_size, eta=eta, 
+				out_act_func = "softmax",hidden_act_func=activation_function, 
+				lmbd=lamb)
+
 			NN.train()
 			Y_predict = NN.predict_class(X_test)
 			Y_tilde = NN.predict_class(X_train)
-			f.write("{0} {1} {2} {3}\n".format(lamb, eta, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
-			print(lamb)
+
+			f.write("{0} {1} {2} {3}\n".format(
+				lamb, eta, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
+
 	f.close()
 

@@ -1,21 +1,6 @@
-# The main program is used to collecting results for the Franke's function
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from random import random, seed
-from imageio import imread
-
-from sklearn.model_selection import train_test_split
-import scipy.linalg as scl
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.utils import resample
-from sklearn.linear_model import LinearRegression
-import sklearn.linear_model as skl
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from sklearn.linear_model import SGDRegressor
-from sklearn.linear_model import LogisticRegression
 
 from statistical_functions import *
 from data_processing import Data
@@ -25,22 +10,17 @@ from resampling_methods import Resampling
 from neuralnetwork import NeuralNetwork
 from activation_functions import *
 
-from sklearn.neural_network import MLPClassifier #For Classification
-from sklearn.neural_network import MLPRegressor #For Regression
-from keras_NN import Create_NeuralNetwork_Keras
-
-import tensorflow as tf
-from tensorflow.keras.layers import Input
-from tensorflow.keras.models import Sequential      #This allows appending layers to existing models
-from tensorflow.keras.layers import Dense           #This allows defining the characteristics of a particular layer
-from tensorflow.keras import optimizers             #This allows using whichever optimiser we want (sgd,adam,RMSprop)
-from tensorflow.keras import regularizers           #This allows using whichever regularizer we want (l1,l2,l1_l2)
-from tensorflow.keras.utils import to_categorical   #This allows using categorical cross entropy as the cost function
-from tensorflow.keras.models import Model
-from tensorflow import keras
-from keras.regularizers import l2
-
+from sklearn.linear_model import LogisticRegression
 from sklearn import datasets # MNIST dataset
+
+''' Task e
+
+	The following file contains the code used to perform all studies 
+	for the task e of the project. User defines which option for the logistic 
+	regression to run (SGD-based, GD-based of scikit-learn.
+
+	option: "SGD", "GD", "SKL Logistic"
+''' 
 
 # -----------------------------------------------Logistic regression---------------------------------------------
 
@@ -95,22 +75,40 @@ n_categories = 10
 #For the GD
 n_iterations = 100000
 
-option = "SGD" #"SGD", "GD", "SKL Logistic"
+# user defined option
+option = "SGD" 
 
+# setting the model
 model = Fitting(digits)
 
+# --------------------------------------- GD based Logistic regression--------------------------------------
 if(option == "GD"):
 
-	y_pred, y_tilde = model.logistic_regression(X_train, X_test, Y_train_onehot, n_iterations = n_iterations, eta = 0.001, option = "GD", lamb = lamb)
+	y_pred, y_tilde = model.logistic_regression(
+		X_train, X_test, 
+		Y_train_onehot, 
+		n_iterations = n_iterations, 
+		eta = 0.001, 
+		option = "GD", 
+		lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
 
+# --------------------------------------- SGD based Logistic regression--------------------------------------
 elif(option == "SGD"):
 
-	y_pred, y_tilde = model.logistic_regression(X_train, X_test, Y_train_onehot, epochs = epochs, eta = eta, option = "SGD", lamb = lamb)
+	y_pred, y_tilde = model.logistic_regression(
+		X_train, 
+		X_test, 
+		Y_train_onehot, 
+		epochs = epochs, 
+		eta = eta, 
+		option = "SGD", 
+		lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
 
+# --------------------------------------- SKL Logistic regression--------------------------------------
 elif(option == "SKL Logistic"):
 
 	if(lamb>0):

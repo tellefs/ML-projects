@@ -6,12 +6,13 @@ from activation_functions import *
 from sklearn.linear_model import SGDRegressor
 
 class Fitting():
-
 	def __init__(self, inst):
+		''' Fitting class containing OLS and ridge with matrix inversion, 
+		SGD, GD and SKL SGD'''
 		self.inst = inst
 
 	def OLS(self):
-
+		''' OLS with matrix inversion'''
 		inst = self.inst
 		beta = np.linalg.pinv(inst.X_train.T.dot(inst.X_train)).dot(inst.X_train.T.dot(inst.z_train))
 		self.z_predict = inst.X_test.dot(beta)
@@ -20,7 +21,7 @@ class Fitting():
 		self.beta = beta
 
 	def ridge(self, lamb):
-
+		''' ridge with matrix inversion'''
 		inst = self.inst
 		I = np.identity(len(inst.X_train[0,:]))
 		beta = np.linalg.pinv(inst.X_train.T.dot(inst.X_train)+lamb*I).dot(inst.X_train.T.dot(inst.z_train))
@@ -30,13 +31,14 @@ class Fitting():
 		self.beta = beta
 
 	def SGD(self, n_epochs, t0, t1, seed, regression_method, lamb):
-
+		''' Stochastic gradient descent for a given number of epochs and eta=t0/t1'''
 		np.random.seed(seed)
 
 		inst = self.inst
 		len_beta = len(inst.X_train[0,:])
 		beta = np.ones(len_beta)
 
+		# Looping over number of epochs
 		for epoch in range(n_epochs):
 			for i in range(inst.n_minibatch):
 				k = np.random.randint(inst.n_minibatch) #Pick the k-th minibatch at random
@@ -57,7 +59,7 @@ class Fitting():
 		self.beta = beta
 
 	def SGD_SKL(self, eta, seed, regression_method, lamb):
-
+		''' Scikit-learn based stochastic gradient descent'''
 		np.random.seed(seed)
 
 		inst = self.inst
@@ -74,7 +76,7 @@ class Fitting():
 		self.beta = sgdreg.coef_
 
 	def GD(self, Niterations, eta, seed, regression_method, lamb):
-
+		''' Standard gradient descent for a given number of epochs and eta'''
 		np.random.seed(seed)
 
 		inst = self.inst
@@ -95,8 +97,11 @@ class Fitting():
 		self.z_plot = inst.X.dot(beta)
 		self.beta = beta
 
-	def logistic_regression(self, X, X_test, y, Niterations = 100000, eta = 0.001, option = "GD", epochs = 100, lamb = 0.001):
-
+	def logistic_regression(
+		self, X, X_test, 
+		y, Niterations = 100000, eta = 0.001, 
+		option = "GD", epochs = 100, lamb = 0.001):
+		''' Logistic gradient descent taking two options: "SGD" and "GD"'''
 		x1 = X.shape[0]
 		x2 = X.shape[1]
 	
@@ -106,7 +111,7 @@ class Fitting():
 		beta = np.ones((x2,y2))
 
 		if(option == "GD"):
-	
+			''' GD-based logistic regression''' 		
 			for i in range(Niterations):
 				y_curr = X @ beta
 				probability = softmax(y_curr)
@@ -119,7 +124,7 @@ class Fitting():
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
 		
 		if(option == "SGD"):
-
+			''' SGD-based logistic regression''' 
 			n_inputs = X.shape[0]
 			batch_size = 50
 

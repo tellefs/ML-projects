@@ -1,22 +1,26 @@
-# All activation functions and their derivatives
-
 import numpy as np
 
+''' File contains all operations on activation functions'''
+
 def sigmoid(x):
+	''' Sigmoid activation function'''
 	return 1.0/(1.0 + np.exp(-x))
 
 def ReLU(x):
+	''' ReLU activation function'''
 	return np.maximum(0,x)
 
 def leaky_ReLU(x):
+	''' Leaky ReLU activation function'''
 	return np.where(x<=0, 0.001*x, x)
 
 def softmax(x):
+	''' Softmax activation function'''
 	exp_term = np.exp(x)
 	return exp_term / np.sum(exp_term, axis=1, keepdims=True)
 
 def set_activation_function(x, activation_function):
-
+	''' Function returns an activation function according to the choice'''
 	if(activation_function =="softmax"):
 		return softmax(x)
 	elif(activation_function =="sigmoid"):
@@ -33,7 +37,8 @@ def set_activation_function(x, activation_function):
 		return np.heaviside(x, 0)
 
 def set_activation_function_deriv(x, activation_function):
-
+	''' Function returns a derivative of an activation 
+	function according to the choice'''
 	if(activation_function =="softmax"):
 		return softmax(x)*(1-softmax(x))
 	elif(activation_function =="sigmoid"):
