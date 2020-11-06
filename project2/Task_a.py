@@ -1,20 +1,20 @@
 import numpy as np
 from random import random, seed
 
-from statistical_functions import *
-from data_processing import Data
-from print_and_plot import *
-from regression_methods import Fitting
-from resampling_methods import Resampling
+from src.statistical_functions import *
+from src.data_processing import Data
+from src.print_and_plot import *
+from src.regression_methods import Fitting
+from src.resampling_methods import Resampling
 
 ''' Task a
 
-	The following file contains the code used to perform all studies 
+	The following file contains the code used to perform all studies
 	for the first task of the project. User defines whether k-fold
-	cross validation is used or not by setting resampling_method to 
+	cross validation is used or not by setting resampling_method to
 	"cv" or "no resampling".
 
-	Depending on choice of study, either study of R2 and MSE is run for 
+	Depending on choice of study, either study of R2 and MSE is run for
 	different learning rates ("learning rate"), number of epochs ("epochs"),
 	number of minibatches ("minibatches"), or ridge gridd search ("Ridge grid search")
 
@@ -22,7 +22,7 @@ from resampling_methods import Resampling
 	regression_method: "OLS", "Ridge"
 	minimization_method: "matrix_inv", "SGD", "GD", "SGD_SKL"
 	study: "learning rate", "epochs", "minibatches", "simple analysis", "Ridge grid search"
-''' 
+'''
 
 # Setting the Franke's function
 poly_deg = 5
@@ -39,10 +39,10 @@ eta = 0.001 	# constant eta
 n_iterations = 100000	   # number of iterations for the GD
 
 # user-defined settings
-resampling_method = "cv" 	
-regression_method ="Ridge" 	   
-minimization_method = "SGD"    
-study = "simple analysis"      
+resampling_method = "cv"
+regression_method ="Ridge"
+minimization_method = "SGD"
+study = "simple analysis"
 
 # Setting Data
 franke_data = Data()
@@ -57,7 +57,7 @@ franke_data.data_scaling()
 model = Resampling(franke_data)
 
 
-if(study == "learning rate"): 
+if(study == "learning rate"):
 # -------------------------------------------------Learning rate OLS -----------------------------------------------
 # Simple study of R2 and MSE dependence on the learning rate
 
@@ -66,16 +66,16 @@ if(study == "learning rate"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/Ridge_SGD_MSE_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
 
 	t1_array = [
-		500, 1000, 2000, 3000, 
-		4000, 5000, 10000, 20000, 
-		30000, 40000, 50000, 100000, 
+		500, 1000, 2000, 3000,
+		4000, 5000, 10000, 20000,
+		30000, 40000, 50000, 100000,
 		200000, 300000, 400000, 500000, 1000000
 		]
 
@@ -86,16 +86,16 @@ if(study == "learning rate"):
 		eta = t0/t1
 		if(resampling_method == "cv"):
 			model.cross_validation(
-				5, seed, minimization_method, 
-				regression_method, poly_deg, n_epochs=n_epochs, 
-				t0=t0, t1=t1, eta=eta, 
-				lamb=lamb, min_size=min_size, n_iterations=n_iterations)	
+				5, seed, minimization_method,
+				regression_method, poly_deg, n_epochs=n_epochs,
+				t0=t0, t1=t1, eta=eta,
+				lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 
 		elif(resampling_method == "no resampling"):
 			model.no_resampling(
-				seed, minimization_method, regression_method, 
+				seed, minimization_method, regression_method,
 				poly_deg, n_epochs=n_epochs, t0=t0,
-				t1=t1, eta=eta, lamb=lamb, 
+				t1=t1, eta=eta, lamb=lamb,
 				min_size=min_size, n_iterations=n_iterations)
 
 		f_1.write("{0} {1} {2}\n".format(eta, model.R2_train, model.R2_test))
@@ -103,7 +103,7 @@ if(study == "learning rate"):
 	f_1.close()
 	f_2.close()
 
-elif(study == "minibatches"): 
+elif(study == "minibatches"):
 # ------------------------------------------------ Minibatch size -------------------------------------------------
 # Study of R2 and MSE dependence on the minibatch size
 
@@ -112,30 +112,30 @@ elif(study == "minibatches"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/Ridge_SGD_MSE_minibatch_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
-	
+
 	minibatches = [1,5,10,15,20,30,45,60,90]
-	
+
 	f_1 = open(filename_1, "a")
 	f_2 = open(filename_2, "a")
 
 	for min_size in minibatches:
 		if(resampling_method == "cv"):
 			model.cross_validation(
-				5, seed, minimization_method, 
+				5, seed, minimization_method,
 				regression_method, poly_deg, n_epochs=n_epochs,
-				t0=t0, t1=t1, eta=eta, 
+				t0=t0, t1=t1, eta=eta,
 				lamb=lamb, min_size=min_size, n_iterations=n_iterations)
 
 		elif(resampling_method == "no resampling"):
 			model.no_resampling(
-				seed, minimization_method, regression_method, 
-				poly_deg, n_epochs=n_epochs, t0=t0, 
-				t1=t1, eta=eta, lamb=lamb, 
+				seed, minimization_method, regression_method,
+				poly_deg, n_epochs=n_epochs, t0=t0,
+				t1=t1, eta=eta, lamb=lamb,
 				min_size=min_size, n_iterations=n_iterations)
 
 		f_1.write("{0} {1} {2}\n".format(min_size, model.R2_train, model.R2_test))
@@ -143,7 +143,7 @@ elif(study == "minibatches"):
 	f_1.close()
 	f_2.close()
 
-elif(study == "epochs"): 
+elif(study == "epochs"):
 # ------------------------------------------------ Number of epochs -------------------------------------------------
 # Study of R2 and MSE dependence on the number of epochs
 
@@ -152,30 +152,30 @@ elif(study == "epochs"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/Ridge_SGD_MSE_epoch_0_1.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
 	f_2.close()
-	
+
 	epochs_array = [10,100,1000,10000,100000]
-	
+
 	f_1 = open(filename_1, "a")
 	f_2 = open(filename_2, "a")
 
 	for n_epochs in epochs_array:
 		if(resampling_method == "cv"):
 			model.cross_validation(
-				5, seed, minimization_method, regression_method, 
-				poly_deg, n_epochs=n_epochs, t0=t0, 
-				t1=t1, eta=eta, lamb=lamb, 
+				5, seed, minimization_method, regression_method,
+				poly_deg, n_epochs=n_epochs, t0=t0,
+				t1=t1, eta=eta, lamb=lamb,
 				min_size=min_size, n_iterations=n_iterations)
 
 		elif(resampling_method == "no resampling"):
 			model.no_resampling(
-				seed, minimization_method, regression_method, 
-				poly_deg, n_epochs=n_epochs, t0=t0, 
-				t1=t1, eta=eta, lamb=lamb, 
+				seed, minimization_method, regression_method,
+				poly_deg, n_epochs=n_epochs, t0=t0,
+				t1=t1, eta=eta, lamb=lamb,
 				min_size=min_size, n_iterations=n_iterations)
 
 		f_1.write("{0} {1} {2}\n".format(n_epochs, model.R2_train, model.R2_test))
@@ -184,7 +184,7 @@ elif(study == "epochs"):
 	f_1.close()
 	f_2.close()
 
-elif(study == "Ridge grid search"): 
+elif(study == "Ridge grid search"):
 # ------------------------------------------------ Ridge grid search -------------------------------------------------
 # Grid search for Ridge
 
@@ -196,7 +196,7 @@ elif(study == "Ridge grid search"):
 	filename_2 = "Files/Ridge_test_R2_fine.txt"
 	filename_3 = "Files/Ridge_train_MSE_fine.txt"
 	filename_4 = "Files/Ridge_train_R2_fine.txt"
-	
+
 	f_1 = open(filename_1, "w")
 	f_1.write("lambda   eta  MSEtest\n")
 	f_1.close()
@@ -209,7 +209,7 @@ elif(study == "Ridge grid search"):
 	f_4 = open(filename_4, "w")
 	f_4.write("lambda   eta  R2train\n")
 	f_4.close()
-	
+
 	f_1 = open(filename_1, "a")
 	f_2 = open(filename_2, "a")
 	f_3 = open(filename_3, "a")
@@ -219,16 +219,16 @@ elif(study == "Ridge grid search"):
 		for t1 in t1_array:
 			if(resampling_method == "cv"):
 				model.cross_validation(
-					5, seed, minimization_method, regression_method, 
-					poly_deg, n_epochs=n_epochs, t0=t0, 
-					t1=t1, eta=eta, lamb=lamb, 
+					5, seed, minimization_method, regression_method,
+					poly_deg, n_epochs=n_epochs, t0=t0,
+					t1=t1, eta=eta, lamb=lamb,
 					min_size=min_size, n_iterations=n_iterations)
 
 			elif(resampling_method == "no resampling"):
 				model.no_resampling(
-					seed, minimization_method, regression_method, 
-					poly_deg, n_epochs=n_epochs, t0=t0, 
-					t1=t1, eta=eta, lamb=lamb, 
+					seed, minimization_method, regression_method,
+					poly_deg, n_epochs=n_epochs, t0=t0,
+					t1=t1, eta=eta, lamb=lamb,
 					min_size=min_size, n_iterations=n_iterations)
 
 			f_1.write("{0} {1} {2}\n".format(lamb, 1.0/t1, model.MSE_test))
@@ -242,21 +242,21 @@ elif(study == "Ridge grid search"):
 
 # ------------------------------------------------ Simple analysis -------------------------------------------------
 # MSE and R2 for the initially chosen parameters
-	
+
 elif(study == "simple analysis"):
 
 	if(resampling_method == "cv"):
 		model.cross_validation(
-			5, seed, minimization_method, regression_method, 
-			poly_deg, n_epochs=n_epochs, t0=t0, 
-			t1=t1, eta=eta, lamb=lamb, 
+			5, seed, minimization_method, regression_method,
+			poly_deg, n_epochs=n_epochs, t0=t0,
+			t1=t1, eta=eta, lamb=lamb,
 			min_size=min_size, n_iterations=n_iterations)
 
 	elif(resampling_method == "no resampling"):
 		model.no_resampling(
-			seed, minimization_method, regression_method, 
-			poly_deg, n_epochs=n_epochs, t0=t0, 
-			t1=t1, eta=eta, lamb=lamb, 
+			seed, minimization_method, regression_method,
+			poly_deg, n_epochs=n_epochs, t0=t0,
+			t1=t1, eta=eta, lamb=lamb,
 			min_size=min_size, n_iterations=n_iterations)
 
 	franke_data.z_scaled = model.z_plot # This is for plotting all data points at once
@@ -275,10 +275,8 @@ elif(study == "simple analysis"):
 	print(model.MSE_test)
 	print("Test R2:")
 	print(model.R2_test)
-	
+
 	#Plotting the surface
 	surface_plot(
-		franke_data.x_rescaled, franke_data.y_rescaled, 
+		franke_data.x_rescaled, franke_data.y_rescaled,
 		franke_data.z_mesh, franke_data.z_rescaled)
-
-

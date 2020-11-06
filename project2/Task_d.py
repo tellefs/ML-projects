@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from random import random, seed
 
-from statistical_functions import *
-from data_processing import Data
-from print_and_plot import *
-from regression_methods import Fitting
-from resampling_methods import Resampling
-from neuralnetwork import NeuralNetwork
-from activation_functions import *
+from src.statistical_functions import *
+from src.data_processing import Data
+from src.print_and_plot import *
+from src.regression_methods import Fitting
+from src.resampling_methods import Resampling
+from src.neuralnetwork import NeuralNetwork
+from src.activation_functions import *
 
 from sklearn.neural_network import MLPClassifier #For Classification
 
@@ -16,18 +16,18 @@ from sklearn import datasets # MNIST dataset
 
 ''' Task d
 
-	The following file contains the code used to perform all studies 
-	for the task d of the project. User defines which type of NN 
+	The following file contains the code used to perform all studies
+	for the task d of the project. User defines which type of NN
 	will be used (self made NN, SKL).
 
-	Depending on choice of study, either study of accuracy is run for 
+	Depending on choice of study, either study of accuracy is run for
 	different number of hidden layers ("hidden layers"), number of epochs ("epochs"),
 	number of neurons ("neurons"), or gridd search ("grid search")
 
 	study: "simple analysis", "epochs", "hidden layers", "neurons", "grid search"
 	activation_function: "sigmoid", "relu", "leaky relu", "tanh"
 	NN_type = "self made", "skl"
-''' 
+'''
 
 # -----------------------------------------------NN---------------------------------------------
 
@@ -76,9 +76,9 @@ eta = 0.01
 lamb = 0.01
 n_categories = 10
 
-study = "simple analysis" 
-activation_function = "sigmoid" 
-NN_type = "self made" 
+study = "simple analysis"
+activation_function = "sigmoid"
+NN_type = "self made"
 
 # ---------------------------------------------- Simple analysis ---------------------------------------------
 # Simple study of accuracy for different NN
@@ -88,13 +88,13 @@ if(study == "simple analysis"):
 		# Setting number of hidden layers and neurons in each layer
 		num_hidd_layers = 3
 		nodes_in_hidd_layers = [50, 50, 50]
-		
+
 		NN = NeuralNetwork(
-			X_train, Y_train_onehot, 
-			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-			n_categories=n_categories, epochs=epochs, 
-			batch_size=batch_size, eta=eta, 
-			out_act_func = "softmax", hidden_act_func=activation_function, 
+			X_train, Y_train_onehot,
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+			n_categories=n_categories, epochs=epochs,
+			batch_size=batch_size, eta=eta,
+			out_act_func = "softmax", hidden_act_func=activation_function,
 			lmbd=lamb)
 
 		NN.train()
@@ -105,14 +105,14 @@ if(study == "simple analysis"):
 
 		NN = MLPClassifier(
 			hidden_layer_sizes=(50,50,50), activation='logistic',
-			alpha=lamb, learning_rate_init=eta, 
-			max_iter=1000, solver='sgd', 
+			alpha=lamb, learning_rate_init=eta,
+			max_iter=1000, solver='sgd',
 			batch_size = batch_size)
 
 		NN.fit(X_train, Y_train)
-		Y_predict = NN.predict(X_test) 
+		Y_predict = NN.predict(X_test)
 		Y_tilde = NN.predict(X_train)
-	
+
 	print("Accuracy score on test set: ", accuracy_score(Y_test, Y_predict))
 	print("%.4f" % accuracy_score(Y_test, Y_predict))
 	print("Accuracy score on training set: ", accuracy_score(Y_train, Y_tilde))
@@ -125,22 +125,22 @@ if(study == "hidden layers"):
 	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 1
 	nodes_in_hidd_layers = [50]
-	
+
 	# Setting files
 	filename = "Files/Class_hidd_layers.txt"
 	f = open(filename, "w")
 	f.write("num_hidd_layers   Acctrain  Acctest\n")
 	f.close()
-	
+
 	f = open(filename, "a")
-	
+
 	for i in range(12):
 		NN = NeuralNetwork(
-			X_train, Y_train_onehot, 
-			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-			n_categories=n_categories, epochs=epochs, 
-			batch_size=batch_size, eta=eta, 
-			out_act_func = "softmax",hidden_act_func=activation_function, 
+			X_train, Y_train_onehot,
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+			n_categories=n_categories, epochs=epochs,
+			batch_size=batch_size, eta=eta,
+			out_act_func = "softmax",hidden_act_func=activation_function,
 			lmbd=lamb)
 
 		NN.train()
@@ -150,8 +150,8 @@ if(study == "hidden layers"):
 		f.write("{0} {1} {2}\n".format(num_hidd_layers, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 		num_hidd_layers=num_hidd_layers+1
 		nodes_in_hidd_layers.append(50)
-	
-	f.close()			
+
+	f.close()
 
 # ---------------------------------------------- Number of neurons ---------------------------------------------
 # Study of R2 and MSE dependence on the number of neurons
@@ -161,22 +161,22 @@ if(study == "neurons"):
 	num_hidd_layers = 1
 	nodes_in_hidd_layers = [1]
 	neurons = 1
-	
+
 	# Setting files
 	filename = "Files/Class_hidd_neurons.txt"
 	f = open(filename, "w")
 	f.write("NumNeurons   Acctrain  Acctest\n")
 	f.close()
-	
+
 	f = open(filename, "a")
-	
+
 	for i in range(50):
 		NN = NeuralNetwork(
-			X_train, Y_train_onehot, 
-			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-			n_categories=n_categories, epochs=epochs, 
-			batch_size=batch_size, eta=eta, 
-			out_act_func = "softmax",hidden_act_func=activation_function, 
+			X_train, Y_train_onehot,
+			n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+			n_categories=n_categories, epochs=epochs,
+			batch_size=batch_size, eta=eta,
+			out_act_func = "softmax",hidden_act_func=activation_function,
 			lmbd=lamb)
 
 		NN.train()
@@ -186,7 +186,7 @@ if(study == "neurons"):
 		f.write("{0} {1} {2}\n".format(neurons, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 		neurons=neurons+1
 		nodes_in_hidd_layers[0]=neurons
-	
+
 	f.close()
 if(study == "epochs"):
 # ---------------------------------------------- Number of epochs ---------------------------------------------
@@ -195,25 +195,25 @@ if(study == "epochs"):
 	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 3
 	nodes_in_hidd_layers = [50,50,50]
-	
+
 	# Setting files
 	filename = "Files/Class_epochs.txt"
 	f = open(filename, "w")
 	f.write("epochs   Acctrain  Acctest\n")
 	f.close()
-	
+
 	epochs = np.arange(20,1020,20)
-	
+
 	f = open(filename, "a")
-	
+
 	for ep in epochs:
 		NN = NeuralNetwork(
-			X_train, Y_train_onehot, 
-			n_hidden_layers = num_hidd_layers, 
-			n_hidden_neurons = nodes_in_hidd_layers, 
-			n_categories=n_categories, epochs=ep, 
-			batch_size=batch_size, eta=eta, 
-			out_act_func = "softmax",hidden_act_func=activation_function, 
+			X_train, Y_train_onehot,
+			n_hidden_layers = num_hidd_layers,
+			n_hidden_neurons = nodes_in_hidd_layers,
+			n_categories=n_categories, epochs=ep,
+			batch_size=batch_size, eta=eta,
+			out_act_func = "softmax",hidden_act_func=activation_function,
 			lmbd=lamb)
 
 		NN.train()
@@ -221,7 +221,7 @@ if(study == "epochs"):
 		Y_tilde = NN.predict_class(X_train)
 
 		f.write("{0} {1} {2}\n".format(ep, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
-	
+
 	f.close()
 
 if(study == "grid search"):
@@ -230,26 +230,26 @@ if(study == "grid search"):
 	lambdas = [0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
 	etas = [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001]
 
-	# Setting number of hidden layers and neurons in each layer	
+	# Setting number of hidden layers and neurons in each layer
 	num_hidd_layers = 3
 	nodes_in_hidd_layers = [50,50,50]
-	
+
 	# Setting files
 	filename = "Files/Class_Ridge_grid_search_3_layers.txt"
 	f = open(filename, "w")
 	f.write("lambda   eta   Acctrain  Acctest\n")
 	f.close()
-	
+
 	f = open(filename, "a")
-	
+
 	for lamb in lambdas:
 		for eta in etas:
 			NN = NeuralNetwork(
-				X_train, Y_train_onehot, 
-				n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-				n_categories=n_categories, epochs=epochs, 
-				batch_size=batch_size, eta=eta, 
-				out_act_func = "softmax",hidden_act_func=activation_function, 
+				X_train, Y_train_onehot,
+				n_hidden_layers = num_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+				n_categories=n_categories, epochs=epochs,
+				batch_size=batch_size, eta=eta,
+				out_act_func = "softmax",hidden_act_func=activation_function,
 				lmbd=lamb)
 
 			NN.train()
@@ -260,4 +260,3 @@ if(study == "grid search"):
 				lamb, eta, accuracy_score(Y_train, Y_tilde), accuracy_score(Y_test, Y_predict)))
 
 	f.close()
-

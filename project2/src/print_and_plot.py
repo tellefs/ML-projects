@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from data_processing import *
+from .data_processing import *
 import seaborn as sns
 
-from statistical_functions import *
+from .statistical_functions import *
 
 ''' This program contains all plotting functions'''
 
@@ -374,10 +374,10 @@ def plot_heatmaps_coarse():
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
     axs[1].set_title("$R^2$ for the test set", fontsize=14)
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
-    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
-    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)   
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/Ridge_R2.pdf')
     plt.show()
 
@@ -406,8 +406,8 @@ def plot_heatmaps_coarse():
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
     axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
-    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)    
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/Ridge_MSE.pdf')
     plt.show()
 
@@ -441,10 +441,10 @@ def plot_heatmaps_fine():
     ax=sns.heatmap(r22,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
     axs[1].set_title("$R^2$ for the test set", fontsize=14)
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
-    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0) 
-    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)  
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/Ridge_R2_fine.pdf')
     plt.show()
 
@@ -471,23 +471,23 @@ def plot_heatmaps_fine():
     ax=sns.heatmap(mse2, vmin = 0, vmax =0.45, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis")
     axs[1].set_title("MSE for the test set", fontsize=14)
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
-    axs[1].set_ylabel("$\lambda$", fontsize=14) 
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
-    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)  
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/Ridge_MSE_fine.pdf')
     plt.show()
 
 def NN_epochs():
 
     file = np.loadtxt("Files/NN_MSE_epochs.txt", skiprows=1)
-    epochs  = file[:,0]   
-    mse_train  = file[:,1]  
-    mse_test  = file[:,2]  
+    epochs  = file[:,0]
+    mse_train  = file[:,1]
+    mse_test  = file[:,2]
 
-    file = np.loadtxt("Files/NN_R2_epochs.txt", skiprows=1) 
-    r2_train  = file[:,1]  
-    r2_test  = file[:,2]  
+    file = np.loadtxt("Files/NN_R2_epochs.txt", skiprows=1)
+    r2_train  = file[:,1]
+    r2_test  = file[:,2]
 
     plt.xlabel("Number of epochs",fontsize=12)
     plt.ylabel("MSE",fontsize=12)
@@ -510,13 +510,13 @@ def NN_epochs():
 def NN_layers():
 
     file = np.loadtxt("Files/NN_MSE_layers.txt", skiprows=1)
-    epochs  = file[:,0]   
-    mse_train  = file[:,1]  
-    mse_test  = file[:,2]  
+    epochs  = file[:,0]
+    mse_train  = file[:,1]
+    mse_test  = file[:,2]
 
-    file = np.loadtxt("Files/NN_R2_layers.txt", skiprows=1) 
-    r2_train  = file[:,1]  
-    r2_test  = file[:,2]  
+    file = np.loadtxt("Files/NN_R2_layers.txt", skiprows=1)
+    r2_train  = file[:,1]
+    r2_test  = file[:,2]
 
     plt.xlabel("Number of hidden layers",fontsize=12)
     plt.ylabel("MSE",fontsize=12)
@@ -539,13 +539,13 @@ def NN_layers():
 def NN_neurons():
 
     file = np.loadtxt("Files/NN_MSE_neurons.txt", skiprows=1)
-    epochs  = file[:,0]   
-    mse_train  = file[:,1]  
-    mse_test  = file[:,2]  
+    epochs  = file[:,0]
+    mse_train  = file[:,1]
+    mse_test  = file[:,2]
 
-    file = np.loadtxt("Files/NN_R2_neurons.txt", skiprows=1) 
-    r2_train  = file[:,1]  
-    r2_test  = file[:,2]  
+    file = np.loadtxt("Files/NN_R2_neurons.txt", skiprows=1)
+    r2_train  = file[:,1]
+    r2_test  = file[:,2]
 
     plt.xlabel("Number of neurons",fontsize=12)
     plt.ylabel("MSE",fontsize=12)
@@ -568,9 +568,9 @@ def NN_neurons():
 def class_layers():
 
     file = np.loadtxt("Files/Class_hidd_layers.txt", skiprows=1)
-    layers  = file[:,0]   
-    acc_train  = file[:,1]  
-    acc_test  = file[:,2]  
+    layers  = file[:,0]
+    acc_train  = file[:,1]
+    acc_test  = file[:,2]
 
     plt.xlabel("Number of hidden layers",fontsize=12)
     plt.ylabel("Accuracy",fontsize=12)
@@ -584,9 +584,9 @@ def class_layers():
 def class_neurons():
 
     file = np.loadtxt("Files/Class_hidd_neurons.txt", skiprows=1)
-    neurons  = file[:,0]   
-    acc_train  = file[:,1]  
-    acc_test  = file[:,2]  
+    neurons  = file[:,0]
+    acc_train  = file[:,1]
+    acc_test  = file[:,2]
 
     plt.xlabel("Number of neurons",fontsize=12)
     plt.ylabel("Accuracy",fontsize=12)
@@ -600,9 +600,9 @@ def class_neurons():
 def class_epochs():
 
     file = np.loadtxt("Files/Class_epochs.txt", skiprows=1)
-    epochs  = file[:,0]   
-    acc_train  = file[:,1]  
-    acc_test  = file[:,2]  
+    epochs  = file[:,0]
+    acc_train  = file[:,1]
+    acc_test  = file[:,2]
 
     plt.xlabel("Number of epochs",fontsize=12)
     plt.ylabel("Accuracy",fontsize=12)
@@ -648,9 +648,9 @@ def plot_heatmaps_NN():
     ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
     axs[1].set_title("$R^2$ for the test set", fontsize=14)
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
-    axs[1].set_ylabel("$\lambda$", fontsize=14)  
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
 
     plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/NN_Ridge_R2.pdf')
@@ -674,7 +674,7 @@ def plot_heatmaps_NN():
     axs[1].tick_params(axis="x", labelsize=12)
     axs[1].tick_params(axis="y", labelsize=12,rotation=0)
 
-    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)    
+    plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('Figures/NN_Ridge_MSE.pdf')
     plt.show()
 
@@ -702,12 +702,12 @@ def plot_heatmaps_class():
     axs[0].set_ylabel("$\lambda$", fontsize=14)
     axs[0].tick_params(axis="x", labelsize=12)
     axs[0].tick_params(axis="y", labelsize=12,rotation=0)
-    axs[0].margins(2, 2) 
+    axs[0].margins(2, 2)
 
     ax=sns.heatmap(acc_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="viridis",fmt=".3")
     axs[1].set_title("Accuracy for the test set, Sigmoid activation", fontsize=14)
     axs[1].set_xlabel("$\log_{10}\eta$", fontsize=14)
-    axs[1].set_ylabel("$\lambda$", fontsize=14)  
+    axs[1].set_ylabel("$\lambda$", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
     axs[1].tick_params(axis="y", labelsize=12,rotation=0)
 
@@ -722,28 +722,28 @@ def plot_franke_test_train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     for i in range(np.int(len(X_train[:,0]))):
         abs_train[i]=X_train[i,1]
         ord_train[i]=X_train[i,2]
-    
+
     dataset_scaled = np.stack((abs_train, ord_train, z_train))
     dataset_rescaled = scaler.inverse_transform(dataset_scaled.T)
     abs_train_resc = dataset_rescaled[:,0]
     ord_train_resc = dataset_rescaled[:,1]
     z_train_resc = dataset_rescaled[:,2]
-    
-    
+
+
     abs_test = np.zeros(np.int(len(X_test[:,0])))
     ord_test = np.zeros(np.int(len(X_test[:,0])))
     for i in range(np.int(len(X_test[:,0]))):
         abs_test[i]=X_test[i,1]
         ord_test[i]=X_test[i,2]
-    
+
     dataset_scaled = np.stack((abs_test, ord_test, z_test))
     dataset_rescaled = scaler.inverse_transform(dataset_scaled.T)
     abs_test_resc = dataset_rescaled[:,0]
     ord_test_resc = dataset_rescaled[:,1]
     z_test_resc = dataset_rescaled[:,2]
-    
+
     fig = plt.figure(figsize=(12,5))
-    
+
     axs = fig.add_subplot(1, 3, 1, projection='3d')
     surf = axs.plot_surface(x, y, z_noise, cmap="viridis",linewidth=0, antialiased=False)
     axs.zaxis.set_major_locator(LinearLocator(10))
@@ -754,7 +754,7 @@ def plot_franke_test_train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     axs.set_zlabel("z", fontsize=12)
     axs.set_zlim(-0.1,1.2)
     #plt.colorbar(surf, shrink=0.5, aspect=20)
-    
+
     axs = fig.add_subplot(1, 3, 2, projection='3d')
     axs.scatter(abs_train_resc, ord_train_resc, z_train_resc, color = "navy")
     axs.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
@@ -762,7 +762,7 @@ def plot_franke_test_train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     axs.set_xlabel("x", fontsize=12)
     axs.set_ylabel("y", fontsize=12)
     axs.set_zlabel("z", fontsize=12)
-    
+
     axs = fig.add_subplot(1, 3, 3, projection='3d')
     axs.scatter(abs_test_resc, ord_test_resc, z_test_resc, color = "orangered")
     axs.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
@@ -772,7 +772,7 @@ def plot_franke_test_train(z_test,z_train, X_test, X_train, scaler, x, y, z_nois
     axs.set_zlabel("z", fontsize=12)
     axs.set_zlim(-0.1,1.25)
     plt.subplots_adjust(hspace=0.2, top=0.96, bottom=0.08, right=0.97,left=0.03)
-    plt.show() 
+    plt.show()
 
 # Uncomment required plot
 #plot_R2()

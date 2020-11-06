@@ -1,5 +1,5 @@
 import numpy as np
-from activation_functions import *
+from .activation_functions import *
 
 class NeuralNetwork:
     def __init__(
@@ -83,7 +83,7 @@ class NeuralNetwork:
             error_output = self.a_o - self.Y_data[:,np.newaxis]
         else:
             error_output = self.a_o - self.Y_data
-            
+
         self.error_output = error_output
 
         # Calculate gradients for the output layer
@@ -101,7 +101,7 @@ class NeuralNetwork:
             if(i == (self.n_hidden_layers-1)):
                 forward_error = error_output
                 forward_weights = self.output_weights
-                
+
             else:
                 forward_error = self.hidden_layers[i+1].error
                 forward_weights = self.hidden_layers[i+1].hidden_weights
@@ -137,7 +137,7 @@ class NeuralNetwork:
                 self.Y_data = self.Y_data_full[chosen_datapoints]
 
                 self.feed_forward()
-                self.backpropagation()              
+                self.backpropagation()
 
     def predict(self, X):
         ''' Predicting value for regression'''
@@ -172,4 +172,3 @@ class HiddenLayer:
         ''' Initializing weights and biases for a hidden layer'''
         self.hidden_weights = np.random.randn(self.n_features, self.n_hidden_neurons)
         self.hidden_bias = np.zeros(self.n_hidden_neurons) + 0.01
-

@@ -1,13 +1,13 @@
 import numpy as np
 from random import random, seed
 
-from statistical_functions import *
-from data_processing import Data
-from print_and_plot import *
-from regression_methods import Fitting
-from resampling_methods import Resampling
-from neuralnetwork import NeuralNetwork
-from activation_functions import *
+from src.statistical_functions import *
+from src.data_processing import Data
+from src.print_and_plot import *
+from src.regression_methods import Fitting
+from src.resampling_methods import Resampling
+from src.neuralnetwork import NeuralNetwork
+from src.activation_functions import *
 
 from sklearn.neural_network import MLPRegressor #For Regression
 
@@ -24,32 +24,32 @@ from keras.regularizers import l2
 
 ''' Task b
 
-	The following file contains the code used to perform all studies 
-	for the second task of the project. User defines which type of NN 
+	The following file contains the code used to perform all studies
+	for the second task of the project. User defines which type of NN
 	will be used (self made NN, SKL and Keras NN).
 
-	Depending on choice of study, either study of R2 and MSE is run for 
+	Depending on choice of study, either study of R2 and MSE is run for
 	different number of hidden layers ("hidden layers"), number of epochs ("epochs"),
 	number of neurons ("neurons"), or ridge gridd search ("Ridge grid search")
 
 	study: "simple analysis", "epochs", "hidden layers", "Ridge grid search", "neurons"
 	NN_type = "self made", "skl", "keras"
-''' 
+'''
 
 # Setting the Franke's function
 poly_deg = 5
 N = 30
 seed = 2021
 alpha = 0.001
-lamb = 0.001 
+lamb = 0.001
 
 min_size = 5 	#size of each minibatch
 n_epochs = 1000 	#number of epochs
 eta = 0.001 	# learning rate
 
 # user-defined settings
-study = "simple analysis" 
-NN_type = "self made" 
+study = "simple analysis"
+NN_type = "self made"
 
 # Setting Data
 franke_data = Data()
@@ -74,9 +74,9 @@ if(study == "simple analysis"):
 		nodes_in_hidd_layers = [50,50,50]
 
 		NN = NeuralNetwork(
-			franke_data.X_train, franke_data.z_train, 
-			n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-			epochs = n_epochs, batch_size = min_size, 
+			franke_data.X_train, franke_data.z_train,
+			n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+			epochs = n_epochs, batch_size = min_size,
 			eta = eta, lmbd=lamb)
 
 		NN.train()
@@ -85,17 +85,17 @@ if(study == "simple analysis"):
 		z_plot = np.ravel(NN.predict(franke_data.X))
 
 		plot_franke_test_train(
-			z_predict,z_tilde, franke_data.X_test, 
-			franke_data.X_train, franke_data.scaler, 
-			franke_data.x_mesh, franke_data.y_mesh, 
+			z_predict,z_tilde, franke_data.X_test,
+			franke_data.X_train, franke_data.scaler,
+			franke_data.x_mesh, franke_data.y_mesh,
 			franke_data.z_mesh)
 
 	elif(NN_type == "skl"):
 
 		regr = MLPRegressor(
 			hidden_layer_sizes=(50,50,50),activation='logistic',
-			solver='adam', alpha=lamb, 
-			batch_size=min_size, learning_rate_init=eta, 
+			solver='adam', alpha=lamb,
+			batch_size=min_size, learning_rate_init=eta,
 			max_iter=n_epochs)
 
 		regr.fit(franke_data.X_train, franke_data.z_train)
@@ -113,10 +113,10 @@ if(study == "simple analysis"):
 
 		#opt = keras.optimizers.Adam(learning_rate=0.001)
 		# use in case user wants to change default eta = 0.01 for sgd
-		opt = keras.optimizers.SGD(learning_rate=0.01) 
+		opt = keras.optimizers.SGD(learning_rate=0.01)
 
 		model.compile(loss='mse', optimizer=opt, metrics=['mse','mae'])
-		model.fit(franke_data.X_train, franke_data.z_train, epochs=n_epochs, batch_size=min_size)	
+		model.fit(franke_data.X_train, franke_data.z_train, epochs=n_epochs, batch_size=min_size)
 
 		z_predict = np.ravel(model.predict(franke_data.X_test))
 		z_tilde = np.ravel(model.predict(franke_data.X_train))
@@ -132,7 +132,7 @@ if(study == "simple analysis"):
 	print(MSE(franke_data.z_test, z_predict))
 	print("Test R2:")
 	print(R2(franke_data.z_test, z_predict))
-	
+
 	franke_data.z_scaled = z_plot # This is for plotting
 	franke_data.data_rescaling()
 	surface_plot(franke_data.x_rescaled, franke_data.y_rescaled, franke_data.z_mesh, franke_data.z_rescaled)
@@ -145,7 +145,7 @@ if(study == "epochs"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_MSE_epochs.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
@@ -181,7 +181,7 @@ if(study == "hidden layers"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_MSE_layers.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
@@ -204,7 +204,7 @@ if(study == "hidden layers"):
 		f_1.write("{0} {1} {2}\n".format(n_hidd_layers, R2(franke_data.z_train, z_tilde), R2(franke_data.z_test, z_predict)))
 		f_2.write("{0} {1} {2}\n".format(n_hidd_layers, MSE(franke_data.z_train, z_tilde), MSE(franke_data.z_test, z_predict)))
 		n_hidd_layers = n_hidd_layers+1
-		nodes_in_hidd_layers.append(50)	
+		nodes_in_hidd_layers.append(50)
 	f_1.close()
 	f_2.close()
 
@@ -217,7 +217,7 @@ if(study == "neurons"):
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_MSE_neurons.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   MSEtrain  MSEtest\n")
@@ -233,9 +233,9 @@ if(study == "neurons"):
 
 	for i in range(50):
 		NN = NeuralNetwork(
-			franke_data.X_train, franke_data.z_train, 
-			n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-			epochs = n_epochs, batch_size = min_size, 
+			franke_data.X_train, franke_data.z_train,
+			n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+			epochs = n_epochs, batch_size = min_size,
 			eta = eta, lmbd=lamb)
 
 		NN.train()
@@ -264,7 +264,7 @@ if(study == "Ridge grid search"):
 	f_1 = open(filename_1, "w")
 	f_1.write("lamb eta   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_Ridge_MSE.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("lamb eta   MSEtrain  MSEtest\n")
@@ -279,12 +279,12 @@ if(study == "Ridge grid search"):
 	for lamb in lambdas:
 		for eta in etas:
 			NN = NeuralNetwork(
-				franke_data.X_train, franke_data.z_train, 
-				n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers, 
-				epochs = n_epochs, batch_size = min_size, 
+				franke_data.X_train, franke_data.z_train,
+				n_hidden_layers = n_hidd_layers, n_hidden_neurons = nodes_in_hidd_layers,
+				epochs = n_epochs, batch_size = min_size,
 				eta = eta, lmbd=lamb)
 
-			NN.train()			
+			NN.train()
 			z_predict = np.ravel(NN.predict(franke_data.X_test))
 			z_tilde = np.ravel(NN.predict(franke_data.X_train))
 			z_plot = np.ravel(NN.predict(franke_data.X))
@@ -294,4 +294,3 @@ if(study == "Ridge grid search"):
 
 	f_1.close()
 	f_2.close()
-	

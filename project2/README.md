@@ -2,8 +2,18 @@
 
 Collaboration between Tellef Storebakken (@tellefs), Julian E. Vevik (@jvevik) and Maria L. Markova (@sagora123 / @markmarko).
 
+The final report, as well as the .tex file and figures used can be found in the Latex folder. The final report is called project2_report.pdf. 
 
-Programs task_a.py, task_b.py, task_c.py, task_d.py and task_e.py were used for collecting the results for the project.
+The Files folder contain textfiles with data for the different methods and runs. 
+
+The Figures folder contain the Figures produces.
+
+The src folder holds all the source .py files we created and used to find the results in this project. They are used in the Task_*.py files.
+
+An example run is included in the interactive project2.ipynb notebook. Here all the Task programs were run with the settings described below. This notebook also contains the Scikit-Learn and TensorFlow/Keras NN for classification. If you encounter problems in opening the notebook in Github.com you can easily view it from the following link: https://nbviewer.jupyter.org/github/tellefs/ML-projects/blob/master/project2/project2.ipynb
+
+
+Programs Task_a.py, Task_b.py, Task_c.py, Task_d.py and Task_e.py were used for collecting the results for the project. These programs are run in the project2.ipynb jupyter notebook as an example run.
 With the current settings chosen in the programs:
 
 	1. task_a_py runs a simple analysis of the training and test MSE for ridge with lambda=0.001, stochastic gradient descent with 1000 epochs and constant eta=0.001.

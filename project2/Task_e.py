@@ -2,25 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import random, seed
 
-from statistical_functions import *
-from data_processing import Data
-from print_and_plot import *
-from regression_methods import Fitting
-from resampling_methods import Resampling
-from neuralnetwork import NeuralNetwork
-from activation_functions import *
+from src.statistical_functions import *
+from src.data_processing import Data
+from src.print_and_plot import *
+from src.regression_methods import Fitting
+from src.resampling_methods import Resampling
+from src.neuralnetwork import NeuralNetwork
+from src.activation_functions import *
 
 from sklearn.linear_model import LogisticRegression
 from sklearn import datasets # MNIST dataset
 
 ''' Task e
 
-	The following file contains the code used to perform all studies 
-	for the task e of the project. User defines which option for the logistic 
+	The following file contains the code used to perform all studies
+	for the task e of the project. User defines which option for the logistic
 	regression to run (SGD-based, GD-based of scikit-learn.
 
 	option: "SGD", "GD", "SKL Logistic"
-''' 
+'''
 
 # -----------------------------------------------Logistic regression---------------------------------------------
 
@@ -76,7 +76,7 @@ n_categories = 10
 n_iterations = 100000
 
 # user defined option
-option = "SGD" 
+option = "SGD"
 
 # setting the model
 model = Fitting(digits)
@@ -85,11 +85,11 @@ model = Fitting(digits)
 if(option == "GD"):
 
 	y_pred, y_tilde = model.logistic_regression(
-		X_train, X_test, 
-		Y_train_onehot, 
-		n_iterations = n_iterations, 
-		eta = 0.001, 
-		option = "GD", 
+		X_train, X_test,
+		Y_train_onehot,
+		n_iterations = n_iterations,
+		eta = 0.001,
+		option = "GD",
 		lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
@@ -98,12 +98,12 @@ if(option == "GD"):
 elif(option == "SGD"):
 
 	y_pred, y_tilde = model.logistic_regression(
-		X_train, 
-		X_test, 
-		Y_train_onehot, 
-		epochs = epochs, 
-		eta = eta, 
-		option = "SGD", 
+		X_train,
+		X_test,
+		Y_train_onehot,
+		epochs = epochs,
+		eta = eta,
+		option = "SGD",
 		lamb = lamb)
 	print("Training accuracy: {:.10f}".format(accuracy_score(Y_train, y_tilde)))
 	print("Test accuracy: {:.10f}".format(accuracy_score(Y_test, y_pred)))
@@ -118,4 +118,3 @@ elif(option == "SKL Logistic"):
 	logreg.fit(X_train, Y_train)
 	print("Test set accuracy with SKL Logistic Regression: {:.4f}".format(logreg.score(X_train,Y_train)))
 	print("Test set accuracy with SKL Logistic Regression: {:.4f}".format(logreg.score(X_test,Y_test)))
-

@@ -15,22 +15,22 @@ import sklearn.linear_model as skl
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-from statistical_functions import *
-from data_processing import *
-from print_and_plot import *
-from regression_methods import *
+from .statistical_functions import *
+from .data_processing import *
+from .print_and_plot import *
+from .regression_methods import *
 
 seed = 2021
 
 class Resampling():
 	def __init__(self, inst):
-		''' Resampling class containing k-fold cross-validation or no-resampling option''' 
+		''' Resampling class containing k-fold cross-validation or no-resampling option'''
 		self.inst = inst
 
 	def cross_validation(
-		self, nrk, seed, minimization_method, 
-		regression_method, poly_deg, n_epochs=1000, t0=1, 
-		t1=1000, eta=0.001, lamb=0.001, min_size=5, 
+		self, nrk, seed, minimization_method,
+		regression_method, poly_deg, n_epochs=1000, t0=1,
+		t1=1000, eta=0.001, lamb=0.001, min_size=5,
 		n_iterations=10000):
 		''' k-fold cross-validation
 		minimization_method takes values "matrix_inv", "SGD", "GD",  "SGD_SKL"
@@ -40,7 +40,7 @@ class Resampling():
 		inst = self.inst
 		inst.design_matrix(poly_deg)
 		inst.split_minibatch(False, nrk)
-	
+
 		MSError_test_CV = np.zeros(nrk)
 		MSError_train_CV = np.zeros(nrk)
 		R2_test_CV = np.zeros(nrk)
@@ -51,23 +51,23 @@ class Resampling():
 		z_predict_stored = np.zeros(int(len(inst.z_scaled)/nrk))
 
 		fit = Fitting(inst)
-	
+
 		# loop over folds
 		for k in range(nrk):
 
 			inst.X_test = inst.split_matrix[k]
 			inst.z_test = inst.split_z[k]
-	
+
 			X_train = inst.split_matrix
 			X_train = np.delete(X_train,k,0)
 			inst.X_train = np.concatenate(X_train)
-	
+
 			z_train = inst.split_z
 			z_train = np.delete(z_train,k,0)
 			inst.z_train = np.ravel(z_train)
 
 			# refression
-			if(minimization_method == "matrix_inv"):	
+			if(minimization_method == "matrix_inv"):
 				if(regression_method == "Ridge"):
 					fit.ridge(lamb)
 				elif(regression_method == "OLS"):
@@ -102,8 +102,8 @@ class Resampling():
 
 
 	def no_resampling(
-		self, seed, minimization_method, regression_method, 
-		poly_deg, n_epochs=1000, t0=1, t1=1000, 
+		self, seed, minimization_method, regression_method,
+		poly_deg, n_epochs=1000, t0=1, t1=1000,
 		eta=0.001, lamb=0.001, min_size=5, n_iterations=10000):
 		''' No resampling
 		minimization_method takes values "matrix_inv", "SGD", "GD",  "SGD_SKL"
@@ -115,9 +115,9 @@ class Resampling():
 		inst.design_matrix(poly_deg)
 		inst.test_train_split(0.2)
 		fit = Fitting(inst)
-		
+
 		# regression
-		if(minimization_method == "matrix_inv"):	
+		if(minimization_method == "matrix_inv"):
 			if(regression_method == "Ridge"):
 				fit.ridge(lamb)
 			elif(regression_method == "OLS"):
@@ -138,5 +138,3 @@ class Resampling():
 		self.z_predict = fit.z_predict
 		self.z_tilde = fit.z_tilde
 		self.z_plot = fit.z_plot
-
-
