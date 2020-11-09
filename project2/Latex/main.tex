@@ -13,6 +13,9 @@
 \usepackage{natbib}
 \usepackage{float}
 
+%To force figures to stay within section/subsection:
+\usepackage[section]{placeins}
+\usepackage[subsection]{placeins}
 
 %To get the fancy letters
 \usepackage{mathrsfs}
@@ -85,19 +88,22 @@ FYS-STK4155 $-$ Project 2}
 
 \begin{abstract}
 
+The present project aims at introducing the stochastic gradient descent for the minimization of a cost function and building a feed forward neural network (FFNN) with a flexible architecture on its base. The first part is focused on implementing the standard GD, SGD and the FFNN to perform the regression on Franke's data, considered in the Project 1 \cite{proj1,proj1_2}. The sensitivity of the FFNN to the number of epochs, hidden layers, neurons, learning rate and regularization parameter is studied. The FFNN demonstrates excellent performance on the training and test data as compared to the linear regression. Both the Sigmoid and tanh were found to be effective hidden layer activation functions, yielding good performance stable to various NN parameters. Furthermore, a classification problem for the MNIST dataset was studied with the FFNN and the SGD-based logistic regression (LR). The latter demonstrates excellent performance with slightly higher  accuracy than for the FFNN with 3 hidden layers mainly considered in the project. For a bigger number of hidden layers (6 layers) our FFNN outperforms the LR for both the training and test datasets, with and without regularization. The FFNN results are also compared to those for the NNs based on the Scikit-Learn and Keras TensorFlow packages.
+
 \end{abstract}
 
-\keywords{Regression, Logistic regression, Classification, Gradient descent, Stochastic gradient decent, Feed Forward Neural Network}
+\keywords{Machine Learning, Neural Networks, Regression, Logistic Regression, Classification, Gradient Descent, Stochastic Gradient Decent, Feed Forward Neural Network}
 
 \section{Introduction}
 \label{sec: introduction}
-In recent years the amount of applications using Machine Learning have skyrocketed, and Artificial Neural Network (ANN) algorithms have established themselves as perhaps the most widespread and best performing Machine Learning algorithms around. Their application is, to a great extent, correlated with an exponential growth of computational power, available memory and rapidly increasing need to process large data in numerous areas of science. The basic idea behind a neural network (NN) is based on the human brain, and how we have neurons interacting with each other through electric pulses. The NN algorithms are built up of layers containing different amounts of neurons, of which some neurons "fire" given one input, whilst other neurons might "fire" given another input.  
 
-The main objective of this project is to study regression and classification problems by developing our own feed-forward neural network (FFNN) code with a back propagation algorithm. The former problem would be especially relevant for making predictions of continuous values approximating a given dataset, whilst the latter aims rather at predicting to which discrete category, or class, a given input value will correspond. In this project we will focus on both quality of estimation and predicting power, \textit{i.e.} how well a model is being trained and will be able to perform on a test dataset. First, we study performance of our neural network on the regression tasks from Project 1 \cite{proj1, proj1_2}, and compare to our previous results obtained with the linear regression models. To do this, we first implement gradient descent (GD) and stochastic gradient descent (SGD) codes and compare our results with the matrix inversion procedure exploited in Project 1. These methods will be used for creating our FFNN code. Subsequently, we analyse the effects of different activation functions and architectures and see how well our NN performs compared to the built in NN in Scikit-Learn and TensorFlow with Keras.
+In recent years the amount of applications using Machine Learning have skyrocketed, and Artificial Neural Network (ANN) algorithms have established themselves as perhaps the most widespread and best performing Machine Learning algorithms around. Their application is, to a great extent, correlated with an exponential growth of computational power, available memory and rapidly increasing need to process large data in numerous areas, including science. The main idea behind a neural network (NN) is based on the human brain and neurons interacting with each other through electric pulses. The NN algorithms are built up of layers containing different amounts of neurons, of which some neurons \textquotedblleft fire\textquotedblright given a certain input, whilst other neurons might \textquotedblleft fire\textquotedblright given another input.  
+
+The main objective of this project is to study regression and classification problems by developing our own feed forward neural network (FFNN) code with the back propagation algorithm. The former problem would be especially relevant for making predictions of continuous values approximating a given dataset, whilst the latter aims rather at predicting to which discrete category, or class, a given input value will correspond. In this project we will focus on both quality of estimation and predicting power, \textit{i.e.} how well a model is being trained and will be able to perform on a test dataset. First, we study performance of our neural network in the regression tasks from Project 1 \cite{proj1, proj1_2}, and compare to our previous results obtained with the linear regression models. To do this, we first implement the gradient descent and stochastic gradient descent codes and compare our results with the matrix inversion procedure exploited in Project 1. These methods will be used for creating our FFNN code. Subsequently, we analyse the effects of different activation functions and architectures and see how well our NN performs compared to the built-in NN in Scikit-Learn and TensorFlow with Keras.
 
 Secondly, we study a classification problem, namely the MNIST data set of handwritten numbers \cite{MNIST}. This is studied using the neural networks described above, as well as with a logistic regression code.
 
-The theoretical description of the models is found in Section \ref{sec: Theoretical background}. The models and the developed code are presented in Sections \ref{sec: Studied models} and \ref{sec: Code}, and all the results can be found in Section \ref{sec: Results}. Discussion, outlooks and conclusions are presented in Sections \ref{sec: Discussion}, \ref{sec: Improvements} and \ref{sec: Conclusions} respectively.
+The theoretical description of the models is found in Section \ref{sec: Theoretical background}. The models and the developed code are presented in Sections \ref{sec: Studied models} and \ref{sec: Code}, and all the results can be found in Section \ref{sec: Results}. Discussion, outlooks and conclusions are presented in Sections \ref{sec: Discussion}, \ref{sec: Improvements} and \ref{sec: Conclusions} respectively. Some additional studies and figures are also included in the appendices.
 
 
 %---------------------------------------------------------------------
@@ -106,76 +112,128 @@ The theoretical description of the models is found in Section \ref{sec: Theoreti
 
 \subsection{Cost Function Minimization with Gradient Descent}
 \label{subsec: Cost function minimization with gradient descent}
-Optimization is one of the main features of Machine Learning. In this project the Gradient Descent (GD) and Stochastic Gradient Descent (SGD) methods are introduced and used for optimization of the cost function. Both methods use the gradient of the cost function to find its minimum.
+Optimization is one of the main features of Machine Learning. By analogy with the linear regression tested in the Project 1 \cite{proj1,proj1_2},  the core objective of the learning procedure in a neural network is to find a set of optimal parameters minimizing the difference between a prediction made $\tilde{\textbf{Y}}$ and a real observed, or so-called target, value \textbf{Y}. This difference is expressed in terms of the cost function. Let us consider a convenient choice of the cost function for the regression problem, namely the sum of squared residuals, or the mean squared error:
+\begin{equation}
+\begin{split}
+      C(\textbf{Y},\tilde{\textbf{Y}})=&\frac{1}{n}(\textbf{Y}-\tilde{\textbf{Y}})^T(\textbf{Y}-\tilde{\textbf{Y}}),
+\end{split}
+\end{equation}
 
-In project 1 we used the Ordinary Least Square method to minimize the cost function with the expression for the parameter $\boldsymbol{\beta}^{\mathrm{OLS}}$ given by 
+Further, we write the predicted value  $\tilde{\textbf{Y}}$ explicitly as $\tilde{\textbf{Y}}=\textbf{X}\boldsymbol{\beta}$ in terms of the design matrix $\textbf{X}$ built from the predictor variables and the regression parameter $\boldsymbol{\beta}$ \cite{Morten}. The Ordinary Least Squares (OLS) method studied in \cite{proj1,proj1_2} exploits an analytical expression for the optimal regression parameter $\boldsymbol{\beta}$, minimizing the cost function.  Parameter $\boldsymbol{\beta}^{\mathrm{OLS}}$ is given by the following equation:
 
 \begin{equation}
-    \boldsymbol{\beta}^{\mathrm{OLS}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}.
+    \boldsymbol{\beta}^{\mathrm{OLS}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}.
     \label{eq:beta-ols}
 \end{equation}
 
-Here the matrix $\mathbf{X}^T\mathbf{X}$ is inverted, which can be a heavy computational operation. With GD and SGD the matrix inversion is avoided, making it computationally favorable to the previously used regression methods. 
+Here the matrix $\mathbf{X}^T\mathbf{X}$ is inverted, which can be a heavy computational operation or can not be performed if $\mathbf{X}^T\mathbf{X}$ is a singular matrix. On the contrary, the gradient descent (GD) and its modification, stochastic gradient descent (SGD), use the gradient of the cost function to modify the regression parameter $\boldsymbol{\beta}$ in order to find the minimum of $C(\textbf{Y},\tilde{\textbf{Y}})$. No analytical expression for the optimized parameter is needed, which is especially important for the NN application. In addition, with the GD and SGD the matrix inversion is avoided, making it computationally favorable to the previously used regression methods (OLS, ridge and LASSO \cite{Morten}). 
+
 
 \subsubsection{Gradient Descent: Mechanism}
 \label{subsubsec: GD}
-In the GD-method the gradient of the cost function $C$ with the variable $\mathbf{\beta}$ (in the case of linear regression, $\mathbf{\beta}$ was the parameter vector of the polynomial model) is used to minimize the function. Starting at an arbitrary chosen value of $\mathbf{\beta}$ the gradient $\nabla_\beta C(\mathbf{\beta})$ is calculated. Since the gradient gives us the direction of the steepest ascent, the next $\mathbf{\beta}$ value is found in the negative direction of the gradient. Repeating the process 
-\begin{equation}
-    \mathbf{\beta}_{k+1} = \mathbf{\beta}_k - \eta\nabla_\beta C(\mathbf{\beta}_k)
-\end{equation}
-for increasing $k$ will give us the the local minimum of the cost function. The $\eta$ parameter represents the learning rate, and decides how large the steps will be. Too small steps can yield an abundance of computation processes, while too big steps might miss the minimum. The GD method can be highly sensitive to the choice of learning rate which the results in Sec. \ref{sec: Results} show. 
 
-Since the gradient will decrease as $\mathbf{\beta}$ reaches a minimum, the steps will get smaller and smaller with increasing iterations. The process can be stopped when the gradient has reached a value close to zero or when a maximum number of steps are reached.
+In the GD method the gradient of the cost function $C$ with the variable $\boldsymbol{\beta}$ (in the case of linear regression, $\boldsymbol{\beta}$ was the parameter vector of the polynomial model) is used to minimize it. Starting with an arbitrary chosen value of $\boldsymbol{\beta}$, the gradient $\nabla_\beta C(\boldsymbol{\beta})$ is calculated for a current choice of $\boldsymbol{\beta}$. Since the gradient gives us the direction of the steepest ascent of a function, the next $\boldsymbol{\beta}$ value can be found by moving in the negative direction of the gradient with a certain step length. Repeating the process
+\begin{equation}
+    \boldsymbol{\beta}_{k+1} = \boldsymbol{\beta}_k - \eta\nabla_\beta C(\boldsymbol{\beta}_k)
+\end{equation}
+for the increasing index $k$ will lead us to the the local minimum of the cost function \cite{Morten}. The $\eta$ parameter represents the learning rate and decides how large the steps will be made towards the minimum. Too small steps can yield an abundance of a computation processes, while too big steps might lead to overshooting the minimum and making the computational procedure unstable \cite{high bias}. Ideally, just one step $\eta_{opt}$ can be made for $\boldsymbol{\beta}$ to reach a minimum of the cost function. If a chosen learning rate $\eta<\eta_{opt}$, numerous iterations will be needed to arrive at the minimum. For $\eta_{opt}<\eta<2\eta_{opt}$, the algorithm will oscillate around the minimum before reaching it, as for $\eta>2\eta_{opt}$ the algorithm diverges \cite{high bias}. The GD method is highly sensitive to the choice of the learning rate which will be shown and discussed in detail in Section \ref{sec: Results}. Moreover, with the GD there is no certainty whether the procedure converges in a local of a global minimum. This is not the case for a convex function, for which a local minimum coincides with the global minimum. However, in practice, the optimized surfaces demonstrate numerous local minima (\textit{e.g.} with the terrain data) and whether a local or a global minimum of the cost function is reached depends on $\eta$, number of iterations and an initial guess of $\boldsymbol{\beta}$.
+
+Since the gradient will decrease gradually as $C$ reaches a minimum, the steps will get smaller and smaller with increasing iterations. The process can be stopped when the gradient has reached a value close to zero, when a certain maximum number of steps is accomplished or when a pre-defined accuracy is reached. Depending on the dataset and choice of the learning rate, the GD might be an extremely computationally expensive procedure.
 
 \subsubsection{Stochastic Gradient Descent}
 \label{subsubsec: SGD}
-A downside of GD is that only the local minimum is found. For a second degree polynomial this is not a problem as there will only be a single minimum, but for higher polynomial degrees we might not find the lowest minimum. SGD takes care of this problem by using the fact that the cost function can be written as a sum over $n$ datapoints. Using this, the gradient can be estimated as a sum over the gradients for each datapoint. To reduce the computational load, we split the data into so-called minibatches. The randomly selected minibatch consist of a group of the data, and the gradient is calculated for this group. $\mathbf{\beta}$ is the updated as
+
+As it was mentioned, a downside of the GD is that only the local minimum is guaranteed to be found. SGD mitigates this problem by using the fact that the cost function can be written as a sum over $n$ data points. Using this, the gradient can be estimated as a sum over the gradients for each data point. To reduce the computational load, we split the data into so-called minibatches. A randomly selected minibatch consists of a group of the data points and the gradient is calculated for this group. Parameter $\boldsymbol{\beta}$ is the updated as
 \begin{equation}
-    \mathbf{\beta}_{k+1} = \mathbf{\beta}_k - \eta_k \sum_{i\in B_j }^{n}  \nabla_\beta c_i(\mathbf{x}_i, \mathbf{\beta}_k)
+    \boldsymbol{\beta}_{k+1} = \boldsymbol{\beta}_k - \eta_k \sum_{i\in B_j }^{n}  \nabla_\beta c_i(\mathbf{x}_i, \boldsymbol{\beta}_k)
 \end{equation}
- where $B_j$ is a randomly selected minibatch. Repeating this process, we will eventually reach a local minimum. When this minimum is reached, we can save it as a global minimum and keep the iterations going until we find another local minimum. If the new local minimum is smaller than the previous, the global minimum is updated. The learning rate is often reduced for each iteration by a so-called learning schedule, and the iterations stop when the learning rate has reached its minimum. The learning schedule starts out with a large value then decreases for each iteration. This will increase the chances of actually finding the global minimum, and not getting stuck in a local minimum.
+ where $B_j$ is a randomly selected minibatch \cite{Morten}. Practically, a gradient is approximated at each gradient descent step by one chosen minibatch only. This introduces stochasticity to the minimization procedure. A period of passing through all minibatches is called an epoch. 
  
- SGD is sensitive to number of epochs, which here is the ratio of datapoints  to the number of minibatches $n/M$. An iteration over increasing epochs, will show fluctuations in the cost function as well as a gradual decrease. The fluctuations can be seen as noise from each sample being different. Ultimately, this observation shows the strength of SGD over GD, where the fluctuations let the cost function optimization "jump" out of a local minimum on its way to find the global minimum. Such fluctuations are observed in the presented results in Sec.\ref{sec: Results}.
+ 
+ This approach has two major advantages over the standard gradient descent. Firstly, the procedure does not have to pass through all data points in order to make one update of $\boldsymbol{\beta}$, it makes an update for a smaller minibatch instead. This might decrease the computational time significantly. Secondly, the stochasticity reduces a probability for the procedure to be stuck in a local minimum.
+ 
+ 
+ The learning rate is often reduced for each iteration and epoch by introducing a so-called learning schedule. The learning schedule starts out with a large value then decreases for each iteration depending on a current epoch and a minibatch choice according to \cite{Morten}:
+ \begin{equation}
+     \eta=\frac{t_0}{t_1+m\cdot e+i},
+ \end{equation}
+ where $t_0$ and $t_1$ are pre-defined constants, $e$ is a current epoch, $i$ is a current minibatch and $m$ is the number of minibatches.
+ 
+ 
+ Iteration over sequential epochs will show fluctuations in the cost function due to the stochasticity as well as a gradual decrease. This can also be interpreted as the noise of the resulting output values. Ultimately, this observation shows also the strength of the SGD over GD, where the fluctuations let the cost function optimization \textquotedblleft jump\textquotedblright out of a local minimum on its way to find the global minimum. Such fluctuations are observed in the presented results in Section \ref{sec: Results}.
+
 
 \subsection{Logistic Regression}\label{subsec: logistic regression}
 
-In this project, logistic regression is the first introduction to \textit{classification problems}. In linear regression we fit a continuous function to the data while with logistic regression we usually want to solve a classification problem. Here, we find the probability that a value belongs to a certain class. In its simplest form we have a binary outcome with two classes, a positive and a negative one. If the probability is higher than 50\%, the model predicts the outcome to belong to the positive class.
+In this project, logistic regression is the first introduction to classification problems. In linear regression we fit a continuous function to the data while with the logistic regression we are rather interested in finding a probability that a certain value belongs to a certain output class. In its simplest form, we have a binary outcome with two classes, a positive (yes) and a negative (no) one. For example, if the probability assigned to a given input is higher than 50\%, the model predicts it to belong to the positive class. Strict division between two outcomes based on a threshold condition is an example of a so-called hard classifier \cite{high bias}. In numerous cases one might be more interested in a probability of a certain class, given by a soft classifier. A simple and widely used example of such a classifier is the (logistic) Sigmoid function:
+\begin{equation}\label{eq: sigmoid}
+    f(x) = Sigmoid(x)=\frac{1}{1+e^{-x}}.
+\end{equation}
 
-For two parameters, the cost function is derived from the Maximum Likelihood Estimation, which maximises the probability of seeing the observed data.  For this project, we used the \textit{Softmax} function to derive the probabilities, given by 
+Given the Sigmoid function the probability of the input $\textbf{x}_i$ ($i=0,1,...n-1)$ to belong to one of two categories $y_i\in\{0,1\}$ can be written in terms of the parameters $\boldsymbol{\beta}$ \cite{high bias}:
+\begin{equation}
+\begin{split}
+    &P(y_i=1|\textbf{x}_i,\boldsymbol{\beta})=\frac{1}{1+e^{-\textbf{x}_i^T\boldsymbol{\beta}}},\\
+    &P(y_i=0|\textbf{x}_i,\boldsymbol{\beta})=1-P(y_i=1|\textbf{x}_i,\boldsymbol{\beta}).
+\end{split}
+\end{equation}
+
+By introducing the dataset $\mathcal{D}(\textbf{x}_i, y_i)$ with the binary outcome, from which data points are drawn independently, one can write the likelihood of observing the data under a chosen model as \cite{high bias}:
+\begin{equation}
+P(\mathcal{D}|\boldsymbol{\beta})=\sum_{i=0}^{n-1} P(y_i=1|\textbf{x}_i,\boldsymbol{\beta})^{y_i}(1-P(y_i=1|\textbf{x}_i,\boldsymbol{\beta}))^{y_i-1}.
+\end{equation}
+
+Since we are interested in finding the model maximizing this likelihood, it is convenient to build the cost function we are aiming at minimizing as the negative log of the likelihood function:
+\begin{equation}
+\begin{split}
+C(\boldsymbol{\beta})=&-\sum_{i=0}^{n-1} [y_i \log{P(y_i=1|\textbf{x}_i,\boldsymbol{\beta})}+\\
++&(y_i-1)\log{(1-P(y_i=1|\textbf{x}_i,\boldsymbol{\beta}))}],
+\end{split}
+\end{equation}
+also know as the cross-entropy. The minimization of the cross-entropy is coupled to finding an optimal set of parameters $\boldsymbol{\beta}$ which is performed by means of the GD or SGD. For both procedures, the gradient of this cost function has to be written explicitly:
+\begin{equation}
+    \frac{\partial C(\boldsymbol{\beta})}{\partial \boldsymbol{\beta}}= - \textbf{x}_i^T(\textbf{y}_i-\textbf{P}),
+\end{equation}
+where \textbf{P} is the vector of fitted probabilities.
+
+However, not all classification problems are limited to the binary outcome. For this project, we used the Softmax function to derive the probabilities for each class $K$. If $y_i={1,0,..0}$ ($y_{i0}=1$) denotes that $\textbf{x}_i$ belongs to the first class out of K, the probability of $\textbf{x}_i$ to be in a class $k$ is given by:
 \begin{equation}\label{eq:softmax}
-    f(z_i)=\frac{e^{z_i}}{\sum_{k=0}^{K-1}e^{z_i}}
+    P(y_{ik}=1|\textbf{x}_i,\boldsymbol{\beta} )=\frac{-e^{\textbf{x}_i^T\boldsymbol{\beta}_k}}{\sum_{j=0}^{K-1}e^{\textbf{x}_i^T\boldsymbol{\beta}_j}}.
 \end{equation}
-where $K$ is the number of different classes. From this probability distribution, the maximum likelihood function is derived, giving the cost function 
+From this probability distribution, the maximum likelihood function is derived, giving the cost function in a multiclass case \cite{high bias}:
 \begin{equation}\label{eq: cross entropy}
-    C(\mathbf{\beta}) = -\sum_{i=0}^{n} z_i(\mathbf{\beta}) - \log{(1-e^{\mathbf{\beta}})}
+\begin{split}
+C(\boldsymbol{\beta})=&-\sum_{i=0}^{n-1}\sum_{j=0}^{K-1} [y_i \log{P(y_i=1|\textbf{x}_i,\boldsymbol{\beta}_j)}+\\
++&(y_i-1)\log{(1-P(y_i=1|\textbf{x}_i,\boldsymbol{\beta}_j))}],
+\end{split} 
 \end{equation}
-also know as the \textit{cross-entropy}. The optimization of the cost function leads to a minimization problem for the cross-entropy, with a non-linear equation of parameters $\mathbf{\beta}$. Therefore, the GD methods are often used for cost-function minimization, as it was in this project.
+which will be used in the present project.
 
 \subsection{Neural Networks}
 \label{subsec: NN}
 
-One of the main tools considered in this project is an artificial neural network (ANN), a computational system performing tasks based on how it has previously learned, rather than following any specific rules to perform this task directly.  The idea of a neural network (NN) and artificial neurons was adopted from the neuroscience by McCulloch and Pitts \cite{pitts} and aims at working by analogy with brain neurons.  The signal is being directed to a net of nodes, or neurons, where it is modified to yield a desired output, or so-called target values. Learning is the primary mechanism making NN to adapt various tasks in various fields - from solving differential equations, detecting phase transitions in quantum mechanical systems, unfolding of experimental spectra to predicting the choice of future purchases in adds by analysing previous choices. In this project, the NN employs supervised learning, meaning that it the set of labelled data, or training examples, is used to guide the learning process before making a prediction on the new set of similar data. 
+One of the main tools considered in this project is an artificial neural network (ANN), a computational system performing tasks based on how it has previously learned, rather than following any specific rules to perform this task directly.  The idea of a neural network (NN) and artificial neurons was adopted from the neuroscience by McCulloch and Pitts \cite{pitts} and aims at working by analogy with brain neurons.  The signal is being directed to a net of nodes, or neurons, where it is modified to yield a desired output. Learning is the primary mechanism making NN to adapt various tasks in various fields - from solving differential equations, detecting phase transitions in quantum mechanical systems, unfolding of experimental spectra to predicting the choice of future purchases in adds by analysing previous choices. In this project, the NN employs supervised learning, meaning that it the set of labelled data, or training examples, is used to guide the learning process before making a prediction on the new set of similar data. 
 
-In a general case, the NN comprises of an input layer, from which the input signal is directed to the, so-called, hidden layers, where it is modified and sent to an output layer. Each hidden layer might comprise of $N$ neurons, connected with neurons in the preceding and the following hidden layers. The signal is modified in a neuron by weighting the input signals from the previous layers and forming a local output by applying an activation function $f(\cdot)$. In the simplest case, each node accumulates input signals and yields an output if accumulated sum of signals exceeds a certain threshold. In practise, the activation function can differ from this kind of a binary classifier and yield output without any rigid condition for the threshold. Depending on the connection and signal transfer between neurons, one can consider Feed Forward NN (FFNN), convolutional NN (CNN), recurrent NN (RNN), and NN for unsupervised learning. In the former case, the signal is transferred in a single, forward, direction (forward pass). In a CNN each neuron is connected only to a subset of neurons, facilitating recognition of spatially local correlations. This is particularly useful for the image recognition task. Compared to FFNN, RNN effectively exploit directed cycles in the net of neurons and is widely applicable the the data in sequences, \textit{e.g.} speech, music recognition. 
+In a general case, the NN comprises of an input layer, from which the input signal is directed to the so-called hidden layers, where it is modified and sent to an output layer. Each hidden layer might comprise of $N$ neurons, connected with neurons in the preceding and the following hidden layers. The signal is modified in a neuron by weighting the input signals from the previous layers and forming a local output by applying an activation function $f(\cdot)$. In the simplest case, each node accumulates input signals and yields an output if accumulated sum of signals exceeds a certain threshold. In practise, the activation function can differ from this kind of a binary classifier and yield output without any rigid condition for the threshold. Depending on the connection and signal transfer between neurons, one can consider Feed Forward NN (FFNN), convolutional NN (CNN), recurrent NN (RNN), and NN for unsupervised learning. In the former case, the signal is transferred in a single, forward, direction (forward pass). In a CNN each neuron is connected only to a subset of neurons, facilitating recognition of spatially local correlations. This is particularly useful for the image recognition task. Compared to FFNN, a RNN effectively exploits directed cycles in the net of neurons and is widely applicable the the data in sequences, \textit{e.g.} speech, music recognition. 
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.39\textwidth]{Figures/NN.pdf}
     \caption{Example scheme of a NN with two hidden layers.}
     \label{fig:NN}
 \end{figure}
 
-For the regression and classification tasks considered in this project the most natural choice is the FFNN, where each neuron has a non-linear activation function and is connected to all neurons in the subsequent layer. This type of NN is also called a fully-connected NN. All NN used in this project consist of at least three layers (input, hidden and output layer) and are also called multilayer perceptron (MLP) (see Fig.\ref{fig:NN}).
+For the regression and classification tasks considered in this project the most natural choice is the FFNN, where each neuron has a non-linear activation function and is connected to all neurons in the subsequent layer. This type of a NN is also called a fully-connected NN. All NN used in this project consist of at least three layers (input, hidden and output layer) and are also called multilayer perceptrons (MLP) (see Fig. \ref{fig:NN}).
 
-\subsubsection{Mathematical Model of MLP}
+\subsubsection{Mathematical Model of the MLP}
 \label{subsubsec: MLP}
 
-As it was mentioned, each neuron transforms an input signal from all neurons in the previous layer. Let us consider a node $i$ in the first hidden layer. The contribution of the input data points $x_j$ in $x_0, x_1, ..., x_{N_{in}}$ is regulated by the weights $w_{ij}$ and an additional bias $b_i$. The modified input can be written as:
+As it was mentioned, each neuron transforms an input signal from all neurons in the previous layer. Let us consider a node $i$ in the first hidden layer. The contribution of the input data points $x_j$ in $x_0, x_1, ..., x_{N_{in}}$ is regulated by the weights $w_{ij}$ and an additional bias $b_i$. The modified input can be written as \cite{Morten}:
 \begin{equation}
 \label{eq: 1}
     z_i = \sum_{j=0}^{N_{in}}w_{ij}x_j +b_i.
 \end{equation}
-Further, the way neuron fires as a response to this signal is defined by an activation function $f(\cdot)$ and forms an output sent to all neurons on the next layer:
+Further, the way a neuron fires as a response to this signal is defined by an activation function $f(\cdot)$, forming an output sent to all neurons on the next layer:
 \begin{equation}
     a_i = f\left(z_i\right)=\left(\sum_{j=0}^{N_{in}-1}w_{ij}x_j +b_i\right).
 \end{equation}
@@ -196,18 +254,14 @@ In overall, this yields $L+1$ (including output) matrices of parameters to be ad
 \subsubsection{Choice of an Activation Function}
 \label{subsubsec: activation function}
 
-By analogy with the action potential on a membrane of a neuron, defining whether a neuron fires or not, an activation function controls an output from each node. This function should fulfill conditions of being non-constant, monotonically-increasing, bounded and continuous. In addition, the activation functions in the output layer should not be linear: in this case the output will be simply linear function of an input. This will make efficient learning of the NN practically impossible. In the simplest case a threshold $a$ is set and an output is set to zero if $z_i$ for a current neuron $i$ is below the threshold, thus switching "on" and "off". This type of activation function can be simply written with the Heaviside step function $H$ as:
+By analogy with the action potential on a membrane of a neuron, defining whether a neuron fires or not, an activation function controls an output from each node. This function should fulfill conditions of being non-constant, monotonically-increasing, bounded and continuous \cite{Morten}. In addition, the activation functions should not be linear: in this case the output will be simply a linear function of an input. This will make efficient learning of the NN practically impossible. In the simplest case a threshold $a$ is set and an output is set to zero if $z_i$ for a current neuron $i$ is below the threshold, thus switching \textquotedblleft on\textquotedblright and \textquotedblleft off\textquotedblright. This type of activation function can be simply written with the Heaviside step function $H$ as:
 \begin{equation}\label{eq:heaviside}
     f(z)=H(bz+c)=\begin{cases}
                0, \mbox{ }z<-c/b\\
                1, \mbox{ } z\geq -c/b\\
             \end{cases}.
 \end{equation}
-An efficient smooth alternative for the Heaviside function is the logistic Sigmoid function:
-\begin{equation}
-    f(z) = Sigmoid(z)=\frac{1}{1+e^{-z}}.
-\end{equation}
-This function constrains an output from a neuron, compressing it to a value from 0 to 1. An output of inactive neuron is set to 0 (one-sided function) and, as compared to the Heaviside, this activation function has defined derivatives for the whole range of $z$ values. Similar alternative to the step function is the hyperbolic tangent:
+An efficient smooth alternative for the Heaviside function is the logistic Sigmoid function (see Eq. \ref{eq: sigmoid}). This function constrains an output from a neuron, compressing it to a value from 0 to 1. An output of inactive neuron is set to 0 (one-sided function) and, as compared to the Heaviside, this activation function has defined derivatives for the whole range of $z$ values. Similar alternative to the step function is the hyperbolic tangent:
 \begin{equation}
     f(z)=tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}.
 \end{equation}
@@ -220,7 +274,7 @@ In order to avoid identity activation function $f(z)=z$, the so-called rectifier
                z, \mbox{ } z\geq 0\\
             \end{cases}.
 \end{equation}
-Simplicity of this function yields potentially efficient computation and smaller CPU times. By analogy with the Sigmoid, it is biologically plausible due to setting outputs of inactive neurons to 0. In addition, it is invariant to scaling and mitigates problem of vanishing gradients in the training procedure. However, it shares the same problem with the step function, by being non-differentiable at zero. In addition, it is unbound for high $z$ values. Another issue, so-called dying ReLU problem, is related to some neurons being hut down(deactivated) so that the signal does not pass through it while training and updating the weights and biases. This can, however, be resolved by allowing a certain linear dependence of an output on the input with leaky ReLU:
+Simplicity of this function yields potentially efficient computation and smaller CPU times. By analogy with the Sigmoid, it is biologically plausible due to setting outputs of inactive neurons to 0. In addition, it is invariant to scaling and mitigates a problem of vanishing gradients in the training procedure. However, it shares the same problem with the step function, by being non-differentiable at zero. In addition, it is unbound for high $z$ values. Another issue, so-called dying ReLU problem, is related to some neurons being put down (deactivated) so that the signal does not pass through it while training and updating the weights and biases. This can, however, be resolved by allowing a certain linear dependence of an output on the input with the leaky ReLU:
 \begin{equation}
     f(z)=\begin{cases}
                az, \mbox{ }z<0\\
@@ -229,7 +283,7 @@ Simplicity of this function yields potentially efficient computation and smaller
 \end{equation}
 where $a$ is a small value, \textit{e.g.} 0.001. In this project the latter four activation functions will be tested for hidden layers.
 
-Finally, the activation function of the output layer yields directly a result to be compared with the target values. For the regression problem adjustment of the weights and biases for all hidden layers and the output layer should be sufficient to be able to reproduce the target. Therefore, a simple identity function $f(z)=z$ is proposed for the output layer. On the contrary, for the classification problem one would be interested in probabilities for a given input point to be attributed to a certain class. As all probabilities should add up to 1, the Softmax function was used for the activation of an output layer (see Eq.\ref{eq:softmax}). With this choice of output activation functions architecture of a NN can be further modified by combining different activation functions for hidden layers to improve an overall performance.
+Finally, the activation function of the output layer yields directly a result to be compared with the target values. For the regression problem adjustment of the weights and biases for all hidden layers and the output layer should be sufficient to be able to reproduce the target. Therefore, a simple identity function $f(z)=z$ is proposed for the output layer. On the contrary, for the classification problem one would be interested in probabilities for a given input point to be attributed to a certain class. As all probabilities should add up to 1, the Softmax function was used for the activation of an output layer (see Eq. \ref{eq:softmax}). With this choice of output activation functions architecture of a NN can be further modified by combining different activation functions for hidden layers to improve an overall performance.
 
 \subsubsection{Back Propagation Mechanism}
 \label{subsubsec: back propagation}
@@ -242,13 +296,13 @@ Let us consider all terms in this equation. The first one is firectly defined by
 \begin{equation}
     \frac{\partial a_{j}^O}{\partial z_{j}^O} = f^{\prime}(z_{j}^O).
 \end{equation}
-The last term yields simply (see Eq.\ref{eq: 1}):
+The last term yields simply (see Eq. \ref{eq: 1}):
 \begin{equation}
     \frac{\partial z_{j}^O}{\partial w_{ij}^O}=a^L_i,
 \end{equation}
 where $L$ denotes the last hidden layer. Combining all together we can express the change of the cost function with respect to $w_{ij}^O$ in terms of an output error $\delta_{j}^O$:
 \begin{equation}
-    \frac{\partial C(a_i^O, t_i}{\partial w_{ij}^O}=f^{\prime}(z_{j}^O)\frac{\partial C(a_j^O, t_i)}{\partial a_{j}^O}a^L_i= \delta_j^Oa^L_i
+    \frac{\partial C(a_i^O, t_i)}{\partial w_{ij}^O}=f^{\prime}(z_{j}^O)\frac{\partial C(a_j^O, t_i)}{\partial a_{j}^O}a^L_i= \delta_j^Oa^L_i
 \end{equation}
 The error $\delta_j^O=f^{\prime}(z_{j}^O)\frac{C(a_j^O, t_i)}{\partial a_{j}^O}$ for an output layer reflects directly how fast the cost function changes with an output activation. It can be also obtained that:
 \begin{equation}
@@ -260,7 +314,7 @@ Replacing the output layer $O$ with a general layer $l$ one can obtain the relat
     \delta_j^l=\frac{\partial C}{\partial z_{j}^l}=\sum_k \frac{\partial C}{\partial z_{k}^{l+1}}\frac{\partial z_{k}^{l+1}}{\partial z_{j}^{l}}=\sum \delta_k^{l+1}\frac{\partial z_{k}^{l+1}}{\partial z_{j}^{l}}.
 \end{equation}
 
-Taking into account the relations between $z_{k}^{l+1}, a_{k}^{l}$ and $z_{k}^{l}$, namely  $z_{k}^{l+1}=\sum_{i=0}^{N_l}w_{ik}^{l+1}a_i^l+b^{l+1}_k$ and $a_{k}^{l}=f(z_{k}^{l})$, one can rewrite Eq.\ref{eq: 2} in the following form:
+Taking into account the relations between $z_{k}^{l+1}, a_{k}^{l}$ and $z_{k}^{l}$, namely  $z_{k}^{l+1}=\sum_{i=0}^{N_l}w_{ik}^{l+1}a_i^l+b^{l+1}_k$ and $a_{k}^{l}=f(z_{k}^{l})$, one can rewrite Eq. \ref{eq: 2} in the following form:
 \begin{equation}
     \delta_j^l=\sum_k \delta_k^{l+1} w_{jk}^{l+1}f^{\prime}(z_j^l).
 \end{equation}
@@ -269,10 +323,10 @@ Thus, the error in a layer $l$ can be propagated back, towards the first hidden 
     w^l_{jk}\rightarrow w_{jk}^l-\eta\delta_j^la_k^{l-1},
     b_j^l\rightarrow b_j^l-\eta\delta_j^l,
 \end{equation}
-where $\eta$ is the learning rate. Therefore,  Gradient Desencent can be seen as the the core mechanism of learning (updating of all parameters) in the NN. Let us assume that the data set is split into $M$
-minibatches, then the full forward pass of a current minibatch followed by the back propagation is called an iteration. The full training period for all $M$ minibatches is called an epoch in the context of the NN. Depending on the choice of a minibatch size and, thus, number of iterations, learning rate, initial choice of weights and biases and number of epochs, the accuracy or the resulting scores can vary significantly. By tuning these parameters and modifying the architecture of the NN one could approximate a desired target with desired accuracy. This is indeed in accordance with the Universal approximation theorem, stating that a FFNN with one hidden layer and a fine number of neurons in it can approximate a continuous multidimensional function with an arbitrary chosen accuracy, given an activation function fulfilling all necessary requirements. 
+where $\eta$ is the learning rate. Therefore,  gradient desencent (SGD) can be seen as the the core mechanism of learning (updating of all parameters) in the NN. Let us assume that the data set is split into $M$
+minibatches, then the full forward pass of a current minibatch followed by the back propagation is called an iteration. The full training period for all $M$ minibatches is called an epoch in the context of the NN. Depending on the choice of a minibatch size and, thus, number of iterations, learning rate, initial choice of weights and biases and number of epochs, the accuracy or the resulting scores can vary significantly. By tuning these parameters and modifying the architecture of the NN one could approximate a desired target with desired accuracy. This is indeed in accordance with the Universal approximation theorem, stating that a FFNN with one hidden layer and a fine number of neurons in it can approximate a continuous multidimensional function with an arbitrary chosen accuracy, given an activation function fulfilling all necessary requirements \cite{Morten}. 
 
-All equations listed above are written in their general form and should be specified for a particular cost, hidden layer and output activation functions. For the regression problem, the natural choice of cost function is a sum of squared residuals, by analogy with that in the Project 1:
+All equations listed above are written in their general form and should be specified for a particular cost function, hidden layer and output activation functions. For the regression problem, the natural choice of cost function is a sum of squared residuals, by analogy with that in the Project 1:
 \begin{equation}
     C(a_j^O, t_j)=\frac{1}{2}\sum_{j=0}^{N_O}(a_j^O-t_j)^2.
 \end{equation}
@@ -285,7 +339,7 @@ All equations listed above are written in their general form and should be speci
      \delta_j^O = a_{j}^O-t_j.
  \end{equation}
  
- For the case of the multiclass classification problem the typical choice of the cross-entropy, or negative log likelihood function, expressed as:
+ For the case of the multiclass classification problem the typical choice of the cross-entropy, or negative log likelihood function, expressed as (for one class, can be easily modified for more classes):
  \begin{equation}
      C(a_j^O, t_j)=-\sum_{j=0}^{N_O}\left(t_j\log{a_j^O}+(1-t_j)\log{a_j^O}\right).
  \end{equation}
@@ -301,12 +355,13 @@ All equations listed above are written in their general form and should be speci
  \begin{equation}
      \delta_j^O=a_j^O(1-a_j^O)\frac{t_1-a_j^O}{a_j^O(1-a_j^O)}=a_{j}^O-t_j,
  \end{equation}
- which is exactly the same result as in case of the regression problem. Hence, the same equations will be used to perform both regression and classification types of analysis. The only expression left is the derivative of an activation layer $l$ used for the propagation of the error in the backward direction. Since different activation functions can be assigned to different hidden layers, all options for the activation functions and their derivatives is included in the code for this project.
+ which is exactly the same result as in case of the regression problem. Hence, the same equations will be used to perform both regression and classification types of analysis. The only expression left is the derivative of an activation layer $l$ used for the propagation of the error in the backward direction. Since different activation functions can be assigned to different hidden layers, all options for the activation functions and their derivatives are included in the code for this project.
  %----------------------------------------------------------
  
- \subsection{Metrics}\label{subsec: metrics}
+ \subsection{Metrics}
+ \label{subsec: metrics}
  
- In order to asses performance of the model (in our case, a NN) one has to introduce statistical characteristics relating the target values with an obtained prediction. The $R^2$ and MSE scores are the natural choice to estimate deviation of the predictions from the actual value in case of a regression problem. They are used in this Project for the Franke's function-based dataset. Both definitions are are described and discussed in more detail in the previous project \cite{proj1, proj1_2}.
+ In order to asses performance of the model (in our case, a NN) one has to introduce statistical characteristics relating the target values with an obtained prediction. The $R^2$ and MSE scores are the natural choice to estimate deviation of the predictions from the actual value in case of a regression problem. They are used in this project for the Franke's function-based dataset. Both definitions are described and discussed in more detail in the previous project \cite{proj1, proj1_2}.
  
 In contrast to predicting continuous values, an assessment of how well a machine performs by guessing a class (discrete value) was carried out in terms of the accuracy. This metric is simply defined as the number of correctly guessed targets $t_i$ divided by the total number of targets, \textit{i.e.} \cite{Morten}:
  \begin{equation}
@@ -317,26 +372,26 @@ In contrast to predicting continuous values, an assessment of how well a machine
 \section{Studied models}
 \label{sec: Studied models} 
 
-\subsection{Franke Function}\label{subsec: franke function}
+\subsection{Franke's Function}\label{subsec: franke function}
 
-All methods described in the previous sections were tested on the dataset acquired with the Franke's function with added noise, by analogy with Project 1. We hereby refer to Project 1 for more information about the form of the Franke's function \cite{proj1, proj1_2}. This dataset provides us with a good test example where various methods performing regression can be compared on the same footing. The noise added is normally distributed $\sim\mathcal{N}(0,1)$ and modulated by an amplitude $\alpha=0.001$. Such a small noise reduces probability of the standard gradient descent procedure to be stuck in numerous potential  local minima of the cost function and makes it, presumably, less dependent on the initial choice of the regression parameter $\beta$.  For the present project, the Franke's function is defined on the regular grid $x\in[0,1]$ and $y\in[0,1]$ with $N\timesN=30\times 30=900$ data points in overall.
+All methods described in the previous sections were tested on the dataset acquired with the Franke's function with added noise, by analogy with the Project 1. We hereby refer to the Project 1 for more information about the form of the Franke's function \cite{proj1, proj1_2}. This dataset provides us with a good test example where various methods performing regression can be compared on the same footing. The noise added is normally distributed $\sim\mathcal{N}(0,1)$ and modulated by an amplitude $\alpha=0.001$. Such a small noise reduces probability of the standard gradient descent procedure to be stuck in numerous potential  local minima of the cost function and makes it, presumably, less dependent on the initial choice of the regression parameter $\beta$.  For the present project, the Franke's function is defined on the regular grid $x\in[0,1]$ and $y\in[0,1]$ with $N\timesN=30\times 30=900$ data points in overall.
 
-The first step of the analysis is again scaling of the dataset as discussed in \cite{proj1, proj1_2}. Since the GD and SGD are involved, scaling of the data might become crucial for the convergence of the procedure. The study in Project 1 was found to be less sensitive to weather the dataset is scaled or not, but in the presented case might result in reduction of the number of epochs used (for the same learning rate) and, therefore, decrease the CPU run time. The second step implies creation of the design matrix $X$ for a chosen polynomial degree \cite{proj1, proj1_2}. From now on we limit ourselves to the polynomial degree 5, which reproduces the main features of the function without slowing down the computational procedure due to the particularly large dimensions of the design matrix. This matrix, together with the values of the Franke's function presents the main input for the GD, SGD and the FFNN, which will be first trained on the training subset of the design matrix and the Franke's function and subsequently applied to the test set of data. 
+The first step of the analysis is again scaling of the dataset as discussed in \cite{proj1, proj1_2}. Since the GD and SGD are involved, scaling of the data might become crucial for the convergence of the procedure. The study in the Project 1 was found to be less sensitive to whether the dataset is scaled or not, but in the presented case might result in reduction of the number of epochs used (for the same learning rate) and, therefore, decrease the CPU run time. The second step implies creation of the design matrix $X$ for a chosen polynomial degree \cite{proj1, proj1_2}. From now on we limit ourselves to the polynomial degree 5, which reproduces the main features of the function without slowing down the computational procedure due to the particularly large dimensions of the design matrix. This matrix, together with the values of the Franke's function presents the main input for the GD, SGD and the FFNN, which will be first trained on the training subset of the design matrix and the Franke's function and subsequently applied to the test set of data. 
 
 \subsection{MNIST Data}\label{subsec: mnist data}
 
-The Neural Network developed in this project was also tested on the MNIST hand-written numbers database \cite{MNIST}. Here, a picture of a hand written digit was input to the neural network, with a goal of \textquotedblleft reading\textquotedblright the value. Where the Franke's function was a continuous function and we were interested in predicting its value for a data point in the grid, the MNIST database provides an opportunity to work with the classification problem where we are interested in an exact discrete output value between $0-9$.
-\begin{figure}[h]
+The Neural Network developed in this project was also tested on the MNIST hand-written numbers database \cite{MNIST}. Here, a picture of a hand written digit was input to the neural network with a goal of \textquotedblleft reading\textquotedblright the value. Where the Franke's function was a continuous function and we were interested in predicting its value for a data point in the grid, the MNIST database provides an opportunity to work with the classification problem where we are interested in an exact discrete output value between $0-9$.
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/MNIST_illustrated.png}
     \caption{Examples of hand written numbers from the MNIST database used for this project. The label shows what digit it is supposed to be.}
     \label{fig:MNIST_illustrations}
 \end{figure}
 
-From the MNIST database we collect gray-scale images with the size of $8x8$ pixels (see Fig. \ref{fig:MNIST_illustrations}). For simplicity, the number of pixels are reduced from the original values of $28x28$. Since each input picture is a 2D matrix, it was \textquotedblleft unraveled\textquotedblright to a vector with $64$ inputs. Each vector element is then a number between $0$ and $1$, representing the gray-scale intensity, and additionally labelled by this number. These labels will be the target values we will be aiming at reproducing.
+From the MNIST database we collect gray-scale images with the size of $8 \times 8$ pixels (see Fig. \ref{fig:MNIST_illustrations}). For simplicity, the number of pixels are reduced from the original values of $28 \times 28$. Since each input picture is a 2D matrix, it was \textquotedblleft unraveled\textquotedblright to a vector with $64$ inputs. Each vector element is then a number between $0$ and $1$, representing the gray-scale intensity, and additionally labelled by this number. These labels will be the target values we will be aiming at reproducing.
 
 As for a typical multiclass classification problem, it is convenient to convert the labels attributed to each image into the so-called \textit{one-hot} vectors. 
-Therefore, the NN will output a one-hot vector by using the Softax activation function in the outpuut layer from an input image and will be compared with the target one-hot vector in the training procedure. The cost-function as well as the output error of the NN model is calculated from a relation between the input and the output one-hot vector in terms of the cross-entropy. A one-hot vector has the size of the number of classes, where each value corresponds to the probability that the input image represents a certain class. For example, the input one-hot vector for an image of the written digit "2" will  look like 
+Therefore, the NN will output a one-hot vector by using the Softmax activation function from an input image and it will be compared with the target one-hot vector in the training procedure. The cost function as well as the output error of the NN model is calculated from a relation between the input and the output one-hot vector in terms of the cross-entropy. A one-hot vector has the size of the number of classes, where each value corresponds to the probability that the input image represents a certain class. For example, the input one-hot vector for an image of the written digit \textquotedblleft 2\textquotedblright will  look like 
 \begin{equation}
 y=2 \rightarrow \hat{y}_{input} = \{0,0,1,0,0,0,0,0,0,0\}
 \end{equation}
@@ -351,37 +406,40 @@ After the training procedure is accomplished, there is no need to convert the da
 %-----------------------------------------------------------
 \section{Code} \label{sec: Code}
 
-The study of the regression and classification problems for the Franke's and MNIST data combined with an application of the stochastic gradient descent was performed with the set of Python3-based codes which can be accessed from Appendix.A(\ref{Appendix:A}). The major improvement of the code, as compared to the code for the Project 1 \cite{proj1,proj1_2} is introduction of the classes, used for more efficient structuring of the computational procedure for all tasks. Interpreting a neural network as an object of a neural network class is a natural and efficient choice for the work with various types of networks with adjustable parameters and architectures. In addition, the functions used for performing direct work with and preprocessing of input data, resampling methods and regression methods were combined into three interconnecting classes. 
+The study of the regression and classification problems for the Franke's and MNIST data combined with an application of the stochastic gradient descent was performed with the set of Python3-based codes. All programs used can be accessed from Appendix A(\ref{Appendix:A}). The major improvement of the code, as compared to the code for the Project 1 \cite{proj1,proj1_2}, is introduction of the classes, used for more efficient structuring of the computational procedure for all tasks. Interpreting a neural network as an object of a neural network class is a natural and efficient choice for the work with various types of networks with adjustable parameters and architectures. In addition, the functions used for performing direct work with and preprocessing of input data, resampling methods and regression methods were combined into three interconnected classes. 
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/code.pdf}
     \caption{Principal scheme of the code used in the project.}
     \label{fig:code}
 \end{figure}
 
-The principal scheme of the components of the code is shown in Fig.\ref{fig:code}. In order to collect results for different cases \textit{task\_a.py}, \textit{task\_b.py}, \textit{task\_c.py}, \textit{task\_d.py}, and \textit{task\_e.py} files were run. In each file several user-defined study options are available, \textit{e.g.} study of the test and training scores as functions of the learning rate, number of epochs, grid search, \textit{etc.} Resulting scores are written to files used further for graphical interpretation of the results, presented in the following section.
+The principal scheme of the components of the code is shown in Fig. \ref{fig:code}. In order to collect results for different cases \textit{task\_a.py}, \textit{task\_b.py}, \textit{task\_c.py}, \textit{task\_d.py}, and \textit{task\_e.py} files were run. In each file several user-defined study options are available, \textit{e.g.} study of the test and training scores as functions of the learning rate, number of epochs, grid search, and so on. The resulting scores are written out into files used further for graphical interpretation of the results, which are presented in the following section.
 
 
-For the first task an object \textit{franke\_function} of the class \textit{Data} (\textit{data\_processing.py} is created and prepared for the implementation of regression with the attributed class methods, \text{e.g.} by setting a grid and the Franke's function (\textit{set\_grid\_franke\_function(...)}, \textit{set\_franke\_function()}), adding noise (\textit{add\_noise()}) and scaling with the Scikit-Learn functionality \textit{sklearn.preprocessing.StandardScaler} \cite{skl}. Further, an additional object \textit{model} of the class \textit{Resampling} (\textit{resampling\_methods.py}) is created on the base of an existing \textit{Data} object. For the presented study we keep two possible options for the analysis of the scores, namely k-fold cross-validation and no-resampling method exploiting \textit{sklearn.model\_selection.train\_test\_split} functionality from Scikit-Learn \cite{skl}. For the project, if k-fold cross-validation is not chosen, the input data are split into the test and training subsets with this functionality, implemented as a class \textit{Data} method, in proportion  80\% training/ 20\% test data. This was shown to be a suitable ratio for effective training in Project 1 \cite{proj1}. For the k-fold cross-validation 5 folds case was used based on its good performance for the score assessment for the Franke's data in the first Project \cite{proj1,proj1_2} and relatively small CPU run time as compared to the higher number of folds. Splitting of data into minibatches is performed with the \textit{split\_minibatch(...)} routine of \textit{Data} class. Since this method is used for both the k-fold cross-validation (all data into minibatches) and SGD (training data into minibatches), a user can choose which dataset will be divided into minibatches or divide both of them. 
+For the first task, an object \textit{franke\_function} of the class \textit{Data} is created and prepared for the implementation of regression with the attributed class methods, \text{e.g.} by setting a grid and the Franke's function (\textit{set\_grid\_franke\_function(...)}, \textit{set\_franke\_function()}), adding noise (\textit{add\_noise()}). Finally, it is scaled with the Scikit-Learn functionality \textit{sklearn.preprocessing.StandardScaler} \cite{skl}. Further, an additional object \textit{model} of the class \textit{Resampling} is created on the base of an existing \textit{Data} object. For the presented study we keep two possible options for the analysis of the scores, namely k-fold cross-validation and no-resampling method exploiting \textit{sklearn.model\_selection.train\_test\_split} functionality from Scikit-Learn \cite{skl}. For the project, if k-fold cross-validation is not chosen, the input data are split into the test and training subsets with this functionality, implemented as a class \textit{Data} method, in proportion  80\% training/ 20\% test data. This was shown to be a suitable ratio for effective training in the Project 1 \cite{proj1}. For the k-fold cross-validation 5 folds case was used based on its good performance for the score assessment for the Franke's data in the first Project \cite{proj1,proj1_2} and relatively small CPU run time as compared to the higher number of folds. Splitting of data into minibatches is performed with the \textit{split\_minibatch(...)} routine of the \textit{Data} class. Since this method is used for both the k-fold cross-validation (all data into minibatches) and SGD (training data into minibatches), a user can choose which dataset will be divided into minibatches or divide both of them. 
 
-Both resampling options perform fitting of the data (class \textit{Fitting}, \textit{regression\_methods.py} object) by either OLS (\textit{OLS()}) or ridge (\textit{ridge(...)}) with the standard matrix SVD-based matrix inversion \textit{numpy.linalg.pinv} \cite{numpy}. The new cost function minimization options include SGD (\textit{SGD()}) for the cases with and without penalty ($\lambda>0$) included, standard GD and the Scikit-Learn functionality \textit{sklearn.linear\_model.SGDRegressor} \cite{skl}. The mechanism of the SGD tested in the first task is further implemented in the neural network.
+Both resampling options perform the fitting of the data (class \textit{Fitting} object) by either OLS (\textit{OLS()}) or Ridge regression (\textit{ridge(...)}) employing the standard SVD-based matrix inversion \textit{numpy.linalg.pinv} \cite{numpy}. The new cost function minimization options include SGD (\textit{SGD()}) for the cases both with and without penalty ($\lambda>0$) included, standard GD as well as the Scikit-Learn SGD functionality \textit{sklearn.linear\_model.SGDRegressor} \cite{skl}. The mechanism of the SGD tested in the first task is subsequently implemented in the feed forward neural network.
 
 
-As it was already mentioned, the neural network in the second task is set and interpreted as an object of the \textit{NeuralNetwork(...)} class in \textit{neuralnetwork.py}. Setting of the network is flexible and implies different architecture types with variable number of hidden layers, neurons in each layer, activation functions for the hidden and output layers. In order to facilitate setting of the new hidden layers, and additional class \textit{HiddenLayer(...)} was created, collecting all inputs and outputs from each neuron in a given hidden layer. The principal components of the NN are listed below:
+As it was already mentioned, the neural network in the second task is set and interpreted as an object of the \textit{NeuralNetwork(...)} class in \textit{neuralnetwork.py}. Setting up the network is flexible and implies different architecture types with variable number of hidden layers, neurons in each layer, activation functions for the hidden and output layers. In order to facilitate the addition and alteration of new hidden layers, an additional class \textit{HiddenLayer(...)} was created, collecting all the inputs and the outputs from each neuron in a given hidden layer. The principal components of the neural network are illustrated in Listing \ref{lst:code_listing}, including a brief explanation of the different functions, and actions they perform and what they return.
 
-\begin{lstlisting}[language=Python, caption={Structure of the NeuralNetwork and HiddenLayer classes}]
+
+\begin{lstlisting}[language=Python, caption={Structure of the NeuralNetwork and HiddenLayer classes.},label={lst:code_listing}]
 import numpy as np
 from activation_functions import *
 
 class NeuralNetwork:
     def __init__(NN parameters):
-        ''' FFNN class, setting of all SGD parameters, 
-        penalty hidden and output weights  '''
+        ''' FFNN class, setting of all SGD 
+        parameters,  penalty hidden and 
+        output weights  '''
         
     def create_output_biases_and_weights(self):
         '''Setting of normally distributed 
-        output weights and constant output bias'''
+        output weights and constant output 
+        bias'''
         
     def feed_forward(self):
         '''Forward pass for a selected 
@@ -428,7 +486,7 @@ class HiddenLayer:
         hidden layer'''
 \end{lstlisting}
 
-Training procedure combines passage of each randomly selected (without replacement) minibatch in the forward direction through the whole NN and its back propagation looped over a selected number of minibatches and epochs. Such setting of the NN provides us with a considerable freedom to adjust the architecture to achieve the best scores. This will be shown in the next section for the regression problem on the Franke's data. In addition, the NN can be easily adapted for the classification problem by switching to the different (cross-entropy) cost function, output activation function (Softmax) and number of output categories. For both cases, the regression and classification, performance of this NN is compared to the in-built Scikit-Learn functionalities, namely \textit{sklearn.neural\_network.MLPRegressor} and \textit{sklearn.neural\_network.MLPClassifier} \cite{skl} with the same settings of the layer initialization, SGD parameters and regularization parameter (SKL NN). In addition, we compare performance of all above-mentioned NN \textit{vs.} the Keras NN, running on top of the machine learning platform TensorFlow \cite{keras}. In overall, Keras provides us with even more freedom in designing a NN , by \textit{e.g.} choosing different activation functions and for different hidden layers and their initialization. In this sense, the Scikit-Learn is more limited, but still an effective tool for the proposed analyses. For this project we aim to compare performance of all three types of NN with the same settings without exploring the whole computational power of Keras-based NN. For the classification task, all studies of the SKL and Keras NN is kept in the \textit{project2.ipynb} Jupiter notebook, exploiting \textit{keras\_NN.py} functionality for the faster representation of the results.  
+Training procedure combines passage of each randomly selected minibatch in the forward direction through the whole NN and its back propagation looped over a selected number of minibatches and epochs. Such setting of the NN provides us with a considerable freedom to adjust the architecture to achieve the best scores. This will be shown in the next section for the regression problem on the Franke's data. In addition, the NN can be easily adapted for the classification problem by switching to the different (cross-entropy) cost function, output activation function (Softmax) and number of output categories. For both cases, the regression and classification, performance of this NN is compared to the in-built Scikit-Learn functionalities, namely \textit{sklearn.neural\_network.MLPRegressor} and \textit{sklearn.neural\_network.MLPClassifier} \cite{skl} with the same settings of the layer initialization, SGD parameters and regularization parameter (SKL NN). In addition, we compare performance of all above-mentioned NN \textit{vs.} the Keras NN, running on top of the machine learning platform TensorFlow \cite{keras}. In overall, Keras provides us with even more freedom in designing a NN , by \textit{e.g.} choosing different activation functions and for different hidden layers and their initialization. In this sense, the Scikit-Learn is more limited, but still an effective tool for the proposed analyses. For this project we aim to compare performance of all three types of NN with the same settings without exploring the whole computational power of Keras-based NN. For the classification task, all studies of the SKL and Keras NN is kept in the \textit{project2.ipynb} Jupyter notebook, exploiting \textit{keras\_NN.py} functionality for the faster representation of the results.  
 
 Finally, for the last task, including classification of the MNIST data, the logistic regression based on the SGD and GD was written and included as a routine of the \textit{Fitting} class. Performance of this logistic regression function was also compared with the implemented Scikit-Learn functionality \textit{sklearn.linear\_model.LogisticRegression}, also included, as an option, in the logistic regression routine.
 
@@ -443,91 +501,91 @@ All classes and task files share access to the functions from \textit{statistica
 %---------------------------Task a----------------------------
 \subsection{Testing stochastic gradient descent}
 \label{subsec: Task 1}
-As a first step, the Franke's  function analysis from Project 1 \cite{proj1, proj1_2} was performed again,but using stochastic gradient descent (SGD) with both the ordinary least square regression (OLS) and ridge regression instead of the matrix inversion. For all the results for the Franke's function analysis we used 5-fold cross-validation resampling method to increase stability and reliability of the results.
+As a first step, the Franke's  function analysis from Project 1 was performed again, but using SGD with both the ordinary least square regression (OLS) and ridge regression instead of the matrix inversion. For all the results for the Franke's function analysis we used 5-fold cross-validation resampling method to increase stability and reliability of the results.
 
-The resulting $R^{2}$ scores and MSEs for the training and test datasets as functions of the learning rate $\eta$ for OLS is shown in Fig.\ref{fig: R2_OLS_eta} and Fig.\ref{fig: MSE_OLS_eta} respectively. The results show a very slight difference between the training and test data, where the $R^{2}$ is slightly bigger for the training set, whereas the MSE is lower for the training set, as might be expected for this choice of the design matrix. For a selected range of the learning rates, both the training and test $R^{2}$ seem to increase monotonously (MSE decreases monotonously) for a chosen number of epochs and minibatch size $N_{\mathrm{epochs}}=1000$ and minibatch size $M=5$ (will be denoted by $M$ from now own).
+The resulting $R^{2}$ scores and MSEs for the training and test datasets as functions of the learning rate $\eta$ for OLS are shown in Fig. \ref{fig: R2_OLS_eta} and Fig. \ref{fig: MSE_OLS_eta} respectively. The results show a very slight difference between the training and test data, where the $R^{2}$ is slightly bigger for the training set, whereas the MSE is lower for the training set, as might be expected for this choice of the design matrix. For a selected range of the learning rates, both the training and test $R^{2}$ seem to increase monotonously (MSE decreases monotonously) for a chosen number of epochs $N_{\mathrm{epochs}}=1000$ and minibatch size $M=5$ (will be denoted by $M$ from now own).
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_R2_eta.pdf}
     \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. OLS ($\lambda=0.0)$ case.}
     \label{fig: R2_OLS_eta}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_MSE_eta.pdf}
     \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. OLS ($\lambda=0.0)$ case.}
     \label{fig: MSE_OLS_eta}
 \end{figure}
 
-The OLS $R^{2}$ test and training scores and MSEs as functions of a minibatch size are presented in Fig.\ref{fig: R2_OLS_minibatch} and \ref{fig: MSE_OLS_minibatch}. It seems to show that the optimal size of the minibatch is around $M\approx5-10$. For the further increase of $M$ a fast worsening of the results is observed. 
+The OLS $R^{2}$ test and training scores and MSEs as functions of a minibatch size are presented in Fig. \ref{fig: R2_OLS_minibatch} and \ref{fig: MSE_OLS_minibatch}. It shows that the optimal size of the minibatch is around $M\approx5-10$. For the further increase of $M$ a fast worsening of the results is observed. 
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_R2_minibatch.pdf}
     \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. OLS ($\lambda=0.0)$ case.}
     \label{fig: R2_OLS_minibatch}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_MSE_minibatch.pdf}
     \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. OLS ($\lambda=0.0)$ case.}
     \label{fig: MSE_OLS_minibatch}
 \end{figure}
 
-To also study the effect of the number of epochs, the $R^{2}$ scores for the test and training sets and MSE for OLS were also studied as functions of epochs. These results are shown in Fig.\ref{fig: R2_OLS_epochs} and Fig.\ref{fig: MSE_OLS_epochs} respectively. The optimal number of epochs seem to be $\approx 1000$, after which it seems to be essentially constant with increasing epochs. For the chosen learning rate $\eta=0.001$ and the minibatch size $M=5$ further increasing of $N_{\mathrm{epochs}}$ does not seen to lead to any significant improvements, meaning that the SGD was able to converge properly.
+To also study the effect of the number of epochs, the $R^{2}$ scores for the test and training sets and MSE for OLS were also studied as functions of epochs. These results are shown in Fig. \ref{fig: R2_OLS_epochs} and Fig. \ref{fig: MSE_OLS_epochs} respectively. The optimal number of epochs seem to be $\approx 1000$, after which it seems to be essentially constant with increasing epochs. For the chosen learning rate $\eta=0.001$ and the minibatch size $M=5$ further increasing of $N_{\mathrm{epochs}}$ does not seen to lead to any significant improvements, meaning that the SGD was able to converge properly.
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_R2_epochs.pdf}
     \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $M=5$ and $\eta=0.001$ for different numbers of epochs. OLS ($\lambda=0.0)$ case.}
     \label{fig: R2_OLS_epochs}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/OLS_MSE_epochs.pdf}
     \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $M=5$ and $\eta=0.001$ for different numbers of epochs. OLS ($\lambda=0.0)$ case.}
     \label{fig: MSE_OLS_epochs}
 \end{figure}
 
-When it comes to the ridge regression results with SGD, a grid search was performed to find the optimal $\lambda$ and $\eta$. The $R^{2}$ score and MSE for the test and training datasets  for zero and non-zero regularization parameters are presented in Figures \ref{fig: Ridge_grid_R2_coarse} and \ref{fig: Ridge_grid_MSE_coarse} respectively. These results use a coarse learning rate grid with the step of one order of magnitude. We also present results with a fine learning rate grid where Fig.\ref{fig: Ridge_grid_R2_fine} and Fig.\ref{fig: Ridge_grid_MSE_fine} show the resulting $R^{2}$ scores and MSEs respectively for a selected set of learning rates, thus zooming the area of the best scores presented in the previous figures. These fine scale results are used for a better representation of the area with the highest $R^{2}$ scores (and lowest MSE). The white spots encountered in the grid denote the cases where results can not be obtained due to a computational overflow.
+When it comes to the ridge regression results with SGD, a grid search was performed to find the optimal $\lambda$ and $\eta$. The $R^{2}$ score and MSE for the test and training datasets  for zero and non-zero regularization parameters are presented in Fig. \ref{fig: ridge_grid_R2_coarse} and Fig. \ref{fig: ridge_grid_MSE_coarse} respectively. These results use a coarse learning rate grid with the step of one order of magnitude. We also present results with a fine learning rate grid where Fig. \ref{fig: ridge_grid_R2_fine} and Fig. \ref{fig: ridge_grid_MSE_fine} show the resulting $R^{2}$ scores and MSEs respectively for a selected set of learning rates, thus zooming the area of the best scores presented in the previous figures. These fine scale results are used for a better representation of the area with the highest $R^{2}$ scores (and lowest MSE). The white spots encountered in the grid denote the cases where results cannot be obtained due to a computational overflow.
 
 In addition, the study of the $R^2$ scores and MSE for the case of non-zero regularization parameter $\lambda=0.1,0.01,0.001$ was also performed. But due to the similar trends they are not included into the main discussion part and presented in Appendix C \ref{Appendix:C}. 
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2.pdf}
-    \caption{Grid search for the optimal $\lambda$ and $\eta$ maximising the training (upper panel) and test (lower panel) $R^2$ scores for Ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Coarse learning rate grid.}
-    \label{fig: Ridge_grid_R2_coarse}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2.pdf}
+    \caption{Grid search for the optimal $\lambda$ and $\eta$ maximising the training (upper panel) and test (lower panel) $R^2$ scores for ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Coarse learning rate grid.}
+    \label{fig: ridge_grid_R2_coarse}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_MSE.pdf}
-    \caption{Grid search for the optimal $\lambda$ and $\eta$ minimizing the training (upper panel) and test (lower panel) MSE for Ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Coarse learning rate grid.}
-    \label{fig: Ridge_grid_MSE_coarse}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_MSE.pdf}
+    \caption{Grid search for the optimal $\lambda$ and $\eta$ minimizing the training (upper panel) and test (lower panel) MSE for ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Coarse learning rate grid.}
+    \label{fig: ridge_grid_MSE_coarse}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2_fine.pdf}
-    \caption{Grid search for the optimal $\lambda$ and $\eta$ maximising the training (upper panel) and test (lower panel) $R^2$ scores for Ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Fine learning rate grid.}
-    \label{fig: Ridge_grid_R2_fine}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2_fine.pdf}
+    \caption{Grid search for the optimal $\lambda$ and $\eta$ maximising the training (upper panel) and test (lower panel) $R^2$ scores for ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Fine learning rate grid.}
+    \label{fig: ridge_grid_R2_fine}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_MSE_fine.pdf}
-    \caption{Grid search for the optimal $\lambda$ and $\eta$ minimizing the training (upper panel) and test (lower panel) MSE for Ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Fine learning rate grid.}
-    \label{fig: Ridge_grid_MSE_fine}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_MSE_fine.pdf}
+    \caption{Grid search for the optimal $\lambda$ and $\eta$ minimizing the training (upper panel) and test (lower panel) MSE for ridge with the SGD with 5-fold cross-validation, $N_{\mathrm{epochs}}=1000$, $M=5$. Fine learning rate grid.}
+    \label{fig: ridge_grid_MSE_fine}
 \end{figure}
 
 Additionally, we investigated the effects of a scaled learning rate $\eta$. As it was mentioned in Section \ref{subsubsec: SGD}, the learning rate can be set to adjustable as procedure runs through a chosen number of epochs and iterations. By scaled from now on we define the learning rate $\eta=t_0/(t_1+e\cdot m+i)$ with $e$ being a current epoch, $i$ - a current minibatch, $m$ - total number of minibatches. This adjustable learning rate starts with the initial value $t_0/t_1$ and decreases gradually with the number of epochs and minibatch number. The scaled learning rate was tested versus the constant learning rate that keeps the same value $t_0/t_1$ throughout the whole procedure. The results in Table \ref{tab:OLS} show the training and test $R^{2}$ scores and MSEs for OLS with both a constant $\eta$ and a scaled $\eta$. From these results, the performance with the constant learning rate is noticeably better and for the further analysis we should not scale the $\eta$ for OLS with the chosen parameters. From now on the learning rate is kept constant.
 
-In Table \ref{tab:OLS vs ridge} the test $R^{2}$ score and MSE is presented for both OLS and Ridge using the matrix inversion from Project 1, as well as our SGD and and Scikit-Learn SGD (SKL SGD). We also have included the results using the standard gradient descent method. The results are presented for a selected number of different learning rates, as is shown in the Table \ref{tab:OLS vs ridge}. For the SKL SGD maximum 1000 iterations were sufficient to achieve a result comparable to the implemented SGD. For the GD 100000 were chosen and found sufficient to achieve good performance on both the training and the test set.
+In Table \ref{tab:OLS vs ridge} the test $R^{2}$ score and MSE is presented for both OLS and ridge using the matrix inversion from the Project 1, as well as our SGD and and Scikit-Learn SGD (SKL SGD). We also have included the results using the standard gradient descent method. The results are presented for a selected number of different learning rates, as is shown in the Table \ref{tab:OLS vs ridge}. For the SKL SGD maximum 1000 iterations were sufficient to achieve a result comparable to the implemented SGD. For the GD 100000 were chosen and found sufficient to achieve good performance on both the training and the test set.
 
 
 \begin{table}[!htb]
@@ -549,11 +607,11 @@ In Table \ref{tab:OLS vs ridge} the test $R^{2}$ score and MSE is presented for 
 
 \begin{table}[!htb]
 \begin{center}
-\caption{\scriptsize Comparison of the test $R^2$ for OLS ($\lambda=0.0) $ and Ridge ($\lambda=0.001$) for the standard matrix inversion, SGD with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$, GD with 100000 iterations and $\eta=0.01,0.001$, and scikit-learn SGD with $\eta=0.01,0.001$ and maximum limit of 1000 iterations. }
+\caption{\scriptsize Comparison of the test $R^2$ for OLS ($\lambda=0.0) $ and ridge ($\lambda=0.001$) for the standard matrix inversion, SGD with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$, GD with 100000 iterations and $\eta=0.01,0.001$, and scikit-learn SGD with $\eta=0.01,0.001$ and maximum limit of 1000 iterations. }
 \label{tab:OLS vs ridge}  
 \begin{tabular}{lllll}
 \cline{2-5}\noalign{\smallskip}\cline{2-5}\noalign{\smallskip}
-& \multicolumn{2}{c}{OLS} & \multicolumn{2}{c}{Ridge} \\ \cline{2-5}\noalign{\smallskip} 
+& \multicolumn{2}{c}{OLS} & \multicolumn{2}{c}{ridge} \\ \cline{2-5}\noalign{\smallskip} 
 & $R^2$ & MSE & $R^2$ & MSE \\ \hline\noalign{\smallskip}
 \multicolumn{1}{l|}{Mat.inv.} & 0.9712 & 0.0287 & 0.9712 & 0.0287\\
 \multicolumn{1}{l|}{SGD, $\eta=0.001$} & 0.9698 & 0.0301 & 0.9697 & 0.0302\\
@@ -570,7 +628,7 @@ In Table \ref{tab:OLS vs ridge} the test $R^{2}$ score and MSE is presented for 
 
 The SGD discussed in the previous section forms the base for the learning mechanism in the neural network. As the main structure of the NN is developed, an important choice to make is to set initial guesses for all hidden layers, an output layer as well as the corresponding biases. For the NN used to produce the results in this task we have, unless stated otherwise, set the biases as small constant values, $b_i=0.01$, the weights used are normally distributed $w_{ij}\in\mathcal{N}(0,1)$, and for the output activation we simply select the identity function $f(x) = x$. For each hidden layer the Sigmoid activation function is chosen.
 
-In Table \ref{tab:Ols vs ridge vs FFNN and NN} the results for the cases with and without regularization ($\lambda=0.001, \lambda=0$ respectively) our self-made FFNN with three hidden layers and 50 neurons in each is compared to the results obtained with the matrix inversion, the Scikit-Learn FFNN using both SGD and ADAM optimizer, and TensorFlow Keras FFNN using SGD and ADAM as optimizers. For all mentioned NN 1000 epochs, minibatch size $M=5$ and $\rta=0.001$ were chosen. For the Keras NN performance can be further improved by setting $\eta=0.01$. This result is also included in the Table \ref{tab:Ols vs ridge vs FFNN and NN}. We see that all the NN perform better than matrix inversion. For Scikit-Learn and Keras we test several different optimizers, but the Keras FFNN with ADAM seems to perform best for the case with $\lambda=0$, whereas our self-made FFNN perform the best for $\lambda=0.001$.
+In Table \ref{tab:Ols vs ridge vs FFNN and NN} the results for the cases with and without regularization ($\lambda=0.001, \lambda=0$ respectively) for our self-made FFNN with three hidden layers and 50 neurons in each is compared to the results obtained with the matrix inversion, the Scikit-Learn FFNN using both SGD and ADAM optimizer, and TensorFlow Keras FFNN using SGD and ADAM as optimizers. ADAM optimizer is an effective modification of the SGD using squared gradients to scale the learning rate and a moving mean of the gradient instead of the gradient itself \cite{Morten}. For all mentioned NN 1000 epochs, minibatch size $M=5$ and $\rta=0.001$ were chosen. For the Keras NN performance can be further improved by setting $\eta=0.01$. This result is also included in the Table \ref{tab:Ols vs ridge vs FFNN and NN}. We see that all the NN perform better than matrix inversion. For Scikit-Learn and Keras we test several different optimizers, but the Keras FFNN with ADAM seems to perform best for the case with $\lambda=0$, whereas our self-made FFNN perform the best for $\lambda=0.001$.
 
 \begin{table}[!htb]
 \begin{center}
@@ -580,7 +638,7 @@ In Table \ref{tab:Ols vs ridge vs FFNN and NN} the results for the cases with an
 \cline{2-5}\noalign{\smallskip}\cline{2-5}\noalign{\smallskip}
 & \multicolumn{2}{c}{$\lambda=0$} & \multicolumn{2}{c}{$\lambda=0.001$} \\ \cline{2-5}\noalign{\smallskip} 
 & $R^2$ & MSE & $R^2$ & MSE \\ \hline\noalign{\smallskip}
-\multicolumn{1}{l|}{Mat.inv.} & 0.9719 & 0.0287 & 0.9719 & 0.0287\\
+\multicolumn{1}{l|}{Mat.inv.} & 0.9712 & 0.0287 & 0.9712 & 0.0287\\
 \multicolumn{1}{l|}{FFNN} & 0.9955 & 0.0039 & 0.9967 & 0.0028\\
 \multicolumn{1}{l|}{FFNN SKL (SGD)} & 0.9908 & 0.0080 & 0.9908 & 0.0079\\
 \multicolumn{1}{l|}{FFNN SKL (ADAM)} & 0.9978 & 0.0019 & 0.9965 & 0.0030\\
@@ -592,57 +650,57 @@ In Table \ref{tab:Ols vs ridge vs FFNN and NN} the results for the cases with an
 \end{center}
 \end{table}
 
-We also study how the training and test MSE behaves for our FFNN with three hidden layers for an increasing number of epochs. This result can be seen in Figure \ref{fig: NN_MSE_epochs}. An overall trend here is a decrease of the training and test MSE with increasing number of neurons. The decrease for the training set is apparent, whilst the test value varies significantly throughout the whole range chosen for the number of epochs. This makes the search for the local minimum of the test MSE complicated. In overall, we observe a slight increase of the MSE for the number of epochs higher than $\approx 900$, implying that for  $N_{\mathrm{epochs}}$ we might enter the area of overfitting.
+We also study how the training and test MSE behaves for our FFNN with three hidden layers for an increasing number of epochs. This result can be seen in Fig. \ref{fig: NN_MSE_epochs}. An overall trend here is a decrease of the training and test MSE with increasing number of neurons. The decrease for the training set is apparent, whilst the test value varies significantly throughout the whole range chosen for the number of epochs. This makes the search for the local minimum of the test MSE complicated. In overall, we observe a slight increase of the MSE for the number of epochs higher than $\approx 900$, implying that for  $N_{\mathrm{epochs}}=1000$ we might enter the area of overfitting.
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/NN_MSE_epochs.pdf}
     \caption{Mean squared error for the test and train datasets as a function of number of epochs for the FFNN with three hidden layers with 50 neurons in each, $\eta=0.001$, $M=5$.}
     \label{fig: NN_MSE_epochs}
 \end{figure}
 
-In Fig.\ref{fig: NN_MSE_layers} we study how the MSE for the FFNN changes with increasing number of hidden layers. The decrease of the test and training MSEs is quite steady, no overfitting is observed. Adding additional hidden layers might be a clue to improving a performance of the network. Fig.\ref{fig: NN_MSE_neurons} illustrates how the MSE changes with increasing number of neurons for the FFNN with one hidden layer. As the training MSE drops firmly to its minimum value with the increasing number of neurons, the test MSE demonstrates significant variation from point to point. This, again makes estimation of where the networks begins to overfit the data quite unclear. In overall, one might conclude that overfitting occurs for the number of neurons bigger that $\approx20$, as the test MSE tends to increase in overall after this point. 
+In Fig. \ref{fig: NN_MSE_layers} we study how the MSE for the FFNN changes with increasing number of hidden layers. The decrease of the test and training MSEs is quite steady, no overfitting is observed. Adding additional hidden layers might be a clue to improving a performance of the network. Fig. \ref{fig: NN_MSE_neurons} illustrates how the MSE changes with increasing number of neurons for the FFNN with one hidden layer. As the training MSE drops firmly to its minimum value with the increasing number of neurons, the test MSE demonstrates significant variation from point to point. Again, this makes estimation of where the networks begins to overfit the data quite unclear. In overall, one might conclude that overfitting occurs for the number of neurons bigger than $\approx20$, as the test MSE tends to increase in overall after this point. 
 
-\begin{figure}[h]
+\begin{figure}[t!]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/NN_MSE_layers.pdf}
     \caption{Mean squared error for the test and train datasets as a function of number of hidden layers (50 neurons in each) for the FFNN with $N_{epoch}=1000$, $\eta=0.001$, $M=5$.}
     \label{fig: NN_MSE_layers}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[t!]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/NN_MSE_neurons.pdf}
     \caption{Mean squared error for the test and train datasets as a function of number of neurons for the FFNN with $N_{epoch}=1000$, $\eta=0.001$, $M=5$ and one hidden layer.}
     \label{fig: NN_MSE_neurons}
 \end{figure}
 
-For the case with non-zero regularization parameter included, the grid search showing the training and test $R^{2}$ scores are found in Figure \ref{fig: NN_Ridge_R2}. Since the corresponding search for the minimum MSE is quite similar to search for the maximum $R^{2}$ scores, we present here results for $R^{2}$ only, while the grid search for the smallest test and train MSE can be found in Appendix C \ref{Appendix:C}. The blank squares denote the cases resulting in the computational overflow. The area of the highest scores for both the test and training $R^{2}$ is clear and covers $\lambda=0$ and $\lambda<0.001$ and $10^{-4}\eta<10^{-2}$.
-
-Fig.\ref{fig:franke} demonstrates the original form of the Franke's function to be fitted (a), the fit result with the FFNN with three layers on the training data (b) and, finally, the fitted test data (c). An overall fit of both datasets is quite satisfying, which is supported by the high $R^2$ scores, stored in the Table \ref{tab:Ols vs ridge vs FFNN and NN}.
-
-\begin{figure*}
-\label{fig:franke}
-\includegraphics[width=1.0\textwidth]{Figures/Franke.pdf}% Here is how to import EPS art
-\caption{\label{fig:Franke}Franke's function, test and training datasets in case of $N=30$, and total number of $(x_i,y_i)$ data pairs $N\times N=900$.}
-\end{figure*}
-
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/NN_Ridge_R2.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/NN_ridge_R2.pdf}
     \caption{Grid search for the optimal $\lambda$ and $\eta$ maximising the training (upper panel) and test (lower panel) $R^2$ scores for the three-layer FFNN (50 neurons each), $N_{\mathrm{epochs}}=1000$, $M=5$.}
-    \label{fig: NN_Ridge_R2}
+    \label{fig: NN_ridge_R2}
 \end{figure}
 
+\begin{figure*}
+\includegraphics[width=1.0\textwidth]{Figures/Franke.pdf}
+\caption{\label{fig:Franke_fig}Franke's function, test and training datasets in case of $N=30$, and total number of $(x_i,y_i)$ data pairs $N\times N=900$.}
+\end{figure*}
 
-To study how the different activation functions and initial weights and biases impact the results we hereby vary these. In Table \ref{tab:activation functions} we have used one hidden layer with 50 neurons, but calculated the $R^{2}$ score and MSE using different activation functions, namely Sigmoid, ReLU, leaky ReLU and tanh. For the leaky ReLu we present the results for two slopes below zero, $a=0.01$ and $a=0.001$. For the case of Sigmoid and tanh the NN was run with 1000 epochs, $\eta=0.001$ and minibatch size $M=5$. For the ReLU and leaky ReLU these parameters result in a computational overflow. Decreasing the learning rate was found to be a clue to overcome this issue, among $10^{-3},10^{-4},10^{-5}$, $\eta=10^{-5}$ is the first value that can be used to produce the results. In order to achieve the same performance as for the Sigmoid and tanh, the number of epochs had to be increased significantly to 100000, increasing the CPU run time dramatically. With these parameters, all activation functions performed in a very similar way, but the Sigmoid function performed slightly better than the rest. 
+For the case with non-zero regularization parameter included, the grid search showing the training and test $R^{2}$ scores are found in Fig. \ref{fig: NN_ridge_R2}. Since the corresponding search for the minimum MSE is quite similar to search for the maximum $R^{2}$ scores, we present here results for $R^{2}$ only, while the grid search for the smallest test and train MSE can be found in Appendix C \ref{Appendix:C}. The blank squares denote the cases resulting in computational overflow. The area of the highest scores for both the test and training $R^{2}$ is clear and covers $\lambda=0$ and $\lambda<0.001$ and $10^{-4}\eta<10^{-2}$.
 
 
-Another interesting aspect to study is to check influence of initial setting of weights and biases in the hidden layers, an output layer and biases. The results of how the weights and bias alter the test and training $R^{2}$ score and MSE are shown in Table \ref{tab:bias and weight FFNN}. These results seem to show that the most drastic change is when we use a constant weights ($w_{ij}=0.1$). Increasing of the bias by one order of magnitude does not seem to distort the results dramatically. The combination of constant weights and increased constant bias provided results that are a lot poorer than the results for normally distributed weights and the smaller biases. 
+Fig. \ref{fig:Franke_fig} demonstrates the original form of the Franke's function to be fitted (a), the fit result with the FFNN with three layers on the training data (b) and, finally, the fitted test data (c). An overall fit of both datasets is quite satisfying, which is supported by the high $R^2$ scores, stored in the Table \ref{tab:Ols vs ridge vs FFNN and NN}.
+
+
+To study how the different activation functions and initial weights and biases impact the results we hereby vary these. In Table \ref{tab:activation functions} we have used one hidden layer with 50 neurons, but calculated the $R^{2}$ score and MSE using different activation functions, namely Sigmoid, ReLU, leaky ReLU and tanh. For the leaky ReLU we present the results for two slopes below zero, $a=0.01$ and $a=0.001$. For the case of Sigmoid and tanh the NN was run with 1000 epochs, $\eta=0.001$ and minibatch size $M=5$. For the ReLU and leaky ReLU these parameters result in a computational overflow. Decreasing the learning rate was found to be a clue to overcome this issue, among $10^{-3},10^{-4},10^{-5}$, $\eta=10^{-5}$ is the first value that can be used to produce the results. In order to achieve the same performance as for the Sigmoid and tanh, the number of epochs had to be increased significantly to 100000, increasing the CPU run time dramatically. With these parameters, all activation functions performed in a very similar way, but the Sigmoid function performed slightly better than the rest. 
+
+
+Another interesting aspect to study is to check influence of initial setting of weights and biases in the hidden layers, an output layer and biases. The results of how the weights and bias alter the test and training $R^{2}$ score and MSE are shown in Table \ref{tab:bias and weight FFNN}. These results seem to show that the most drastic change is when we use constant weights ($w_{ij}=0.1$). Increasing of the bias by one order of magnitude does not seem to distort the results dramatically. The combination of constant weights and an increased constant bias provided results that are noticeably poorer than the results for normally distributed weights and the smaller biases.
 
 \begin{table}[!htb]
 \begin{center}
-\caption{1 hidden layer. The MSE and $R^2$ scores for the test and training datasets for the FFNN, in case of sigmoid 1000 epochs are used, $\eta=0.001$, ReLU and leaky Relu 100000 epochs, $\eta=0.00001$ }
+\caption{ The MSE and $R^2$ scores for the test and training datasets for the FFNN, in case of the Sigmoid and tanh 1000 epochs are used, $\eta=0.001$, ReLU and leaky ReLU 100000 epochs, $\eta=0.00001$.1 hidden layer, $M=5$, $\lambda=0.0$. }
 \label{tab:activation functions}  
 \begin{tabular}{lllll}
 \cline{2-5}
@@ -683,68 +741,66 @@ Another interesting aspect to study is to check influence of initial setting of 
 \subsection{Classification}
 \label{sec:classification}
 
-For classification tasks we use primarily the Softmax function as the activation function. To estimate the performance of the neural networks we use the accuracy. 
+For classification tasks we use primarily the Softmax function as the activation function for the output layer together with the cross-entropy cost function. To estimate the performance of the neural networks we use the accuracy for both the test and training datasets. As it was already mentioned, the classification problem studied in the present work is the MNIST dataset of handwritten digits. As the neural network is trained, we can apply it to the test subset and find its accuracy for recognizing what number a handwritten digit is. 
 
-The classification problem studied in the present work is the MNIST dataset of handwritten digits. As the neural network is trained with the dataset, we can find its accuracy for recognizing what number a handwritten digit is. 
-
-In Figures \ref{fig:accuracy vs hidden layers}, \ref{fig:accuracy vs num neurons} and \ref{fig:accuracy vs num epochs} it is shown how the accuracy changes as a function of number of hidden layers, number of neurons, and number of epochs, respectively. We see that for our parameters we get the best accuracy for number of hidden layers at 5 and below. The accuracy is also best for number of neurons above approximately 15. As for number of epochs, we see that the accuracy is best for approximately 100 epochs, and does not improve for higher numbers. 
-
-
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/Class_hidden_layers.pdf}
     \caption{Accuracy for the test and training sets as functions of the number of hidden layers, 50 neurons in each layer, 100 epochs, $\lambda=0.0$, $\eta=0.01$, minibatch size $M=50$.}
     \label{fig:accuracy vs hidden layers}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/Class_hidden_neurons.pdf}
     \caption{Accuracy for the test and training sets as functions of the number of neurons, 1 hidden layer, 100 epochs, $\lambda=0.0$, $\eta=0.01$, minibatch size $M=50$.}
     \label{fig:accuracy vs num neurons}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=.49\textwidth]{Figures/Class_epochs_number.pdf}
     \caption{Accuracy for the test and training sets as functions of the number of neurons, 3 hidden layers, $\lambda=0.0$, $\eta=0.01$, minibatch size $M=50$.}
     \label{fig:accuracy vs num epochs}
 \end{figure}
 
-In order to find the parameters for which we achieve the optimal accuracy, we perform a grid search. The results for the FFNN with Sigmoid activation function can be found in Figure \ref{fig: grid search class 1 layer}.
+In Fig. \ref{fig:accuracy vs hidden layers}, \ref{fig:accuracy vs num neurons} and \ref{fig:accuracy vs num epochs} it is shown how the accuracy changes as a function of number of hidden layers, number of neurons, and number of epochs, respectively. We see that for 100 epochs, $\eta=0.01$ and minibatch size $M=50$ we get the best accuracy for number of hidden layers at 5 and below. By analogy with the regression problem, we choose 3 hidden layers for the architecture of the FFNN from now on. The accuracy reaches its maximum for number of neurons above approximately 15 for the NN with one hidden layer. Further increasing the number of neurons does not seem to improve the accuracy for the test and training sets significantly. As for the number of epochs, we see that the accuracy is best for approximately 100 epochs, and does not improve for higher numbers. 
 
-\begin{figure}[h]
+\begin{figure}[t!]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Class_Ridge_1_layer.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/Class_ridge_1_layer.pdf}
     \caption{Grid search for the optimal accuracy for the test and training sets presented as a functions of the learning rate and regularization parameter $\lambda$, 100 epochs, $M=50$. One hidden layer with Sigmoid activation function and 50 neurons is used.}
     \label{fig: grid search class 1 layer}
 \end{figure}
 
-Comparatively, the ReLU and Leaky ReLU activation functions proved to be more sensitive to input parameters. This can be seen in Figures \ref{fig: grid search class 1 layer relu} and \ref{fig: grid search class 1 layer leaky relu}. Additionally we used the tanh activation function for comparison. The results from this is presented in Figure \ref{fig: grid search class 1 layer tanh}. 
+In order to find the regularization parameter and learning rate for which we achieve the optimal accuracy, we perform a grid search. The results for the FFNN with Sigmoid activation function can be found in Fig. \ref{fig: grid search class 1 layer}. Here, we study the NN with one hidden layer which will be further compared with the NN with different activation functions for the hidden layers. The range of the learning rate yielding relatively high accuracy ($\approx 1$) for the test and training sets is quite narrow, $\eta\sim 10^{-3}-10^{-2}$. This, however, does not hold for the regularization parameter $\lambda$. Values $\lambda<0.1$ yield high accuracy for both the training and test datasets. The highest training accuracy can be achieved by setting $\eta=0.01$ and $\lambda=10^{-5}-10^{-4}$. It is interesting to note that the highest test accuracy does not correspond to this choice of the parameters. On the contrary, $\lambda=0.1$ yields the highest test accuracy, bigger than that for the $\lambda=0$ case.
 
-\begin{figure}[h]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Class_Ridge_1_layer_relu.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/Class_ridge_1_layer_relu.pdf}
     \caption{Grid search for the optimal accuracy for the test and training sets presented as a functions of the learning rate and regularization parameter $\lambda$, 100 epochs, $M=50$. One hidden layer with ReLU activation function and 50 neurons is used.}
     \label{fig: grid search class 1 layer relu}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Class_Ridge_1_layer_leaky_relu.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/Class_ridge_1_layer_leaky_relu.pdf}
     \caption{Grid search for the optimal accuracy for the test and training sets presented as a functions of the learning rate and regularization parameter $\lambda$, 100 epochs, $M=50$. One hidden layer with leaky ReLU activation function ($a=0.001$) and 50 neurons is used.}
     \label{fig: grid search class 1 layer leaky relu}
 \end{figure}
 
-\begin{figure}[h]
+For the same FFNN with one hidden layer and 50 neurons various activation functions can be compared to the originally chosen Sigmoid function.
+Comparatively, the ReLU and Leaky ReLU activation functions proved to be more sensitive to input parameters. This can be seen in Fig. \ref{fig: grid search class 1 layer relu} and \ref{fig: grid search class 1 layer leaky relu}. Additionally we used the tanh activation function for comparison. The results from this is presented in Fig. \ref{fig: grid search class 1 layer tanh}. All these figures present the grid search for the optimal regularization parameter $\lambda$ and the learning rate yielding the highest accuracy. For the tanh activation of the hidden layer the distribution of high accuracy for the training set is quite similar to that for the Sigmoid activation function. Here, again, $\eta=0.01$ yields the highest training accuracy for $\lambda<0.01$. The scores for tanh activation function are slightly smaller than for the Sigmoid activation for the same number of epochs and the size of a minibatch. Similar is observed for the test set. In overall, performance of this NN on the test set is noticeably worse than for the case of the Sigmoid activation function.
+
+
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Class_Ridge_1_layer_tanh.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/Class_ridge_1_layer_tanh.pdf}
     \caption{Grid search for the optimal accuracy for the test and training sets presented as a functions of the learning rate and regularization parameter $\lambda$, 100 epochs, $M=50$. One hidden layer with tanh activation function ($a=0.001$) and 50 neurons is used.}
     \label{fig: grid search class 1 layer tanh}
 \end{figure}
 
-
-Furthermore, we compare our FFNN to the Scikit-Learn and TensorFlow Keras results. The results are shown in Table \ref{tab:Accuracy for FFNN with Keras}. Here we see that our FFNN performs quite well, but the overall best results are achieved with the Scikit-Learn FFNN with SGD. 
+The situation with the accuracy of predictions on the test and training set for the NN with ReLU and leaky ReLU activation functions(for the same number of epochs and minibatch size) is completely different from that for the Sigmoid and tanh. The areas of the high test and training accuracy are essentially irregular and narrow. Practically, only $\eta\sim10^{-4}$ and $\lambda\sim10^{-3}$ and $10^{-5}$ might yield high accuracy comparable with the previous results for other activation functions. This situation is slightly improved for the leaky ReLU activation function with the slope parameter $a=0.001$. In addition to the high accuracy for $\eta\sim10^{-3}$, $\lambda\sim10^{-2}$ and $10^{-5}$, surprisingly, $\lambda=1.0$ yields 100\% accuracy for the training set.
 
 
 \begin{table}[!htb]
@@ -768,15 +824,15 @@ Furthermore, we compare our FFNN to the Scikit-Learn and TensorFlow Keras result
 \end{center}
 \end{table}
 
+Furthermore, we compare our three layer FFNN with 50 neurons in each layer to the Scikit-Learn and TensorFlow Keras results. For the latter two cases we use the same architecture as for the original NN. The regularization parameter $\lambda=0.001$ (as in the case of regression) provides the results which are quite close to the $\lambda=0$ case, therefore $\lambda=0.01$ was chosen. The results are shown in Table \ref{tab:Accuracy for FFNN with Keras}. Here we see that our FFNN performs quite well, and gives the highest training accuracy for both $\lambda=0$ and $\lambda=0.01$. However, in overall, the best result on the test data are achieved with the Scikit-Learn FFNN with SGD. Keras-based NN demonstrates quite low accuracy for the same NN settings as for the self-made and SKL NN. It was found out that it requires further tuning of the learning rate and other parameters to achieve results comparable with the SKL NN.
+
 \subsection{Logistic regression}
 \label{subsec:logistic regression results}
-
-Finally, we also study the accuracy of Logistic regression. In Table \ref{tab:Accuracy FFNN and logistic regression} we see how well our LR with SGD and GD performs compared to our FFNN and the Scikit-Learn LR. Here we see that our FFNN with 6 hidden layers performs the best without regularization, whereas the Scikit-Learn LR performs best with regularization. 
 
 \begin{table}[!htb]
 \begin{center}
 \caption{\scriptsize The accuracy for the test and training sets obtained with $\lambda=0.0$ and 0.01. For the FFNN 100 epochs are used, $\eta=0.01$, minibatch size$=$50. In case of LR+SGD the same settings are used, for LR+GD 10000 iterations and $\eta=0.01$ were used. The Scikit-Learn logistic regression is used with the default settings.}
-\label{tab:Accuracy FFNN and logistic regression}  
+\label{tab:Accuracy FFNN and logistic regression} 
 \begin{tabular}{lllll}
 \cline{2-5}
 \noalign{\smallskip}
@@ -794,33 +850,85 @@ Finally, we also study the accuracy of Logistic regression. In Table \ref{tab:Ac
 \end{center}
 \end{table}
 
+Finally, we study the accuracy of the same classification for the test and training datasets by using the logistic regression. Table \ref{tab:Accuracy FFNN and logistic regression} summarizes all results on how well our logistic regression with SGD and GD performs compared to our FFNN and the Scikit-Learn logistic regression. In order to compare performance of the NN with SGD-based logistic regression, the samve number of epochs (100), learning rate ($\eta=0.01$) and size of a minibatch $M=50$ is used for both of them. For the standard GD-based logistic regression $100000$ iterations were used. The standard GD-based logistic regression demonstrates excellent training accuracy as well as the test accuracy. The highest training score can be obtained with the 3-layer FFNN and the SKL logistic regression for the default settings proposed in \cite{skl}. The test accuracy of the 3-layer NN is essentially similar to that for the SKL logistic regression, but is slightly higher if the SGD or GD are applied. The results for the FFNN can be further improved by modifying its architecture. Here we see that our FFNN with 6 hidden layers performs the best without regularization included among all other models, whereas for the regularization with $\lambda=0.01$ performs equally good as the SKL logistic regression. 
+
 \section{Discussion of the results}  
 \label{sec: Discussion}
 
+\subsection{SGD and regression with the FFNN}  
+\label{sec: Discussion_1}
+
+Before setting the feed forward neural network in the present project, the main aim was to test the main algorithm used for updating the weights and biases, namely the stochastic gradient descent. For a given Franke's function example, the SGD as well as the standard GD were shown to be slightly more time consuming (for the chosen parameters) as compared to the matrix inversion.  As it was shown in Table \ref{tab:OLS}, the learning rate decreasing with number of epochs and a current index of the minibatch with the initial value $\eta=0.001$ provides us with the lower test and training $R^2$ scores. This is the main argument supporting the choice of the constant learning rate throughout the whole project. It might indicate that the initial guess of $\eta=0.001$ is quite satisfactory for achieving the minimum of the cost function, as the scaled learning rate is getting reduced too much and the model is not able to reach an actual minimum. However, this might be potentially fixed by taking a larger initial value of the learning rate. In overall, performance of the SGD and GD as well as implemented Scikit-Learn functionality is quite close to performance of the matrix inversion, according to the Table \ref{tab:OLS}. The number of iterations needed to achieve good test and training scores makes the standard GD a bit more time consuming as compared to the SGD with a bigger minibatch size than $M=5$.
+
+Gradual increasing of the learning rate for the SGD with 1000 epochs and $M=5$ on Franke's function leads to a fast increase of the $R^2$ scores and decrease of the mean squared error to a certain plateau. Already at $\eta\sim10^{-4}$ results for both data subsets can be considered high enough to state a good model performance. However, a closer look at Fig. \ref{fig: R2_OLS_eta} reveals that the score achieves a local maximum at $\eta\approx0.0005$ and drops insignificantly with both increase and decrease of the learning rate. Since both the training and the test score behave in a similar way, this may not necessary indicate overfitting. A value of the learning rate smaller than the optimal value might be insufficient for a given number of epochs, and the model does not reach the minimum after accomplishing all cycles. On the other hand, a bigger value of the learning rate will simply lead to \textquotedblleft overshooting\textquotedblright of the optimal value of $\beta$. In both cases the situation rather resembles underfitting, where performance on both the test and training datasets is getting worsened. 
+
+
+Increasing of the number of epochs leads to the similar behaviour of the test and training $R^2$ scores as for increasing of the learning rate. After 1000 epochs the results do not seem to change significantly, according to Fig. \ref{fig: R2_OLS_epochs}. A closer look at the graph again reveals existence of an optimal number of epochs ($\approx10^4$) yielding slightly higher test and training $R^2$ scores. Ideally, convergence of the SGD implies parameter $\beta$ to be oscillating around the optimal value up til the last epoch is over. The maximum of the $R^2$ scores is too subtle to judge on presence or absence of overfitting or underfitting. This study might require more statistics and higher orders of magnitude involved which will increase computational time dramatically. It is important to keep in mind stochasticity of the procedure which might result in a noticeable variation of the result from point to point. Noisy structure of the data can somewhat hinder such a subtle analysis.This might have been slightly, but not completely, alleviated by the applied cross-validation.
+
+
+A more apparent trend of the test and training $R^2$ scores can be revealed is a number of datapoints in a minibatch is varied (see Fig. \ref{fig: R2_OLS_minibatch}). Work with the data without reshuffling and redistributing them into minibatches leads to a slightly higher result as compared to those for the minibatch size $M=5-10$. Increasing of the minibatch size might improve the scores slightly but then again lead to the worsening of the fit. This might be related both to increasing possibility to pick the same dataset for updating the gradient several times per epoch and increasing robustness of the procedure for too big minibatches, leading to underfitting. In overall, a local maximum of the test and training scores at $M\approx5-10$ supports the choice of 5 data points in each minibatch. 
+
+
+Including the non-zero regularization parameter and performing the grid search in the space of parameters $\lambda$ and $\eta$ (see Fig. \ref{fig: ridge_grid_R2_coarse} and \ref{fig: ridge_grid_MSE_coarse}) reveals ranges of these parameters yielding the highest scores (the smallest MSE). For $\eta\sim10^{-4}-10^{-3}$ the scores remain on the high level for all considered $\lambda$ as long as $\lambda<1$. The fit degrades fast with the increasing learning rate and, slightly slower, with the decreasing learning rate. Fig. \ref{fig: ridge_grid_R2_fine} and \ref{fig: ridge_grid_MSE_fine} were added in order to explore the area of the highest scores (lowest MSE) in more detail. The learning rate $\eta\sim0.002$ and (and parameters in the vicinity) and $\lambda\leq0.001$ yield the highest (and equally high) test and training $R^2$ scores comparable to the values obtained with the matrix inversion, demonstrating good convergence and relative stability of the model based on the SGD. For this discussion the main focus was made on the $R^2$ scores, but, however, everything holds for the MSE as well (by substituting term \textquotedblleft the highest\textquotedblright with \textquotedblleft the lowest\textquotedblright).
+
+As the SGD was tested and demonstrated good results, it was implemented in the back propagation mechanism of the FFNN training procedure. For these results 5-fold cross-validation was no longer used in order to save computational time which might be used to add complexity of the NN. An interesting behaviour can be traced for the three-layer NN with 50 neurons in each, $M=5$ and $\eta=0.001$ in the number of epochs is varied. Based on Fig. \ref{fig: NN_MSE_epochs}, the test and training MSE decrease fast with the increasing number of epochs. Stochasticity of the learning procedure can be seen explicitly since it is no longer mitigated by the 5-fold cross-validation. It might be hard to notice due to the noisy nature of the graph that the training MSE keeps on decreasing for the increasing number of epochs, as the test MSE demonstrates an overall slight increase. It is hard to judge on whether this might be just a stochastic effect or an area of overfitting, it is impossible to exclude overfitting completely. 
+
+This effect does not seem to be the case of the FFNN for which the number of hidden layers is varied for the fixed number of epochs and the learning rate (see Fig. \ref{fig: NN_MSE_layers}). Adding additional layers with 50 neurons each seems to result in a steady improvement of the fit, at least up to 10 hidden layers. Probably the most apparent  appearance of overfitting in the whole project might be seen for the FFNN with one layer for which we consecutively add neurons as shown in Fig. \ref{fig: NN_MSE_neurons}. Both the test and training MSE decrease up to the number of neurons 20. For the further increase of the number of neurons, the training MSE keeps on decreasing whilst the test MSE demonstrates a slight increase hidden by the noisy nature of the graph. This might point to the fact that one should not include more than 20 neurons in the FFNN with one hidden layer for mentioned choice of other parameters. The situation changes slightly when additional hidden layers are added resulting in a different optimal numbers of neurons. For the three-layer NN 50 neurons per layer do not demonstrate any apparent overfitting.
+
+By analogy with the grid search for the SGD, the search for the optimal $\eta$ and $\lambda$ yielding the highest test and training $R^2$ demonstrates that these values peak at $\eta\approx10^{-3}-10^{-2}$ (see Fig. \ref{fig: NN_ridge_R2}). for $\lambda<0.001$. The best scores for both datasets are achieved for $\lambda=0$ and $\lambda=0.0001$. It is interesting to note that the further, even slight, increase of the learning rate results in the computational overflow and the results can no longer be produced. Proximity of the overflow area for $\eta\sim0.01$ makes $\eta\sim0.001$ a good choice for the Franke's function.
+
+
+In overall, the FFNN with adjustable number of layers demonstrates excellent $R^2$ scores for fitting of Franke's function. It can be seen from Table \ref{tab:Ols vs ridge vs FFNN and NN}, the FFNN allows us to improve the fit significantly as compared to using analytical expression for $\beta$ with matrix inversion. Moreover, this FFNN outperforms the SKL and Keras NN based on the SGD with the same learning rate ($\eta=0.001$). It is interesting to note that the learning rate had to be increased to produce equally high results with the Keras NN. Substituting a SGD optimizer in SKL and Keras NN with ADAM optimizer allows us to achieve faster convergence and still for the same number of epochs (1000) to achieve excellent $R^2$ scores, even higher that for the written FFNN (especially for the training set). This holds for both the case with no regularization and small regularization parameter $\lambda=0.001$ added.
+
+
+The final test for our FFNN was studying different activation functions for the hidden layers. Even though ReLU is a computationally simple and biologically plausible activation function, for the current settings of the number of epochs (1000), $\eta=0.001$ and $M=5$ it resulted in a failure of the computational procedure due to the overflow in the matrix multiplication. In order to avoid this problem by only tuning the number of epochs and $\eta$, the learning rate had to be reduced by several orders of magnitude. And in order to achieve performance similar to that with the Sigmoid, the number of epochs had to be increased by two orders of magnitude. This introduces dramatic increase of the CPU run time and makes ReLU not favorable as an activation function for the Franke's dataset with $M=5$ and the FFNN with tree layers and 50 neurons in each. In addition, for several tested settings the dying ReLU problem was encountered. This problem is alleviated by introducing a slope $a=0.01$ and $0.001$ with leaky ReLU. Hoever, for this function the number of epochs had to be increased ($\eta$ decreased) by analogy with ReLU, again increasing the computational time. For the tanh activation function it was no longer a problem, and the results similar to those with Sigmoid were obtained. It is interesting to notice that tanh performs worst on the test set even though the training $R^2$ score is high  ($\approx1$). In overall, high $R^2$ scores were obtained with all activation functions (see Table \ref{tab:activation functions}), but due to big run times for ReLU and leaky ReLU and poor predictability on the test set with tanh, the Sigmoid function is found to be to be the best activation function applied to the Franke's data.
+
+Finally, from the Table \ref{tab:bias and weight FFNN} it can be clearly seen that the performance is not as dependent on the intitial choice of the biases as on the initial choice of the weights. Constant weights in combination with high biases ($b_i=0.1$) do not yield high scores as compared to normally distributed weights and small biases ($b_i=0.1$).
+
+\subsection{Classification with the FFNN and logistic regression}  
+\label{sec: Discussion_1}
+
+The second part of the project aims at performing the classification task on the MNIST data with the same FFNN as for the regression case. For this problem the same three-layer NN with 50 neurons in each was mainly tested. In contrast to the regression problem, there is no clear trend in performance of the network on the test and training subsets (in terms of accuracy) for the increasing number of hidden layers. According to the trends shown in Fig. \ref{fig:accuracy vs hidden layers}, the test and training accuracy tend to decrease as new hidden layers are added, which is different from improving performance for the regression case. The optimal number of hidden layers varies from 2 to 5 and supports the choice of three hidden layers. On the contrary, the increasing number of neurons (for 100 epochs, $\eta=0.01$ and $M=50$ and one layer), leads to the similar increase of accuracy as would be observed for the $R^2$ score with regression (see Fig. \ref{fig:accuracy vs num neurons}). Noisy character of the graph does not allow to judge on any appearance of overfitting or underfitting in contrast to the regression case. The plateau of almost constant test and training accuracy is quite vast (10-50 neurons) and points to the stability of architecture and lack of clear dependence on the number of neurons in a layer. As for the increasing number of epochs seen in Fig. \ref{fig:accuracy vs num epochs}, already 100 epochs seem to be enough to achieve almost 100\% accuracy on the training set. Accuracy for the test set demonstrates highly irregular character making it difficult to distinguish any solid trend. In overall, as applied to the classification, our FFNN does not seem to be especially sensitive to the number of epochs and neurons in the hidden layers, making possible to achieve good results for a vast variety of parameters.
+
+
+Comparing the test and training accuracy obtained as functions of $\eta$ and $\lambda$ for 100 epochs and $M=50$ for the Sigmoid, ReLU, leaky ReLU ($a=0.001$) and tanh activation functions for hidden layers is shown in Fig. \ref{fig: grid search class 1 layer}, \ref{fig: grid search class 1 layer relu}, \ref{fig: grid search class 1 layer leaky relu} and \ref{fig: grid search class 1 layer tanh}. It is important to notice quite similar performance of the Sigmoid and tanh. The Sigmoid function allows us to reach slightly higher test and training accuracy (for $\eta\sim10^{-2}$ and $\lambda<0.1$). It is interesting to notice especially high test accuracy for the Sigmoid and tanh for $\eta=10^{-3}$ and $\lambda=1.0$. So far, no high scores were obtained with such a big value of $\lambda$.  As for the ReLU and leaky ReLU it can be seen that areas with high scores are especially irregular. For the leaky ReLU we encounter more regions with high scores as compared to the ReLU and slightly higher scores. But in overall, the architecture of the NN with these activation functions is unstable and the grid search is necessary to perform in order to find the narrow windows for optimal $\eta$ and $\lambda$. 
+
+
+Comparing the written FFNN with the SKL and Keras NN for the same architecture and choice of parameters (see Fig. \ref{tab:Accuracy for FFNN with Keras}) demonstrates the best performance of our FFNN on the training set for both $\lambda=0$ and 0.01. However, on the test set, the SKL NN outperforms our FFNN with both the SGD and ADAM minimizers. Presumably, further tuning of the parameters might lead to almost equal performance of these NN. Surprisingly, the Keras NN performs worst with both the SGD and ADAM and requires significant parameter tuning to achieve the same accuracy as for the present NN and SKL NN.
+
+
+The final step of the project includes comparison of our FFNN and logistic regression based on the SGD, standard GD and SKL implementation, shown in Table \ref{tab:Accuracy FFNN and logistic regression}. The same number of epochs, learning rate and minibatch size were used for the FFNN and SGD-based logistic regression. Even though the training accuracy with and without regularization parameter is the highest for the FFNN, three-layer NN performs slightly worse than the SGD-based logistic regression. Similarly, it is slightly worse than the GD-based logistic regression (with 10000 iterations) and SKL logistic regression. This, however, can be fixed by modifying the architecture of the NN. For example, setting six hidden layers increases the test accuracy significantly. Such a FFNN outperforms all types of logistic regression for $\lambda=0$ and performs quite similarly to the SKL logistic regression with the default settings. Despite a good performance of all types of logistic regression, flexible architecture of the NN makes it possible to introduce numerous changes to achieve the best performance as compared to all other approaches considered in the project. 
 
 \section{Perspectives for further improvements} 
 \label{sec: Improvements}
 
-One of the desired improvements which will be implemented in the next project is including the validation set alongside the training and test sets and the early stopping mechanism. It is used for the preliminary assessment of the trained model (NN) performance before making predictions on the test data. An overfitting and underfitting problems for the validation set imply that we must expect similar problems for the test set as well. These issues can be traced and avoided by adjusting the parameters for the better performance on the validation and, correspondingly, test sets. In this project all parameters were chosen to achieve good performance on the test set and both overfitting and underfitting are not as apparent and are not expected to be a great issue for the analysis. However, this situation might change significantly if the NN is applied to a different dataset. In case of this project, the early stopping option might be especially crucial for studies with ReLU and leaky ReLu activation functions of the hidden layers. An uneven distribution of the learning rates and $\lambda$ yielding high scores might become an issue in both regression and classification analysis. An option of creating a validation set will be further implemented in the \textit{data\_processing.py} as the early stopping mechanism will be set as an additional function coupled to the grid search. In addition, further assessment of the scores can be coupled to the k-fold cross-validation, and, therefore, more reliable estimates of the scores as functions of the increasing number of hidden layers, neurons, number of epochs and learning rates can be achieved. In overall, implementation of the early stop while searching for the optimal parameters will save computational time which can be used for performing cross-validation and improvement of reliability of the results.
+One of the desired improvements which will be implemented in the next project is including the validation set alongside the training and test sets and the early stopping mechanism. It is used for the preliminary assessment of the trained model (NN) performance before making predictions on the test data. An overfitting and underfitting problems for the validation set imply that we must expect similar problems for the test set as well. These issues can be traced and avoided by adjusting the parameters for the better performance on the validation and, correspondingly, test sets. In this project all parameters were chosen to achieve good performance on the test set and both overfitting and underfitting are not as apparent and are not expected to be a great issue for the analysis. However, this situation might change if the NN is applied to a different dataset. In case of this project, the early stopping option might be especially crucial for studies with ReLU and leaky ReLU activation functions of the hidden layers. An uneven distribution of the learning rates and $\lambda$ yielding high scores might become an issue in both regression and classification analysis. An option of creating a validation set will be further implemented in the \textit{data\_processing.py} as the early stopping mechanism will be set as an additional function coupled to the grid search. In overall, implementation of the early stop while searching for the optimal parameters will save computational time which can be used for performing, \textit{e.g.} cross-validation to improve the reliability of the results.
 
 \section{Conclusions} 
 \label{sec: Conclusions}
 
+In the present study a feed forward neural network was developed and applied it to the regression problem faced in the Project 1 as well as the classification problem for the MNIST dataset. Firstly, we studied the GD and SGD methods of the cost function minimization, demonstrating similar performance as that for the matrix inversion. The SGD was studied for the variable number of epochs, learning rate and the minibatch size in order to define parameters yielding high $R^2$ scores. Same parameters were used for the SGD-based FFNN with three layers with 50 neurons in each. Both our FFNN as well as the Scikit-Learn and Keras FFNNs outperform the OLS and ridge linear regression with matrix inversion from the Project 1. Moreover, the presented FFNN outperforms the Scikit-Learn and Keras FFNNs with the same settings and SGD optimizer. The Sigmoid was found to be the most effective activation for the hidden layers, as tanh demonstrates slightly worse performance on the test data, and ReLU and leaky ReLU are being highly sensitive to the chosen parameters.
+
+In the classification case, we explored the MNIST dataset of handwritten digits, and studied how accurate our FFNN and logistic regression codes perform. The written FFNN demonstrates excellent performance on the training set, but slightly worse performance for the test set as compared to the Scikit-Learn NN. For 3 hidden layers our FFNN yields slightly lower accuracy than the logistic regression codes, but for 6 hidden layers our FFNN provided the best results. 
+
+
+ Thus we conclude that the neural network seem to outperform our simple linear regression methods for regression problems, and logistic regression for classification problems. Albeit having a large set of parameters to be adjusted, the NN provides us freedom to choose an architecture yielding excellent performance as compared to all other regression and classification methods.
+
 
 \section{Appendix A: Link to all programs}
 \label{Appendix:A}
-\href{https://github.com/tellefs/ML-projects/tree/master/project2}{Link to the project in Github}
+\href{https://github.com/tellefs/ML-projects/tree/master/project2}{Link to the project repository on GitHub}.
 
 \section{Appendix B: Study of different NN architecture types}
 \label{Appendix:B}
 
-One additional test to be performed with the FFNN is to study different architectures by selecting different number of neurons in each hidden layer. Here we propose three different architectures shown in Fig.\ref{fig:architectures}. The first type is characterized by an equal distribution of neurons in each, exploiting 5 hidden layers with 150 neurons in total and 30 neurons per layer. The second type has a gradually increasing (by 10) number of neurons in consecutive layers, starting from 10 and ending with 50 neurons. Finally, the third type has a gradually decreasing number of neurons from the first to the last hidden layer. All three types of NN were applied to the regression problem on Franke's data and the classification problem on MNIST data. In the first case, the $R^2$ scores and MSE were estimated for the training and the sets sets, as for the classification of MNIST data these scores were substituted by accuracy. All results obtained are shown in Table \ref{tab:architectures}.
+One additional test to be performed with the FFNN is to study different architectures by selecting different number of neurons in each hidden layer. Here we propose three different architectures shown in Fig. \ref{fig:architectures}. The first type is characterized by an equal distribution of neurons in each, exploiting 5 hidden layers with 150 neurons in total and 30 neurons per layer. The second type has a gradually increasing (by 10) number of neurons in consecutive layers, starting from 10 and ending with 50 neurons. Finally, the third type has a gradually decreasing number of neurons from the first to the last hidden layer. All three types of NN were applied to the regression problem on Franke's data and the classification problem on MNIST data. In the first case, the $R^2$ scores and MSE were estimated for the training and test sets, as for the classification of MNIST data these scores were substituted by accuracy. All results obtained are shown in Table \ref{tab:architectures}.
 
 In case of the regression problem it can be seen that the first type of architecture (even distribution of neurons) yields the highest $R^2$ scores of all and, correspondingly, the lowest MSE for both the training and the test sets. The third type of architecture yields slightly smaller, but comparable $R^2$ scores and slightly bigger MSEs. However, the difference between the scores for the first and the third types is in the fourth digit after the decimal and one could safely conclude that both types perform equally well. The second type of architecture results in somewhat worse results. In case of our analysis, the performance seems to improve if a certain number of neurons larger than 10 is used in the first hidden layer. Three tests are not sufficient to make a solid conclusion. However, this study supports the choice of 3 layers with an equal number of neurons in each used in the project for the majority of tests.
 
-In case of classification problem the third type of NN demonstrates the best performance, as the first one yields slightly lower accuracy. Again, the second type performs worse that the first and the third, but the difference is more noticeable than in the regression problem. relatively high classification accuracy for the first type of NN supports the choice of three hidden layers with equal number of neurons applied to the MNIST data.
+In case of classification problem the third type of the NN demonstrates the best performance, as the first one yields slightly lower accuracy. Again, the second type performs worse than the first and the third, but the difference is more noticeable than in the regression problem. relatively high classification accuracy for the first type of NN supports the choice of three hidden layers with an equal number of neurons applied to the MNIST data.
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=.39\textwidth]{Figures/architectures.pdf}
     \caption{Three different types of NN architecture.}
@@ -829,7 +937,7 @@ In case of classification problem the third type of NN demonstrates the best per
 
 \begin{table}[!htb]
 \begin{center}
-\caption{The MSE, $R^2$ scores and accuracy for the test and training datasets obtained with the FFNN with three different architectures. For the regression problem 1000 epochs, $\lambda=0.0$, $\eta=0.001$ and minibatch size$=$5 were used. In case of classification, 100 epochs, $\eta=0.01$, minibatch size$=$50 were used.}
+\caption{The MSE, $R^2$ scores and accuracy for the test and training datasets obtained with the FFNN with three different architectures. For the regression problem 1000 epochs, $\lambda=0.0$, $\eta=0.001$ and $M=$5 were used. In case of classification, 100 epochs, $\eta=0.01$, $M=$50 were used.}
 \label{tab:architectures}  
 \begin{tabular}{lllll}
 \cline{2-5}
@@ -858,87 +966,87 @@ In case of classification problem the third type of NN demonstrates the best per
 \section{Appendix C: Additional figures}
 \label{Appendix:C}
 
-The following Appendix contains some of the results excluded from the main analysis. Firstly, the results for the training and test MSE presented in form of the grid search for the three layer FFNN are shown in Fig.\ref{fig: NN_Ridge_MSE}. As it was shown for the stochastic gradient descent in Section \ref{sec: Results}, high $R^2$ scores correlate with the low MSE values, and it can be seen that the lowest test and train MSE can be achieved with $\eta=0.01$ and $\lambda=0.001$. The values $\eta=0.001$ and $\lambda=0.001$ chosen for the analysis in the project correspond to the area of low MSE values.
+The following Appendix contains some of the results excluded from the main analysis. Firstly, the results for the training and test MSE presented in form of the grid search for the three layer FFNN are shown in Fig. \ref{fig: NN_ridge_MSE}. As it was shown for the stochastic gradient descent in Section \ref{sec: Results}, high $R^2$ scores correlate with the low MSE values, and it can be seen that the lowest test and train MSE can be achieved with $\eta=0.01$ and $\lambda=0.001$. The values $\eta=0.001$ and $\lambda=0.001$ chosen for the analysis in the project correspond to the area of low MSE values.
 
-\begin{figure}[!ht]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/NN_Ridge_MSE.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/NN_ridge_MSE.pdf}
     \caption{Grid search for the optimal $\lambda$ and $\eta$ minimizing the training (upper panel) and test (lower panel) MSE for the three-layer FFNN (50 neurons each), $N_{\mathrm{epochs}}=1000$, $M=5$.}
-    \label{fig: NN_Ridge_MSE}
+    \label{fig: NN_ridge_MSE}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Class_Ridge.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/Class_ridge.pdf}
     \caption{Grid search for the optimal accuracy for the test and training sets presented as a functions of the learning rate and regularization parameter $\lambda$, 100 epochs, $M=50$. Three hidden layers with 50 neurons are used.}
     \label{fig: grid search class 3 layer}
 \end{figure}
 
-Fig.\ref{fig: grid search class 3 layer} presents the grid search of an optimal learning rate value and regularization parameter $\lambda$ for the 3 layer FFNN specified for the classification task. Here, 100 epochs and 50 data points in each minibatch were used. The accuracy obtained for both the test and training sets are especially close to those from Fig.\ref{fig: grid search class 1 layer} obtained for the NN with one layer only. In overall, accuracy for both dataset is slightly higher and it correlates with a slight increase of of accuracy with number of hidden layers observed in Fig.\ref{fig:accuracy vs hidden layers}. The range of the learning rates yielding high scores is quite narrow, $\eta\approx10^{-3}-10^{-2}$. The accuracy degrades fast with the increasing learning rate and relatively slow with the decreasing learning rate. A wide range of $\lambda\approx0-0.1$ seems to yield almost equally high scores for $\eta\approx10^{-3}-10^{-2}$. The highest test accuracy can be achieved with $\eta=0.01$ and $\lambda=0.1$, bit these values do not yield the highest training accuracy. In overall, $\eta=0.01$ and $\lambda=0.01$ chosen for the analysis and comparison of different methods in the project is a reasonable choice providing 100\% training accuracy and relatively high test accuracy. 
+Fig. \ref{fig: grid search class 3 layer} presents the grid search of an optimal learning rate value and regularization parameter $\lambda$ for the 3 layer FFNN specified for the classification task. Here, 100 epochs and 50 data points in each minibatch were used. The accuracy obtained for both the test and training sets are especially close to those from Fig. \ref{fig: grid search class 1 layer} obtained for the NN with one layer only. In overall, accuracy for both datasets is slightly higher and it correlates with a slight increase of of accuracy with number of hidden layers observed in Fig. \ref{fig:accuracy vs hidden layers}. The range of the learning rates yielding high scores is quite narrow, $\eta\approx10^{-3}-10^{-2}$. The accuracy degrades fast with the increasing learning rate and relatively slow with the decreasing learning rate. A wide range of $\lambda\approx0-0.1$ seems to yield almost equally high scores for $\eta\approx10^{-3}-10^{-2}$. The highest test accuracy can be achieved with $\eta=0.01$ and $\lambda=0.1$, but these values do not yield the highest training accuracy. In overall, $\eta=0.01$ and $\lambda=0.01$ chosen for the analysis and comparison of different methods in the project is a reasonable choice providing 100\% training accuracy and relatively high test accuracy. 
 
 \section{Appendix D: study of the ridge case for SGD}
 \label{Appendix:D}
 
-By analogy with with the study of the OLS with SGD presented in sec.\ref{sec: Results}, study of the test and training $R^2$ scores and MSE as functions of different parameters was performed for the Ridge case with three different regularization parameters $\lambda=0.1,0.01,0.001$. Firstly, the test and training $R^2$ scores were studied as functions of the learning rate. The results for all three values of $\lambda$ are displayed in Fig.\ref{fig: R2_Ridge_eta}. In all cases, the training score is slightly higher than that for the test set, as expected for the chosen parameters. The test $R^2$ are particularly close to the training scores and are close to the maximum value 1, implying good performance of the model for fitting the Franke's function. A zoomed section of the same graph is presented in Fig.\ref{fig: R2_Ridge_eta_zoom}. It can be seen that the regularization parameter $\lambda=0.001$ gives essentially the same results as in the OLS case. Increased parameter $\lambda=0.01$ still yields the high scores, but the highest of considered parameters, $\lambda=0.1$, leads to a noticeable worsening of the fit quality for the learning rates $\eta\sim 10^{-5}-10^{-3}$. It is important to notice an especially poor performance of the model for particularly small values of $\eta\sim 10^{-6}$. The $R^2$ score for both data sets for all parameters $\lambda$ drops below zero, meaning worse predictions as compared to the baseline model, predicting always the mean value or the target values. Indeed, one should not expect good performance for low values of learning rates and 1000 epochs only. Increasing number of epochs will improve predicting ability of the model, but will simultaneously increase CPU run times considerably.
+By analogy with with the study of the OLS with SGD presented in Section \ref{sec: Results}, study of the test and training $R^2$ scores and MSE as functions of different parameters was performed for the ridge case with three different regularization parameters $\lambda=0.1,0.01,0.001$. Firstly, the test and training $R^2$ scores were studied as functions of the learning rate. The results for all three values of $\lambda$ are displayed in Fig. \ref{fig: R2_ridge_eta}. In all cases, the training score is slightly higher than that for the test set, as expected for the chosen parameters. The test $R^2$ are particularly close to the training scores and are close to the maximum value 1, implying good performance of the model for fitting the Franke's function. A zoomed section of the same graph is presented in Fig. \ref{fig: R2_ridge_eta_zoom}. It can be seen that the regularization parameter $\lambda=0.001$ gives essentially the same results as in the OLS case. Increased parameter $\lambda=0.01$ still yields the high scores, but the highest of considered parameters, $\lambda=0.1$, leads to a noticeable worsening of the fit quality for the learning rates $\eta\sim 10^{-5}-10^{-3}$. It is important to notice an especially poor performance of the model for particularly small values of $\eta\sim 10^{-6}$. The $R^2$ score for both data sets for all parameters $\lambda$ drops below zero, meaning worse predictions as compared to the baseline model, predicting always the mean value of the target values. Indeed, one should not expect good performance for low values of learning rates and 1000 epochs only. Increasing number of epochs will improve predicting ability of the model, but will simultaneously increase CPU run times considerably.
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2_eta.pdf}
-    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. Ridge case for $\lambda=0.1,0.01,0.001$.}
-    \label{fig: R2_Ridge_eta}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2_eta.pdf}
+    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. ridge case for $\lambda=0.1,0.01,0.001$.}
+    \label{fig: R2_ridge_eta}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2_eta_zoom.pdf}
-    \caption{Zoomed graph: $R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. Ridge case for $\lambda=0.1,0.01,0.001$.}
-    \label{fig: R2_Ridge_eta_zoom}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2_eta_zoom.pdf}
+    \caption{Zoomed graph: $R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. ridge case for $\lambda=0.1,0.01,0.001$.}
+    \label{fig: R2_ridge_eta_zoom}
 \end{figure}
 
-The MSE for the test and training sets demonstrates an opposite behavior with the increasing learning rate. As the $R^2$ scores demonstrate monotonous increase, the MSE monotonously drops to the minimum value. This fact is reflected in Fig.\ref{fig: MSE_Ridge_eta} for all regularization parameters.
+The MSE for the test and training sets demonstrates an opposite behavior with the increasing learning rate. As the $R^2$ scores demonstrate monotonous increase, the MSE monotonously drops to the minimum value. This fact is reflected in Fig. \ref{fig: MSE_ridge_eta} for all regularization parameters.
 
-\begin{figure}[h]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_MSE_eta.pdf}
-    \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. Ridge case for $\lambda=0.1,0.01,0.001$.}
-    \label{fig: MSE_Ridge_eta}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_MSE_eta.pdf}
+    \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $M=5$ for different learning rates. ridge case for $\lambda=0.1,0.01,0.001$.}
+    \label{fig: MSE_ridge_eta}
 \end{figure}
 
-The test and training $R^2$ were also studied as functions of minibatch size $M$. The results for $\lambda=0.1,0.01,0.001$ are shown in Fig.\ref{fig: R2_Ridge_minibatch}. The results for $\lambda=0.001$ are close to those for the OLS case. A noticeable decrease of the scores can be seen for higher values $\lambda=0.1,0.01$. For $\lambda=0.01$ and 0.001 the optimal size of minibatches is clearly seen and corresponds to $M\approx5-10$. For the highest regularization parameter $\lambda=0.1$ the scores remain almost independent (with a slight decrease with $M$) of the minibatch size and no significant improvements can be introduced by tuning $M$.
+The test and training $R^2$ were also studied as functions of minibatch size $M$. The results for $\lambda=0.1,0.01,0.001$ are shown in Fig. \ref{fig: R2_ridge_minibatch}. The results for $\lambda=0.001$ are close to those for the OLS case. A noticeable decrease of the scores can be seen for higher values $\lambda=0.1,0.01$. For $\lambda=0.01$ and 0.001 the optimal size of minibatches is clearly seen and corresponds to $M\approx5-10$. For the highest regularization parameter $\lambda=0.1$ the scores remain almost independent (with a slight decrease with $M$) of the minibatch size and no significant improvements can be introduced by tuning $M$.
 
-\begin{figure}[h]
+\begin{figure}[t!]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2_minibatch.pdf}
-    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. Ridge case for $\lambda=0.1,0.01,0.001$.}
-    \label{fig: R2_Ridge_minibatch}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2_minibatch.pdf}
+    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. ridge case for $\lambda=0.1,0.01,0.001$.}
+    \label{fig: R2_ridge_minibatch}
 \end{figure}
 
-An opposite is observed for the training and test MSE for all regularization parameters and can be seen in Fig.\ref{fig: MSE_Ridge_minibatch}. The MSE reaches its minimum at $M\approx5-10$. For $\lambda=0.1$ the MSE remains on almost the same high level for all studies sizes of minibatches.
-
-\begin{figure}[h]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_MSE_minibatch.pdf}
-    \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. Ridge case for $\lambda=0.1,0.01,0.001$.}
-    \label{fig: MSE_Ridge_minibatch}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_MSE_minibatch.pdf}
+    \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $N_{\mathrm{epochs}}=1000$ and $\eta=0.001$ for different sizes of minibatches. ridge case for $\lambda=0.1,0.01,0.001$.}
+    \label{fig: MSE_ridge_minibatch}
 \end{figure}
 
-Finally, the $R^2$ scores were studied for different numbers of epochs. The results are displayed in Fig.\ref{fig: R2_Ridge_epochs}. For all regularization parameters the same trend is observed. For  $N_{\mathrm{epochs}}\sim 10-100$ the scores increase fast and reach a plateau at $N_{\mathrm{epochs}}\approx 1000$. The scores for all three regularization parameters remain almost at the constant level with the increasing number of epochs. Collected results for this study demonstrate a local maximum for $N_{\mathrm{epochs}}\approx10^4$ and slight decrease of the scores at $N_{\mathrm{epochs}}\approx10^5$. Practically, further increasing of the number of epochs seems to lead to the overfitting problem similar to that observed for the increasing number of minibatches. The situation with the increasing learning rate is of a different nature: to high values will not allow to reach of approach close enough minimum for the cost function, since the value of $\beta$ will be oscillating around an optimal value with a bigger amplitude as compared to the cases of smaller learning rates. 
+An opposite is observed for the training and test MSE for all regularization parameters and can be seen in Fig. \ref{fig: MSE_ridge_minibatch}. The MSE reaches its minimum at $M\approx5-10$. For $\lambda=0.1$ the MSE remains on almost the same high level for all studied sizes of minibatches.
 
-\begin{figure}[h]
+Finally, the $R^2$ scores were studied for different numbers of epochs. The results are displayed in Fig. \ref{fig: R2_ridge_epochs}. For all regularization parameters the same trend is observed. For  $N_{\mathrm{epochs}}\sim 10-100$ the scores increase fast and reach a plateau at $N_{\mathrm{epochs}}\approx 1000$. The scores for all three regularization parameters remain almost at the constant level with the increasing number of epochs. Collected results for this study demonstrate a local maximum for $N_{\mathrm{epochs}}\approx10^4$ and slight decrease of the scores at $N_{\mathrm{epochs}}\approx10^5$. Practically, further increasing of the number of epochs seems to lead to the overfitting problem similar to that observed for the increasing number of minibatches. The situation with the increasing learning rate is of a different nature: to high values will not allow to reach of approach close enough minimum for the cost function, since the value of $\beta$ will be oscillating around an optimal value with a bigger amplitude as compared to the cases of smaller learning rates. 
+
+\begin{figure}[t!]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_R2_epochs.pdf}
-    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $M=5$ and $\eta=0.001$ for different numbers of epochs. Ridge case $\lambda=0.1,0.01,0.001$.}
-    \label{fig: R2_Ridge_epochs}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_R2_epochs.pdf}
+    \caption{$R^2$ scores for the test and training datasets obtained with SGD and 5-fold cross-validation with $M=5$ and $\eta=0.001$ for different numbers of epochs. ridge case $\lambda=0.1,0.01,0.001$.}
+    \label{fig: R2_ridge_epochs}
 \end{figure}
 
-A complementary study of the MSE for the test and training datasets demonstrate a rapid decrease of MSE with the increasing number of epochs. Here, again, the MSE seems to have a certain local minimum at $N_{\mathrm{epochs}}\approx10^4$. 
-
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
-    \includegraphics[width=.49\textwidth]{Figures/Ridge_MSE_epochs.pdf}
+    \includegraphics[width=.49\textwidth]{Figures/ridge_MSE_epochs.pdf}
     \caption{MSE for the test and training datasets obtained with SGD and 5-fold cross-validation with $M=5$ and $\eta=0.001$ for different numbers of epochs. OLS case $\lambda=0.1,0.01,0.001$.}
-    \label{fig: MSE_Ridge_epochs}
+    \label{fig: MSE_ridge_epochs}
 \end{figure}
+
+A complementary study of the MSE for the test and training datasets in Fig. \ref{fig: MSE_ridge_epochs} demonstrates a rapid decrease of MSE with the increasing number of epochs. Here, again, the MSE seems to have a certain local minimum at $N_{\mathrm{epochs}}\approx10^4$. 
 
 \newpage
 %////////////////////////////////////////////////////////////////
@@ -954,7 +1062,14 @@ J. E. Vevik and T. Storebakken, "Regression analysis and resampling techniques",
 Y. LeCun, C. Cortes and C. J. C. Burges, "The MNIST database of handwritten digits". URL: \url{http://yann.lecun.com/exdb/mnist/}, last accessed November 2, 2020.
 
 \bibitem{Morten}
-H.J. Morten // Applied Data Analysis and Machine Learning, FYS-STK4155 - lecture notes fall 2020.
+M. Hjorth-Jensen, "Applied Data Analysis and Machine Learning, FYS-STK4155" - lecture notes fall 2020.
+
+\bibitem{high bias}
+P. Mehta, M. Bukov,C-H. Wang, A.G.R.Day C. Richardson, C.K.Fisher, D. J.Schwabd, “A high-bias, low-variance introduction to Machine Learning for physicists“. Physics Reports, V.810, P.1-124, (2019).
+
+
+\bibitem{pitts}
+W. S. McCulloch and W. Pitts, “A Logical Calculus of the Ideas Immanent in Nervous Activity.” Bulletin of Mathematical Biology, vol. 5, no. 4, 1943, pp. 115–133.
 
 \bibitem{skl}
 Scikit-learn user guide and documentation, Release 0.23.2: URL: \url{https://scikit-learn.org/stable/_downloads/scikit-learn-docs.pdf}, last accessed November 4, 2020.
