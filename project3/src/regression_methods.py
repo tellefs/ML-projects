@@ -144,3 +144,12 @@ class Fitting():
 			y_tilde = softmax(X @ beta)
 			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
+
+	def XGB(self, objective='reg:linear', 
+		olsample_bytree = 0.3, learning_rate = 0.1, 
+		max_depth = 5, alpha = 10, n_estimators = 10):
+
+		xgb_regression = xgb.XGBRegressor(objective, colsample_bytree, learning_rate, max_depth, alpha, n_estimators)
+		xgb_regression.fit(inst.X_train, inst.z_train)
+		self.z_tilde = xgb_regression.predict(inst.X_train)
+		self.z_pred = xgb_regression.predict(inst.X_test)
