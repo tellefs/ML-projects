@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso
 import sklearn.linear_model as skl
 from .statistical_functions import *
 from sklearn.linear_model import SGDRegressor
+import xgboost as xgb
 
 class Fitting():
 	def __init__(self, inst):
@@ -145,11 +146,9 @@ class Fitting():
 			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
 
-	def XGB(self, objective='reg:linear', 
-		olsample_bytree = 0.3, learning_rate = 0.1, 
-		max_depth = 5, alpha = 10, n_estimators = 10):
-
-		xgb_regression = xgb.XGBRegressor(objective, colsample_bytree, learning_rate, max_depth, alpha, n_estimators)
+	def XGB(self):
+		inst = self.inst
+		xgb_regression = xgb.XGBRegressor()
 		xgb_regression.fit(inst.X_train, inst.z_train)
 		self.z_tilde = xgb_regression.predict(inst.X_train)
-		self.z_pred = xgb_regression.predict(inst.X_test)
+		self.z_predict = xgb_regression.predict(inst.X_test)
