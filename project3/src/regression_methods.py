@@ -1,12 +1,12 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 import sklearn.linear_model as skl
-from statistical_functions import *
+from .statistical_functions import *
 from sklearn.linear_model import SGDRegressor
 
 class Fitting():
 	def __init__(self, inst):
-		''' Fitting class containing OLS and ridge with matrix inversion, 
+		''' Fitting class containing OLS and ridge with matrix inversion,
 		SGD, GD and SKL SGD'''
 		self.inst = inst
 
@@ -97,33 +97,33 @@ class Fitting():
 		self.beta = beta
 
 	def logistic_regression(
-		self, X, X_test, 
-		y, Niterations = 100000, eta = 0.001, 
+		self, X, X_test,
+		y, Niterations = 100000, eta = 0.001,
 		option = "GD", epochs = 100, lamb = 0.001):
 		''' Logistic gradient descent taking two options: "SGD" and "GD"'''
 		x1 = X.shape[0]
 		x2 = X.shape[1]
-	
+
 		y1 = y.shape[0]
 		y2 = y.shape[1]
 
 		beta = np.ones((x2,y2))
 
 		if(option == "GD"):
-			''' GD-based logistic regression''' 		
+			''' GD-based logistic regression'''
 			for i in range(Niterations):
 				y_curr = X @ beta
 				probability = softmax(y_curr)
 				inv_probability = 1 - softmax(y_curr)
 				gradients =  - X.T @ (y - probability) + 2*lamb*beta
 				beta -= eta*gradients * 2./(y1*y2)
-	
+
 			y_tilde = softmax(X @ beta)
 			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
-		
+
 		if(option == "SGD"):
-			''' SGD-based logistic regression''' 
+			''' SGD-based logistic regression'''
 			n_inputs = X.shape[0]
 			batch_size = 50
 

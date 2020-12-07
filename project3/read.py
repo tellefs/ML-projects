@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from random import random, seed
 
-from data_processing import Data
-from regression_methods import Fitting
-from statistical_functions import *
+from src.data_processing import Data
+from src.regression_methods import Fitting
+from src.statistical_functions import *
 
 np.random.seed(2020)
 
@@ -47,7 +47,3 @@ print(MSE(bind_eng.z_test, fit.z_predict))
 
 # Rescaling the data back
 bind_eng.data_rescaling()
-
-
-
-
