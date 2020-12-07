@@ -29,7 +29,9 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-fit.OLS()
+#fit.OLS()
+fit.XGB()
+
 
 print("Train R2 score:")
 print(R2(bind_eng.z_train, fit.z_tilde))
