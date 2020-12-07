@@ -1,9 +1,11 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 import sklearn.linear_model as skl
-from .statistical_functions import *
 from sklearn.linear_model import SGDRegressor
 import xgboost as xgb
+from sklearn.tree import DecisionTreeRegressor
+from .statistical_functions import *
+
 
 class Fitting():
 	def __init__(self, inst):
@@ -152,3 +154,16 @@ class Fitting():
 		xgb_regression.fit(inst.X_train, inst.z_train)
 		self.z_tilde = xgb_regression.predict(inst.X_train)
 		self.z_predict = xgb_regression.predict(inst.X_test)
+
+
+	def decision_tree(self,depth=7):
+		'''
+		Decision tree for regression using SKL.
+		Keywords:
+		depth - takes value 7 as default, but is altered to change the max depth
+		'''
+		inst = self.inst
+		regr=DecisionTreeRegressor(max_depth=depth)
+		regr.fit(inst.X_train, inst.z_train)
+		self.z_tilde = regr.predict(inst.X_train)
+		self.z_predict = regr.predict(inst.X_test)
