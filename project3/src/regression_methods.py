@@ -156,14 +156,16 @@ class Fitting():
 		self.z_predict = xgb_regression.predict(inst.X_test)
 
 
-	def decision_tree(self,depth=7):
+	def decision_tree(self,depth=7,lamb=0.0):
 		'''
 		Decision tree for regression using SKL.
 		Keywords:
-		depth - takes value 7 as default, but is altered to change the max depth
+		depth - takes value 7 as default, but is altered to change the max depth.
+		lamb - defaults 0.0. Is used by SKL for the ccp_alpha parameter,
+			   i.e. the pruning parameter lambda in our code and report.
 		'''
 		inst = self.inst
-		regr=DecisionTreeRegressor(max_depth=depth)
+		regr=DecisionTreeRegressor(criterion='mse', max_depth=depth, ccp_alpha=lamb)
 		regr.fit(inst.X_train, inst.z_train)
 		self.z_tilde = regr.predict(inst.X_train)
 		self.z_predict = regr.predict(inst.X_test)

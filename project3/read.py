@@ -29,9 +29,9 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-fit.OLS()
+#fit.OLS()
 #fit.XGB()
-#fit.decision_tree(depth=10)
+fit.decision_tree(depth=10,lamb=0.0)
 
 
 print("Train R2 score:")
