@@ -165,7 +165,7 @@ class Fitting():
 			   i.e. the pruning parameter lambda in our code and report.
 		'''
 		inst = self.inst
-		regr=DecisionTreeRegressor(criterion='mse', max_depth=depth, ccp_alpha=lamb)
+		regr=DecisionTreeRegressor(criterion='mse', max_depth=int(depth), ccp_alpha=lamb)
 		regr.fit(inst.X_train, inst.z_train)
 		self.z_tilde = regr.predict(inst.X_train)
 		self.z_predict = regr.predict(inst.X_test)
