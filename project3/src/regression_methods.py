@@ -148,9 +148,16 @@ class Fitting():
 			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
 
-	def XGB(self):
+	def XGB(self, max_depth=6, learning_rate=0.3, reg_lambda=1):
+		"""
+		eXtra Gradient Boost method
+		Keywords:
+		max_depth (int): max depth of decision tree (default = 6)
+		lamb: L2 regularization term (default = 1)
+		learning_rate: step size shrinkage (default = 0.3)
+		"""
 		inst = self.inst
-		xgb_regression = xgb.XGBRegressor()
+		xgb_regression = xgb.XGBRegressor(max_depth=max_depth, learning_rate=learning_rate, reg_lambda=reg_lambda)
 		xgb_regression.fit(inst.X_train, inst.z_train)
 		self.z_tilde = xgb_regression.predict(inst.X_train)
 		self.z_predict = xgb_regression.predict(inst.X_test)
