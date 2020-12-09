@@ -20,8 +20,10 @@ bind_eng.set_binding_energies("mass16.txt")
 bind_eng.data_scaling()
 
 # Creating the design matrix
-poly_deg = 19
+poly_deg = 1
 bind_eng.design_matrix(poly_deg)
+deleted_matrix = np.delete(bind_eng.X,0,1)
+bind_eng.X=deleted_matrix
 
 bind_eng.test_train_split(0.2)
 
@@ -31,10 +33,10 @@ fit = Fitting(bind_eng)
 
 #fit.OLS()
 #fit.XGB()
-#fit.decision_tree(depth=10,lamb=0.0)
+fit.decision_tree(depth=10,lamb=0.0)
 
 
-'''print("Train R2 score:")
+print("Train R2 score:")
 print(R2(bind_eng.z_train, fit.z_tilde))
 
 print("Train MSE score:")
@@ -44,7 +46,7 @@ print("Test R2 score:")
 print(R2(bind_eng.z_test, fit.z_predict))
 
 print("Test MSE score:")
-print(MSE(bind_eng.z_test, fit.z_predict))'''
+print(MSE(bind_eng.z_test, fit.z_predict))
 
 depth_values = np.linspace(1,10,10)
 lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,-1,6)))
