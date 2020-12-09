@@ -20,7 +20,7 @@ bind_eng.set_binding_energies("mass16.txt")
 bind_eng.data_scaling()
 
 # Creating the design matrix
-poly_deg = 19
+poly_deg = 1
 bind_eng.design_matrix(poly_deg)
 
 bind_eng.test_train_split(0.2)
@@ -30,7 +30,7 @@ bind_eng.test_train_split(0.2)
 fit = Fitting(bind_eng)
 
 #fit.OLS()
-fit.XGB()
+fit.XGB(max_depth=8, reg_lambda=0.0001)
 #fit.decision_tree(depth=10,lamb=0.0)
 
 
