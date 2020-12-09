@@ -163,7 +163,7 @@ class Fitting():
 		self.z_predict = xgb_regression.predict(inst.X_test)
 
 
-	def decision_tree(self,depth=7,lamb=0.0):
+	def decision_tree(self, random_state=2020, depth=7, lamb=0.0):
 		'''
 		Decision tree for regression using SKL.
 		Keywords:
