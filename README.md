@@ -11,4 +11,4 @@ All files, example runs, code, report and figures are found in the project2 fold
 
 
 Project 3:
-Our third project, analysing the nuclear masses and binding energies from the Atomic Mass Evaluation 2016 dataset (https://www-nds.iaea.org/amdc/) can be found in the project3 folder. This folder contains all the codes, files as well as the report.
+Our third project, analysing the nuclear masses and binding energies from the Atomic Mass Evaluation 2016 dataset (https://www-nds.iaea.org/amdc/), can be found in the project3 folder. This folder contains all the codes, files as well as the report.
