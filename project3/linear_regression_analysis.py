@@ -14,7 +14,7 @@ from src.statistical_functions import *
 from src.print_and_plot import *
 
 
-""" 
+"""
 
 The folowing program performs the linear regression analysis with three options - OLS, Ridge and LASSO
 The user might selesct one of the options by varying the regression_method variable taking values "OLS", "Ridge", "LASSO"
@@ -70,7 +70,7 @@ model = Resampling(bind_eng)
 # ------------------------------------ Grid search analysis ------------------------------------
 
 for poly_deg in poly_deg_array:
-	print("Polynomial degree: ", poly_deg)
+	#print("Polynomial degree: ", poly_deg)
 	for i in range(num_lambda):
 		# Creating the design matrix
 		bind_eng.design_matrix(poly_deg)
@@ -78,12 +78,12 @@ for poly_deg in poly_deg_array:
 		# Choosing between two resampling methods
 		if(resampling_method == "cv"):
 			model.cross_validation(
-				11, seed, minimization_method, 
+				11, seed, minimization_method,
 				regression_method, poly_deg, lamb=lambda_array[i])
 
 		elif(resampling_method == "no resampling"):
 			model.no_resampling(
-				seed, minimization_method, 
+				seed, minimization_method,
 				regression_method, poly_deg, lamb=lambda_array[i])
 
 		# Filling up the matrices
@@ -101,22 +101,22 @@ for poly_deg in poly_deg_array:
 			min_pol = poly_deg
 			min_lamb = lambda_array[i]
 			imin = i
-		print(i)
+
 
 f_1.close()
 f_2.close()
 
 # Printing the scores
-print("Optimal polynomial degree:")	
+print(r"Optimal polynomial degree:")
 print(min_pol)
-print("Optimal lambda:")	
+print(r"Optimal lambda:")
 print(min_lamb)
 print("--------------------------------")
 print("Scores:")
 print("Training MSE: ", MSE_train[min_pol-1, imin])
-print("Minimum test MSE: ", MSE_test[min_pol-1, imin])	
 print("Training R2: ", R2_train[min_pol-1, imin])
-print("Test R2: ", R2_test[min_pol-1, imin])	
+print("Test MSE: ", MSE_test[min_pol-1, imin])
+print("Test R2: ", R2_test[min_pol-1, imin])
 
 # Rescaling the data back
 bind_eng.data_rescaling()

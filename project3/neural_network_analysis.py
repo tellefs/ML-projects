@@ -28,7 +28,7 @@ from tensorflow.keras.models import Model
 from tensorflow import keras
 from keras.regularizers import l2
 
-""" 
+"""
 
 The folowing program performs the linear regression analysis with three options - OLS, Ridge and LASSO
 The user might selesct one of the options by varying the regression_method variable taking values "OLS", "Ridge", "LASSO"
@@ -95,17 +95,17 @@ f_1 = open(filename_1, "a")
 f_2 = open(filename_2, "a")
 
 for i in range(num_eta):
-	print("Eta: ", eta_array[i])
+	#print("Eta: ", eta_array[i])
 	for j in range(num_lambda):
 		NN = NeuralNetwork(
-				bind_eng.X_train, 
-				bind_eng.z_train, 
-				n_hidden_layers = n_hidd_layers, 
-				n_hidden_neurons = nodes_in_hidd_layers, 
-				epochs = n_epochs, 
-				batch_size = min_size, 
-				eta = eta_array[i], 
-				lmbd=lambda_array[j], 
+				bind_eng.X_train,
+				bind_eng.z_train,
+				n_hidden_layers = n_hidd_layers,
+				n_hidden_neurons = nodes_in_hidd_layers,
+				epochs = n_epochs,
+				batch_size = min_size,
+				eta = eta_array[i],
+				lmbd=lambda_array[j],
 				hidden_act_func=activation_function_hidd)
 		NN.train()
 
@@ -129,15 +129,15 @@ for i in range(num_eta):
 			min_lamb = lambda_array[j]
 			imin = i
 			jmin = j
-		print(j)
+
 
 f_1.close()
 f_2.close()
 
 # Printing scores
-print("Optimal eta:")	
+print("Optimal eta:")
 print(min_eta)
-print("Optimal lambda:")	
+print("Optimal lambda:")
 print(min_lamb)
 print("--------------------------------")
 print("Scores:")
