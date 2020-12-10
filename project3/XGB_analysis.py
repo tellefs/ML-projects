@@ -85,6 +85,8 @@ f_3.close()
 f_4.close()
 
 # Printing scores
+print("Learning rate:")
+print('0.882')
 print("Optimal depth:")
 print(min_depth)
 print("Optimal lambda:")
