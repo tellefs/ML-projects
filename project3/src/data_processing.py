@@ -146,24 +146,64 @@ class Data():
 		
 		# Convert from keV to MeV.
 		Masses['Ebinding'] /= 1000
+
 		
 		# Group the DataFrame by nucleon number, A.
 		#Masses = Masses.groupby('A')
 		# Find the rows of the grouped DataFrame with the maximum binding energy.
 		#Masses = Masses.apply(lambda t: t[t.Ebinding==t.Ebinding.max()])
 		
+		self.Masses = Masses
+
 		self.A = Masses['A']
 		self.Z = Masses['Z']
 		self.N = Masses['N']
 		self.Element = Masses['Element']
 		self.Ebind = Masses['Ebinding']
 
-		self.x = self.N.to_numpy()
-		self.y = self.Z.to_numpy()
-		self.A_numpy = self.A.to_numpy()
-		self.z = self.Ebind.to_numpy()#/self.A_numpy
+		x = self.N.to_numpy()
+		y = self.Z.to_numpy()
+		z = self.Ebind.to_numpy()
 
-		self.x_flat = self.N.to_numpy()
-		self.y_flat = self.Z.to_numpy()
-		self.z_flat = self.Ebind.to_numpy()#/self.A_numpy
+		self.x = x
+		self.y = y
+		self.z = z
+		self.A_numpy = self.A.to_numpy()
+
+		self.x_flat = x
+		self.y_flat = y
+		self.z_flat = z
+
+
+	def prepare_for_plotting(self):
+
+		Masses = self.Masses.groupby('Z')
+		Masses = Masses.apply(lambda t: t[t.Ebinding==t.Ebinding.max()])
+		Z = Masses['Z'].to_numpy()
+		self.Z_array = Z
+
+		Masses = self.Masses.groupby('N')
+		Masses = Masses.apply(lambda t: t[t.Ebinding==t.Ebinding.max()])
+		N = Masses['N'].to_numpy()
+		self.N_array = N
+
+		self.y_mesh, self.x_mesh = np.meshgrid(self.Z_array,self.N_array)
+
+		Ebind_mesh = np.empty((len(N),len(Z)))
+		Ebind_mesh[:] = np.NaN
+
+		for i in range(len(N)):
+			for j in range(len(Z)):
+				for k in range(len(self.z)):
+					if((self.x[k] == N[i]) and (self.y[k] == Z[j])):
+						Ebind_mesh[i,j] = self.z[k]
+		self.z_mesh = Ebind_mesh
+
+		
+
+
+
+
+
+
 

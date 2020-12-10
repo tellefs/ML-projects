@@ -51,19 +51,19 @@ def plot_heatmaps_lin_reg():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 10))
     axs = axes.ravel()
     sns.set(font_scale=1)
-    ax=sns.heatmap(r2_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno",fmt=".3", vmin = 0.65, vmax = 1.0)
+    ax=sns.heatmap(r2_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno",fmt=".3", vmin = 0.8, vmax = 1.0)
     axs[0].set_title("$R^2$ for the training set, Ridge", fontsize=14)
     axs[0].set_xlabel("$\lambda$", fontsize=14)
     axs[0].set_ylabel("Polynomial degree", fontsize=14)
     axs[0].tick_params(axis="x", labelsize=12)
     axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
-    ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1],cmap="inferno", fmt=".3", vmin = 0.65, vmax = 1.0)
+    ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1],cmap="inferno", fmt=".3", vmin = 0.8, vmax = 1.0)
     axs[1].set_title("$R^2$ for the test set, Ridge", fontsize=14)
     axs[1].set_xlabel("$\lambda$", fontsize=14)
-    axs[1].set_ylabel("Polynomial degree", fontsize=14)
+    axs[1].set_ylabel("Polynomial degree", fontsize=14)  
     axs[1].tick_params(axis="x", labelsize=12)
-    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
 
     plt.subplots_adjust(hspace=0.25, top=0.96, bottom=0.08, right=0.99,left=0.14)
     plt.savefig('../Figures/Ridge_R2.pdf')
@@ -73,24 +73,89 @@ def plot_heatmaps_lin_reg():
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 10))
     axs = axes.ravel()
     sns.set(font_scale=1)
-    ax=sns.heatmap(mse_train, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", vmin = 0.0, vmax = 0.07)
+    ax=sns.heatmap(mse_train, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt=".1", vmin = 0.0, vmax = 0.08)
     axs[0].set_title("MSE for the training set, Ridge", fontsize=14)
     axs[0].set_xlabel("$\lambda$", fontsize=14)
     axs[0].set_ylabel("Polynomial degree", fontsize=14)
     axs[0].tick_params(axis="x", labelsize=12)
     axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
-    ax=sns.heatmap(mse_test, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", vmin = 0.0, vmax = 0.07)
+    ax=sns.heatmap(mse_test, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", fmt=".2", vmin = 0.0, vmax = 0.08)
     axs[1].set_title("MSE for the test set, Ridge", fontsize=14)
     axs[1].set_xlabel("$\lambda$", fontsize=14)
     axs[1].set_ylabel("Polynomial degree", fontsize=14)
     axs[1].tick_params(axis="x", labelsize=12)
     axs[1].tick_params(axis="y", labelsize=12,rotation=0)
 
-    plt.subplots_adjust(hspace=0.25, top=0.96, bottom=0.08, right=0.99,left=0.14)
+    plt.subplots_adjust(hspace=0.25, top=0.96, bottom=0.08, right=0.99,left=0.14)    
     plt.savefig('../Figures/Ridge_MSE.pdf')
     plt.show()
 
+
+def plot_heatmaps_NN():
+    file = np.loadtxt("../Files/Grid_search_NN_tanh_MSE_tot.txt", skiprows=1)
+    mse_train  = file[:,2]
+    mse_test  = file[:,3]
+    mse_train = mse_train[:,np.newaxis]
+    mse_test = mse_test[:,np.newaxis]
+    mse_train=np.reshape(mse_train,(7,8))
+    mse_test=np.reshape(mse_test,(7,8))
+
+    file = np.loadtxt("../Files/Grid_search_NN_tanh_R2_tot.txt", skiprows=1)
+    r2_train  = file[:,2]
+    r2_test  = file[:,3]
+    r2_train = r2_train[:,np.newaxis]
+    r2_test = r2_test[:,np.newaxis]
+    r2_train=np.reshape(r2_train,(7,8))
+    r2_test=np.reshape(r2_test,(7,8))
+
+    eta_array = [0.0005, 0.0004, 0.0003, 0.0002, 0.0001, 0.00001, 0.000001]
+    lambda_array = [ 0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
+
+    x = lambda_array
+    y = eta_array
+
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 10))
+    axs = axes.ravel()
+    sns.set(font_scale=1)
+    ax=sns.heatmap(r2_train,  xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno",fmt=".3", vmin = 0.4, vmax = 1.0)
+    axs[0].set_title("$R^2$ for the training set, FFNN, tanh", fontsize=14)
+    axs[0].set_xlabel("$\lambda$", fontsize=14)
+    axs[0].set_ylabel("$\eta$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
+
+    ax=sns.heatmap(r2_test,  xticklabels=x, yticklabels=y, annot=True, ax=axs[1],cmap="inferno", fmt=".3", vmin = 0.4, vmax = 1.0)
+    axs[1].set_title("$R^2$ for the test set, FFNN, tanh", fontsize=14)
+    axs[1].set_xlabel("$\lambda$", fontsize=14)
+    axs[1].set_ylabel("$\eta$", fontsize=14)  
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)  
+
+    plt.subplots_adjust(hspace=0.25, top=0.96, bottom=0.08, right=0.99,left=0.14)
+    plt.savefig('../Figures/NN_tanh_R2.pdf')
+    plt.show()
+
+
+    fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 10))
+    axs = axes.ravel()
+    sns.set(font_scale=1)
+    ax=sns.heatmap(mse_train, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", vmin = 0.0, vmax = 0.55)
+    axs[0].set_title("MSE for the training set, FFNN, tanh", fontsize=14)
+    axs[0].set_xlabel("$\lambda$", fontsize=14)
+    axs[0].set_ylabel("$\eta$", fontsize=14)
+    axs[0].tick_params(axis="x", labelsize=12)
+    axs[0].tick_params(axis="y", labelsize=12,rotation=0)
+
+    ax=sns.heatmap(mse_test, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", vmin = 0.0, vmax = 0.55)
+    axs[1].set_title("MSE for the test set, FFNN, tanh", fontsize=14)
+    axs[1].set_xlabel("$\lambda$", fontsize=14)
+    axs[1].set_ylabel("$\eta$", fontsize=14)
+    axs[1].tick_params(axis="x", labelsize=12)
+    axs[1].tick_params(axis="y", labelsize=12,rotation=0)
+
+    plt.subplots_adjust(hspace=0.25, top=0.96, bottom=0.08, right=0.99,left=0.14)    
+    plt.savefig('../Figures/NN_tanh_MSE.pdf')
 
 def gridsearch_decisiontree():
     file = np.loadtxt('../Files/DecisionTree_train_R2.txt',skiprows=1)
@@ -224,5 +289,6 @@ def gridsearch_XGB():
 
 # Uncomment required plot
 #plot_heatmaps_lin_reg()
+#plot_heatmaps_NN()
 #gridsearch_decisiontree()
-gridsearch_XGB()
+#gridsearch_XGB()
