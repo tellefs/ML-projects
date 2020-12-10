@@ -33,6 +33,7 @@ fit = Fitting(bind_eng)
 
 depth_values = np.linspace(1,8,8)
 lambda_values = np.hstack((np.array([0.0]), np.logspace(-2,2,5)))
+learning_rates = np.linspace(0.86, 0.88, 10)
 
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
 min_depth, min_lamb = 0, 0
@@ -60,24 +61,34 @@ f_2 = open(filename_2, "a")
 f_3 = open(filename_3, "a")
 f_4 = open(filename_4, "a")
 
+
+#loop to find optimal values
+for i, depth in enumerate(depth_values):
+    for j, lamb in enumerate(lambda_values):
+    	for k, eta in enumerate(learning_rates):
+       		depth = int(depth)
+        	fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=eta)
+
+        # Tracking the optimal parameters
+	        if(MSE(bind_eng.z_test, fit.z_predict) <= min_mse_test):
+	            min_mse_test = MSE(bind_eng.z_test, fit.z_predict)
+	            min_r2_test = R2(bind_eng.z_test, fit.z_predict)
+	            min_mse_train = MSE(bind_eng.z_train, fit.z_tilde)
+	            min_r2_train = R2(bind_eng.z_train, fit.z_tilde)
+	            min_depth = depth
+	            min_lamb = lamb
+	            min_eta = eta
+
+#loop to make the grid-search plots
 for i, depth in enumerate(depth_values):
     for j, lamb in enumerate(lambda_values):
         depth = int(depth)
-        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=0.882)
+        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=min_eta)
 
         f_1.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_test, fit.z_predict)))
         f_2.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_test, fit.z_predict)))
         f_3.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_train, fit.z_tilde)))
         f_4.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_train, fit.z_tilde)))
-
-        # Tracking the optimal parameters
-        if(MSE(bind_eng.z_test, fit.z_predict) <= min_mse_test):
-            min_mse_test = MSE(bind_eng.z_test, fit.z_predict)
-            min_r2_test = R2(bind_eng.z_test, fit.z_predict)
-            min_mse_train = MSE(bind_eng.z_train, fit.z_tilde)
-            min_r2_train = R2(bind_eng.z_train, fit.z_tilde)
-            min_depth = depth
-            min_lamb = lamb
 
 f_1.close()
 f_2.close()
@@ -85,8 +96,8 @@ f_3.close()
 f_4.close()
 
 # Printing scores
-print("Learning rate:")
-print('0.882')
+print("Optimal learning rate:")
+print(min_eta)
 print("Optimal depth:")
 print(min_depth)
 print("Optimal lambda:")
