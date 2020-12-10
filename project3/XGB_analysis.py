@@ -31,8 +31,8 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-depth_values = np.linspace(1,10,10)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
+depth_values = np.linspace(1,8,8)
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-2,2,5)))
 
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
 min_depth, min_lamb = 0, 0
@@ -63,7 +63,7 @@ f_4 = open(filename_4, "a")
 for i, depth in enumerate(depth_values):
     for j, lamb in enumerate(lambda_values):
         depth = int(depth)
-        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=0.882)#found this to be the best learning rate
+        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=0.882)
 
         f_1.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_test, fit.z_predict)))
         f_2.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_test, fit.z_predict)))
@@ -102,7 +102,7 @@ print(min_r2_test)
 
 #part of script to find optimal learning rate
 """
-eta_values = np.linspace(0.881, 0.883, 10)
+eta_values = np.linspace(0.81, 0.89, 10)
 R2_score = 0
 
 for i, depth in enumerate(depth_values):
