@@ -32,8 +32,7 @@ bind_eng.test_train_split(0.2)
 fit = Fitting(bind_eng)
 
 depth_values = np.linspace(1,10,10)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,-1,6)))
-
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,0,7)))
 
 filename_1 = 'Files/XGB_test_MSE.txt'
 filename_2 = 'Files/XGB_test_R2.txt'
