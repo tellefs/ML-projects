@@ -29,6 +29,15 @@ class Fitting():
 		self.z_plot = inst.X.dot(beta)
 		self.beta = beta
 
+	def LASSO_SKL(self, lamb):
+		inst = self.inst
+		lasso_fit = Lasso(alpha = lamb, max_iter = 10e5, tol = 0.01, normalize = True, fit_intercept = False)
+		#lasso_fit = skl.Lasso(alpha=lamb, max_iter=10e6, tol=1e-3, normalize=True, fit_intercept=False).fit(inst.X_train,inst.z_train)
+		lasso_fit.fit(inst.X_train,inst.z_train)
+		self.z_predict = lasso_fit.predict(inst.X_test)
+		self.z_tilde = lasso_fit.predict(inst.X_train)
+		self.z_plot = lasso_fit.predict(inst.X)
+
 	def SGD(self, n_epochs, t0, t1, seed, regression_method, lamb):
 		''' Stochastic gradient descent for a given number of epochs and eta=t0/t1'''
 		np.random.seed(seed)

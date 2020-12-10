@@ -17,7 +17,6 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 from .statistical_functions import *
 from .data_processing import *
-from .print_and_plot import *
 from .regression_methods import *
 
 seed = 2021
@@ -72,6 +71,8 @@ class Resampling():
 					fit.ridge(lamb)
 				elif(regression_method == "OLS"):
 					fit.OLS()
+				elif(regression_method == "LASSO"):
+					fit.LASSO_SKL(lamb)
 			elif(minimization_method == "SGD"):
 				n_minibatch = int(len(inst.z_train)/min_size)
 				inst.split_minibatch(True, n_minibatch)
@@ -122,6 +123,8 @@ class Resampling():
 				fit.ridge(lamb)
 			elif(regression_method == "OLS"):
 				fit.OLS()
+			elif(regression_method == "LASSO"):
+				fit.LASSO_SKL(lamb)
 		elif(minimization_method == "SGD"):
 			n_minibatch = int(len(inst.z_train)/min_size)
 			inst.split_minibatch(True, m_minibatch)
