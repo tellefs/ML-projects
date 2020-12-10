@@ -34,6 +34,9 @@ fit = Fitting(bind_eng)
 depth_values = np.linspace(1,10,10)
 lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
 
+min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
+min_depth, min_lamb = 0, 0
+
 filename_1 = 'Files/XGB_test_MSE.txt'
 filename_2 = 'Files/XGB_test_R2.txt'
 filename_3 = 'Files/XGB_train_MSE.txt'
@@ -67,10 +70,35 @@ for i, depth in enumerate(depth_values):
         f_3.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_train, fit.z_tilde)))
         f_4.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_train, fit.z_tilde)))
 
+        # Tracking the optimal parameters
+        if(MSE(bind_eng.z_test, fit.z_predict) <= min_mse_test):
+            min_mse_test = MSE(bind_eng.z_test, fit.z_predict)
+            min_r2_test = R2(bind_eng.z_test, fit.z_predict)
+            min_mse_train = MSE(bind_eng.z_train, fit.z_tilde)
+            min_r2_train = R2(bind_eng.z_train, fit.z_tilde)
+            min_depth = depth
+            min_lamb = lamb
+
 f_1.close()
 f_2.close()
 f_3.close()
 f_4.close()
+
+# Printing scores
+print("Optimal depth:")
+print(min_depth)
+print("Optimal lambda:")
+print(min_lamb)
+print("--------------------------------")
+print("Scores:")
+print("Training MSE:")
+print(min_mse_train)
+print("Training R2:")
+print(min_r2_train)
+print("Test MSE:")
+print(min_mse_test)
+print("Test R2:")
+print(min_r2_test)
 
 #part of script to find optimal learning rate
 """
