@@ -227,15 +227,15 @@ def gridsearch_XGB():
 
     r21  = file[:,2]
     r21 = r21[:,np.newaxis]
-    r21=np.reshape(r21,(8,6))
+    r21=np.reshape(r21,(7,8))
 
     file = np.loadtxt("../Files/XGB_test_R2.txt", skiprows=1)
     r22  = file[:,2]
     r22 = r22[:,np.newaxis]
-    r22=np.reshape(r22,(8,6))
+    r22=np.reshape(r22,(7,8))
 
-    lambdas = lambda_values = np.hstack((np.array([0.0]), np.logspace(-2,2,5)))
-    y = np.linspace(1,8,8)
+    lambdas = lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
+    y = np.linspace(1,7,7)
     x = lambdas
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
@@ -260,12 +260,12 @@ def gridsearch_XGB():
     file = np.loadtxt("../Files/XGB_train_MSE.txt", skiprows=1)
     mse1  = file[:,2]
     mse1 = mse1[:,np.newaxis]
-    mse1=np.reshape(mse1,(8,6))
+    mse1=np.reshape(mse1,(8,7))
 
     file = np.loadtxt("../Files/XGB_test_MSE.txt", skiprows=1)
     mse2  = file[:,2]
     mse2 = mse2[:,np.newaxis]
-    mse2=np.reshape(mse2,(8,6))
+    mse2=np.reshape(mse2,(8,7))
 
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()

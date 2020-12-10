@@ -31,8 +31,8 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-depth_values = np.linspace(1,8,8)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-2,2,5)))
+depth_values = np.linspace(1,7,7)
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
 learning_rates = np.linspace(0.86, 0.88, 10)
 
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
