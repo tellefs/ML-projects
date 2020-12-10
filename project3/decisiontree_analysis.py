@@ -9,7 +9,6 @@ from random import random, seed
 from src.data_processing import Data
 from src.regression_methods import Fitting
 from src.statistical_functions import *
-
 np.random.seed(2020)
 
 # Setting up the dataset
@@ -30,23 +29,6 @@ bind_eng.test_train_split(0.2)
 # All we can use now is bind_eng.X_test, bind_eng.X_train, bind_eng.z_test, bind_eng.z_train
 
 fit = Fitting(bind_eng)
-
-#fit.OLS()
-fit.XGB(max_depth=8, reg_lambda=0.0001)
-#fit.decision_tree(depth=10,lamb=0.0)
-
-
-print("Train R2 score:")
-print(R2(bind_eng.z_train, fit.z_tilde))
-
-print("Train MSE score:")
-print(MSE(bind_eng.z_train, fit.z_tilde))
-
-print("Test R2 score:")
-print(R2(bind_eng.z_test, fit.z_predict))
-
-print("Test MSE score:")
-print(MSE(bind_eng.z_test, fit.z_predict))
 
 depth_values = np.linspace(1,10,10)
 lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,-1,6)))
@@ -88,7 +70,6 @@ f_1.close()
 f_2.close()
 f_3.close()
 f_4.close()
-
 
 # Rescaling the data back
 bind_eng.data_rescaling()
