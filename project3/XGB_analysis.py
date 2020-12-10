@@ -57,15 +57,43 @@ f_2 = open(filename_2, "a")
 f_3 = open(filename_3, "a")
 f_4 = open(filename_4, "a")
 
+MSE_test_optimal = 1.
+MSE_train_optimal = 1.
+R2_test_optimal = 0
+R2_train_optimal = 0.
+
 for i, depth in enumerate(depth_values):
     for j, lamb in enumerate(lambda_values):
         depth = int(depth)
-        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=0.882)#found this to be the best learning rate
+        fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=0.882)
 
         f_1.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_test, fit.z_predict)))
         f_2.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_test, fit.z_predict)))
         f_3.write('{0} {1} {2}\n'.format(lamb, depth, MSE(bind_eng.z_train, fit.z_tilde)))
         f_4.write('{0} {1} {2}\n'.format(lamb, depth, R2(bind_eng.z_train, fit.z_tilde)))
+
+        MSE_test_new = MSE(bind_eng.z_test, fit.z_predict)
+        if MSE_test_new<MSE_test_optimal:
+        	MSE_test_optimal = MSE_test_new
+
+        MSE_train_new = MSE(bind_eng.z_train, fit.z_tilde)
+        if MSE_train_new<MSE_train_optimal:
+        	MSE_train_optimal = MSE_train_new
+
+        R2_train_new = R2(bind_eng.z_train, fit.z_tilde)
+        if R2_train_new>R2_train_optimal:
+        	R2_train_optimal = R2_train_new
+
+        R2_test_new = R2(bind_eng.z_test, fit.z_predict)
+        if R2_test_new>R2_test_optimal:
+        	R2_test_optimal = R2_test_new
+
+
+print(MSE_train_optimal)
+print(MSE_test_optimal)
+print(R2_test_optimal)
+print(R2_train_optimal)
+
 
 f_1.close()
 f_2.close()
