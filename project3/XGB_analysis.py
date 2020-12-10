@@ -31,8 +31,8 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-depth_values = np.linspace(1,10,10)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
+depth_values = np.linspace(1,8,8)
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-2,2,5)))
 
 filename_1 = 'Files/XGB_test_MSE.txt'
 filename_2 = 'Files/XGB_test_R2.txt'
@@ -74,7 +74,7 @@ f_4.close()
 
 #part of script to find optimal learning rate
 """
-eta_values = np.linspace(0.881, 0.883, 10)
+eta_values = np.linspace(0.81, 0.89, 10)
 R2_score = 0
 
 for i, depth in enumerate(depth_values):
