@@ -162,15 +162,15 @@ def gridsearch_decisiontree():
 
     r21  = file[:,2]
     r21 = r21[:,np.newaxis]
-    r21=np.reshape(r21,(10,8))
+    r21=np.reshape(r21,(14,8))
 
     file = np.loadtxt("../Files/DecisionTree_test_R2.txt", skiprows=1)
     r22  = file[:,2]
     r22 = r22[:,np.newaxis]
-    r22=np.reshape(r22,(10,8))
+    r22=np.reshape(r22,(14,8))
 
     lambdas = lambda_values = np.hstack((np.array([0.0]), np.logspace(-7,-1,7)))
-    y = np.linspace(1,10,10)
+    y = np.linspace(1,14,14)
     x = lambdas
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
@@ -195,12 +195,12 @@ def gridsearch_decisiontree():
     file = np.loadtxt("../Files/DecisionTree_train_MSE.txt", skiprows=1)
     mse1  = file[:,2]
     mse1 = mse1[:,np.newaxis]
-    mse1=np.reshape(mse1,(10,8))
+    mse1=np.reshape(mse1,(14,8))
 
     file = np.loadtxt("../Files/DecisionTree_test_MSE.txt", skiprows=1)
     mse2  = file[:,2]
     mse2 = mse2[:,np.newaxis]
-    mse2=np.reshape(mse2,(10,8))
+    mse2=np.reshape(mse2,(14,8))
 
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
@@ -291,5 +291,5 @@ def gridsearch_XGB():
 # Uncomment the following lines to get required plot:
 #plot_heatmaps_lin_reg()
 #plot_heatmaps_NN()
-#gridsearch_decisiontree()
+gridsearch_decisiontree()
 #gridsearch_XGB()
