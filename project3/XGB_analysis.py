@@ -16,6 +16,8 @@ np.random.seed(2020)
 bind_eng = Data()
 bind_eng.set_binding_energies("mass16.txt")
 
+bind_eng.z_flat = bind_eng.z_flat*bind_eng.A_numpy #to get the total binding energy
+
 # Scaling the data
 bind_eng.data_scaling()
 
@@ -23,7 +25,8 @@ bind_eng.data_scaling()
 poly_deg = 1
 bind_eng.design_matrix(poly_deg)
 deleted_matrix = np.delete(bind_eng.X,0,1)
-bind_eng.X=deleted_matrix
+bind_eng.X = deleted_matrix
+
 
 bind_eng.test_train_split(0.2)
 
@@ -31,9 +34,9 @@ bind_eng.test_train_split(0.2)
 
 fit = Fitting(bind_eng)
 
-depth_values = np.linspace(1,7,7)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
-learning_rates = np.linspace(0.86, 0.88, 10)
+depth_values = np.linspace(1,10,10)
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,0,7)))
+learning_rates = np.linspace(0.01, 0.99, 30)
 
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
 min_depth, min_lamb = 0, 0

@@ -260,17 +260,17 @@ def gridsearch_XGB():
     file = np.loadtxt("../Files/XGB_train_MSE.txt", skiprows=1)
     mse1  = file[:,2]
     mse1 = mse1[:,np.newaxis]
-    mse1=np.reshape(mse1,(8,7))
+    mse1=np.reshape(mse1,(7,8))
 
     file = np.loadtxt("../Files/XGB_test_MSE.txt", skiprows=1)
     mse2  = file[:,2]
     mse2 = mse2[:,np.newaxis]
-    mse2=np.reshape(mse2,(8,7))
+    mse2=np.reshape(mse2,(7,8))
 
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
     sns.set(font_scale=1)
-    ax=sns.heatmap(mse1, vmin = 0, vmax =0.1, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt='.2g')
+    ax=sns.heatmap(mse1, vmin = 0, vmax =0.1, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt='.1g')
     axs[0].set_title("MSE for the training set", fontsize=14)
     axs[0].set_xlabel(r"$\lambda$", fontsize=14)
     axs[0].set_ylabel("Depth", fontsize=14)

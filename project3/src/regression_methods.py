@@ -10,7 +10,7 @@ from .statistical_functions import *
 class Fitting():
 	def __init__(self, inst):
 		''' Fitting class containing OLS and ridge with matrix inversion,
-		SGD, GD and SKL SGD'''
+		SGD, GD, SKL SGD, XGB and DT'''
 		self.inst = inst
 
 	def OLS(self):
@@ -166,10 +166,11 @@ class Fitting():
 		learning_rate: step size shrinkage (default = 0.3)
 		"""
 		inst = self.inst
-		xgb_regression = xgb.XGBRegressor(max_depth=max_depth, learning_rate=learning_rate, reg_lambda=reg_lambda)
-		xgb_regression.fit(inst.X_train, inst.z_train)
-		self.z_tilde = xgb_regression.predict(inst.X_train)
-		self.z_predict = xgb_regression.predict(inst.X_test)
+		self.xgb_regression = xgb.XGBRegressor(max_depth=max_depth, learning_rate=learning_rate, reg_lambda=reg_lambda)
+		self.xgb_regression.fit(inst.X_train, inst.z_train)
+		self.z_tilde = self.xgb_regression.predict(inst.X_train)
+		self.z_predict = self.xgb_regression.predict(inst.X_test)
+		self.z_plot = self.xgb_regression.predict(inst.X)
 
 
 	def decision_tree(self, random_state=2020, depth=7, lamb=0.0):
@@ -185,3 +186,4 @@ class Fitting():
 		regr.fit(inst.X_train, inst.z_train)
 		self.z_tilde = regr.predict(inst.X_train)
 		self.z_predict = regr.predict(inst.X_test)
+		self.z_plot = regr.predict(inst.X)
