@@ -1,11 +1,8 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 import sklearn.linear_model as skl
-from sklearn.linear_model import SGDRegressor
-import xgboost as xgb
-from sklearn.tree import DecisionTreeRegressor
 from .statistical_functions import *
-
+from sklearn.linear_model import SGDRegressor
 
 class Fitting():
 	def __init__(self, inst):
@@ -156,32 +153,3 @@ class Fitting():
 			y_tilde = softmax(X @ beta)
 			y_pred = softmax(X_test @ beta)
 			return np.argmax(y_pred, axis=1), np.argmax(y_tilde, axis=1)
-
-	def XGB(self, max_depth=6, learning_rate=0.3, reg_lambda=1):
-		"""
-		eXtra Gradient Boost method
-		Keywords:
-		max_depth (int): max depth of decision tree (default = 6)
-		lamb: L2 regularization term (default = 1)
-		learning_rate: step size shrinkage (default = 0.3)
-		"""
-		inst = self.inst
-		xgb_regression = xgb.XGBRegressor(max_depth=max_depth, learning_rate=learning_rate, reg_lambda=reg_lambda)
-		xgb_regression.fit(inst.X_train, inst.z_train)
-		self.z_tilde = xgb_regression.predict(inst.X_train)
-		self.z_predict = xgb_regression.predict(inst.X_test)
-
-
-	def decision_tree(self, random_state=2020, depth=7, lamb=0.0):
-		'''
-		Decision tree for regression using SKL.
-		Keywords:
-		depth - takes value 7 as default, but is altered to change the max depth.
-		lamb - defaults 0.0. Is used by SKL for the ccp_alpha parameter,
-			   i.e. the pruning parameter lambda in our code and report.
-		'''
-		inst = self.inst
-		regr=DecisionTreeRegressor(criterion='mse', max_depth=int(depth), ccp_alpha=lamb)
-		regr.fit(inst.X_train, inst.z_train)
-		self.z_tilde = regr.predict(inst.X_train)
-		self.z_predict = regr.predict(inst.X_test)

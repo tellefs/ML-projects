@@ -169,7 +169,7 @@ class Data():
 		self.y = y
 		self.z = z
 		self.A_numpy = self.A.to_numpy()
-
+		
 		self.x_flat = x
 		self.y_flat = y
 		self.z_flat = z
@@ -200,6 +200,73 @@ class Data():
 		self.z_mesh = Ebind_mesh
 
 		
+	def find_indeces(self):
+
+		file = np.loadtxt("Data_AME16/Data_article.txt", skiprows=1)
+		Z  = file[:,0]   
+		N  = file[:,1]  
+		self.indeces = []
+
+		for i in range(46):
+			for j in range(len(self.x_flat)):
+				if(self.x_flat[j]==N[i] and self.y_flat[j]==Z[i]):
+					self.indeces.append(j)
+
+	def set_new_training_set(self):
+
+		self.X_copy = self.X
+		self.z_scaled_copy = self.z_scaled
+
+		X_new = np.delete(self.X, self.indeces, axis=0)
+		z_scaled_new = np.delete(self.z_scaled, self.indeces)
+
+		self.X = X_new
+		self.z_scaled = z_scaled_new
+
+
+	def set_new_test_set(self):
+
+		X_article = []
+		x_article = []
+		y_article = []
+		z_article = []
+
+		for i in range(len(self.indeces)):
+			X_article.append(self.X_copy[self.indeces[i]])
+			x_article.append(self.x_scaled[self.indeces[i]])
+			y_article.append(self.y_scaled[self.indeces[i]])
+			z_article.append(self.z_scaled_copy[self.indeces[i]])
+
+		self.X_article = X_article
+		self.x_article = x_article
+		self.y_article = y_article
+		self.z_article = z_article
+
+	def data_rescaling_default(self, x, y, z):
+		''' Rescaling data back'''
+		dataset_scaled = np.stack((x, y, z))
+		dataset_rescaled = self.scaler.inverse_transform(dataset_scaled.T)
+		x_rescaled = dataset_rescaled[:,0]
+		y_rescaled = dataset_rescaled[:,1]
+		z_rescaled = dataset_rescaled[:,2]
+		return x_rescaled, y_rescaled, z_rescaled
+
+	def reset_test_and_train_back(self):
+		self.z_scaled = self.z_scaled_copy
+
+
+	def article_scores(self, z, z_pred):
+		z_article = np.zeros(len(self.indeces))
+		z_predict_article = np.zeros(len(self.indeces))
+
+		for i in range(len(self.indeces)):
+			z_article[i] = z[self.indeces[i]]
+			z_predict_article[i] = z_pred[self.indeces[i]]
+
+		MSE = np.sum((z_article-z_predict_article)**2)/len(self.indeces)
+		STD = np.sqrt(MSE)
+		print(STD)
+
 
 
 
