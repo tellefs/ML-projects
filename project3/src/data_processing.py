@@ -265,7 +265,7 @@ class Data():
 
 		MSE = np.sum((z_article-z_predict_article)**2)/len(self.indeces)
 		STD = np.sqrt(MSE)
-		print(STD)
+		return STD
 
 
 
