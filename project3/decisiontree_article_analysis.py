@@ -24,9 +24,8 @@ The folowing program performs the grid search linear regression analysis with XG
 np.random.seed(2020)
 
 #values to perform gridsearch on
-depth_values = np.linspace(1,10,10)
-lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,0,5)))
-learning_rates = np.linspace(0, 1, 50)
+depth_values = np.linspace(1,15,15)
+lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,2,9)))
 
 #values to extract from gridsearch
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
@@ -69,24 +68,25 @@ fit = Fitting(bind_eng)
 #loop to find optimal values
 for i, depth in enumerate(depth_values):
 	for j, lamb in enumerate(lambda_values):
-		for k, eta in enumerate(learning_rates):
-			depth = int(depth)
-			fit.XGB(max_depth=depth,reg_lambda=lamb, learning_rate=eta)
+		depth = int(depth)
+		fit.decision_tree(depth=depth, lamb=lamb)
 
-        # Tracking the optimal parameters
-			if(MSE(bind_eng.z_test, fit.z_predict) <= min_mse_test):
-				min_mse_test = MSE(bind_eng.z_test, fit.z_predict)
-				min_r2_test = R2(bind_eng.z_test, fit.z_predict)
-				min_mse_train = MSE(bind_eng.z_train, fit.z_tilde)
-				min_r2_train = R2(bind_eng.z_train, fit.z_tilde)
-				opt_depth = depth
-				opt_lamb = lamb
-				opt_eta = eta
-				z_predict_article = fit.xgb_regression.predict(np.array(bind_eng.X_article))
-				z_predict_total = fit.xgb_regression.predict(np.array(bind_eng.X_copy))
-				z_predict = fit.z_predict
-				z_tilde = fit.z_tilde
-				z_plot = fit.z_plot
+	# Tracking the optimal parameters
+		if(MSE(bind_eng.z_test, fit.z_predict) <= min_mse_test):
+			#print('yes')
+			#print(depth)
+			#print(lamb)
+			min_mse_test = MSE(bind_eng.z_test, fit.z_predict)
+			min_r2_test = R2(bind_eng.z_test, fit.z_predict)
+			min_mse_train = MSE(bind_eng.z_train, fit.z_tilde)
+			min_r2_train = R2(bind_eng.z_train, fit.z_tilde)
+			opt_depth = depth
+			opt_lamb = lamb
+			z_predict_article = fit.regr.predict(np.array(bind_eng.X_article))
+			z_predict_total = fit.regr.predict(np.array(bind_eng.X_copy))
+			z_predict = fit.z_predict
+			z_tilde = fit.z_tilde
+			z_plot = fit.z_plot
 
 	
 # Printing scores
@@ -104,8 +104,6 @@ print(R2(bind_eng.z_test, z_predict))
 
 # Printing scores for the article values
 print("---------------- Article ----------------")
-print("Optimal learning rate:")
-print(opt_eta)
 print("Optimal depth:")
 print(opt_depth)
 print("Optimal lambda:")
