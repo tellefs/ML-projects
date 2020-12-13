@@ -21,16 +21,15 @@ The folowing program performs the grid search linear regression analysis with XG
 
 """
 
-np.random.seed(2021)
+np.random.seed(2020)
 
 #values to perform gridsearch on
-depth_values = np.linspace(1,10,10)
+depth_values = np.linspace(1,7,7)
 lambda_values = np.hstack((np.array([0.0]), np.logspace(-6,0,7)))
 learning_rates = np.linspace(0.01, 0.99, 30)
 
 #values to extract from gridsearch
 min_mse_test, min_r2_test, min_mse_train, min_r2_train = 1000, 0, 0, 0
-min_depth, min_lamb = 0, 0
 
 
 # Setting up the dataset
@@ -46,10 +45,12 @@ bind_eng.z_flat = bind_eng.z_flat*bind_eng.A_numpy
 # Scaling the data
 bind_eng.data_scaling()
 
-# Setting matrices for the grid search
-poly_deg = 3
 
+# Creating the design matrix. Workaround to create the XGB and DT design matrices
+poly_deg = 1
 bind_eng.design_matrix(poly_deg)
+deleted_matrix = np.delete(bind_eng.X,0,1)
+bind_eng.X = deleted_matrix
 
 # Picking AME16 data without article values
 bind_eng.set_new_training_set()
