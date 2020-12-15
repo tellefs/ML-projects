@@ -15,10 +15,13 @@ from src.print_and_plot import *
 from src.neuralnetwork import NeuralNetwork
 from src.activation_functions import *
 
-""" 
-
-The folowing program performs the grid search linear regression analysis with XGBoost
-
+"""
+The folowing program performs the Decision Tree analysis, on the data to compare
+with the published article, as dicussed in the report at the GitHub repository.
+The user may change the depth_values to change the maximum depth of the tree,
+as well as changing the lambda_values to change the pruning parameter.
+The output of the program is two grid search files for the test and training MSE and R2,
+as well as a print of the optimal values.
 """
 
 np.random.seed(2020)
@@ -88,7 +91,7 @@ for i, depth in enumerate(depth_values):
 			z_tilde = fit.z_tilde
 			z_plot = fit.z_plot
 
-	
+
 # Printing scores
 print("--------------------------------")
 print("Scores:")

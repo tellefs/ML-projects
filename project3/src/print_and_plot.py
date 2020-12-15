@@ -291,5 +291,5 @@ def gridsearch_XGB():
 # Uncomment the following lines to get required plot:
 #plot_heatmaps_lin_reg()
 #plot_heatmaps_NN()
-gridsearch_decisiontree()
+#gridsearch_decisiontree()
 #gridsearch_XGB()

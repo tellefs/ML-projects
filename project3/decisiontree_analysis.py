@@ -11,6 +11,14 @@ from src.regression_methods import Fitting
 from src.statistical_functions import *
 np.random.seed(2020)
 
+"""
+The folowing program performs the Decision Tree analysis.
+The user may change the depth_values to change the maximum depth of the tree,
+as well as changing the lambda_values to change the pruning parameter.
+The output of the program is two grid search files for the test and training MSE and R2,
+as well as a print of the optimal values.
+"""
+
 # Setting up the dataset
 bind_eng = Data()
 bind_eng.set_binding_energies("mass16.txt")
