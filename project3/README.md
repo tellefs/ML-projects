@@ -15,6 +15,5 @@ An example run is included in the interactive **project3_testrun.ipynb** noteboo
 
 The programs **linear_regression_analysis.py**, **neural_network_analysis.py**, **decisiontree_analysis.py**, **XGB_analysis.py**, **article_analysis.py**, **nn_linear_article_analysis.py**, **decisiontree_article_analysis.py** and **XGB_article_analysis.py** were used for collecting the results for the project. These programs are run in the **project3_testrun.ipynb** jupyter notebook as an example run, with the current settings chosen in the programs:
 
-	1. decisiontree_analysis.py runs the decision tree method from SciKit-Learn using a max depth of 14 and lambda from 10^{-1} to 10^{-7}.
-	2. task_b.py runs the self-made FFNN with three hidden layers (50 neurons each) with 1000 epochs, eta=0.001 and lambda=0.001 (ridge case)
+	1. decisiontree_analysis.py runs the decision tree method from SciKit-Learn using a max depth of 14 and lambda from 1e-1 to 1e-7.
 	3. ...
