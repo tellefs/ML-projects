@@ -15,9 +15,9 @@ from src.print_and_plot import *
 from src.neuralnetwork import NeuralNetwork
 from src.activation_functions import *
 
-""" 
+"""
 
-The folowing program performs the simple analysis and the grid search for the FFNN and linear regression 
+The folowing program performs the simple analysis and the grid search for the FFNN and linear regression
 on the total binding energy dataset and extracts the scores for the nuclei presented in the article (see project text)
 separately.
 
@@ -27,8 +27,8 @@ np.random.seed(2021)
 
 lamb = 0.001
 task = "grid search" # "simple analysis", "grid search"
-analysis_type = "linear" # "NN", "Linear"
-regression_method = "ridge" # "OLS", "ridge", "LASSO" 
+analysis_type = "linear" # "NN", "linear"
+regression_method = "ridge" # "OLS", "ridge", "LASSO"
 
 # Setting up the dataset
 bind_eng = Data()
@@ -67,25 +67,25 @@ if(task == "simple analysis"):
 		n_epochs = 1000	#number of epochs
 		eta = 0.0001 	# learning rate
 		activation_function_hidd = "sigmoid" # "tanh", "sigmoid"
-		
+
 		NN = NeuralNetwork(
-				bind_eng.X_train, 
-				bind_eng.z_train, 
-				n_hidden_layers = n_hidd_layers, 
-				n_hidden_neurons = nodes_in_hidd_layers, 
-				epochs = n_epochs, 
-				batch_size = min_size, 
-				eta = eta, 
-				lmbd=lamb, 
+				bind_eng.X_train,
+				bind_eng.z_train,
+				n_hidden_layers = n_hidd_layers,
+				n_hidden_neurons = nodes_in_hidd_layers,
+				epochs = n_epochs,
+				batch_size = min_size,
+				eta = eta,
+				lmbd=lamb,
 				hidden_act_func=activation_function_hidd)
 		NN.train()
-		
+
 		z_predict = np.ravel(NN.predict(bind_eng.X_test))
 		z_tilde = np.ravel(NN.predict(bind_eng.X_train))
 		z_plot = np.ravel(NN.predict(bind_eng.X))
 		z_predict_article = np.ravel(NN.predict(bind_eng.X_article))
 		z_predict_total = np.ravel(NN.predict(bind_eng.X_copy))
-	
+
 	elif(analysis_type == "linear"):
 		fit = Fitting(bind_eng)
 		if(regression_method == "OLS"):
@@ -99,8 +99,8 @@ if(task == "simple analysis"):
 		z_plot = fit.z_plot
 		z_predict_article = np.array(bind_eng.X_article).dot(fit.beta)
 		z_predict_total = np.array(bind_eng.X_copy).dot(fit.beta)
-	
-		
+
+
 	# Printing scores
 	print("--------------------------------")
 	print("Scores:")
@@ -112,8 +112,8 @@ if(task == "simple analysis"):
 	print(MSE(bind_eng.z_test, z_predict))
 	print("Test R2:")
 	print(R2(bind_eng.z_test, z_predict))
-	
-	
+
+
 	# Printing scores for the article values
 	print("---------------- Article ----------------")
 	print("Scores:")
@@ -121,19 +121,19 @@ if(task == "simple analysis"):
 	print(MSE(bind_eng.z_article, z_predict_article))
 	print("Article R2:")
 	print(R2(bind_eng.z_article, z_predict_article))
-	
-	
+
+
 	# Rescaling the data back
 	bind_eng.reset_test_and_train_back()
 	x_rescaled, y_rescaled, z_rescaled = bind_eng.data_rescaling_default(
-														bind_eng.x_scaled, 
-														bind_eng.y_scaled, 
+														bind_eng.x_scaled,
+														bind_eng.y_scaled,
 														bind_eng.z_scaled)
 	x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(
-														bind_eng.x_scaled, 
-														bind_eng.y_scaled, 
+														bind_eng.x_scaled,
+														bind_eng.y_scaled,
 														z_predict_total)
-	
+
 	# Printing scores for the article values
 	print("---------------- RMSD ----------------")
 	print(bind_eng.article_scores(z_rescaled, z_rescaled_predict))
@@ -150,23 +150,23 @@ elif(task == "grid search"):
 		min_el, min_pol, min_lamb, imin= 1000, 0, 0, 0
 		R2_test, R2_val, R2_train = 0, 0, 0
 		MSE_test, MSE_val, MSE_train = 0, 0, 0
-	
+
 		for poly_deg in poly_deg_array:
-	
+
 			for i in range(num_lambda):
-	
+
 				# Creating the design matrix
 				bind_eng.design_matrix(poly_deg)
-	
+
 				# Picking AME16 data without article values
 				bind_eng.set_new_training_set()
-	
+
 				# Picking article values only
 				bind_eng.set_new_test_set()
-	
+
 				# Splitting into the test and training set
 				bind_eng.test_train_split(0.2)
-	
+
 				fit = Fitting(bind_eng)
 				fit.ridge(lambda_array[i])
 				z_predict = fit.z_predict
@@ -174,19 +174,19 @@ elif(task == "grid search"):
 				z_plot = fit.z_plot
 				z_predict_article = np.array(bind_eng.X_article).dot(fit.beta)
 				z_predict_total = np.array(bind_eng.X_copy).dot(fit.beta)
-	
+
 				# Rescaling the data back
 				bind_eng.reset_test_and_train_back()
 				x_rescaled, y_rescaled, z_rescaled = bind_eng.data_rescaling_default(
-																			bind_eng.x_scaled, 
-																			bind_eng.y_scaled, 
+																			bind_eng.x_scaled,
+																			bind_eng.y_scaled,
 																			bind_eng.z_scaled)
 				x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(
-																			bind_eng.x_scaled, 
-																			bind_eng.y_scaled, 
+																			bind_eng.x_scaled,
+																			bind_eng.y_scaled,
 																			z_predict_total)
 				score = bind_eng.article_scores(z_rescaled, z_rescaled_predict)
-	
+
 				# Tracking the optimal parameters
 				if(score <= min_el):
 					min_el = score
@@ -199,14 +199,12 @@ elif(task == "grid search"):
 					MSE_train = MSE(bind_eng.z_train, z_tilde)
 					MSE_val = MSE(bind_eng.z_test, z_predict)
 					MSE_test = MSE(bind_eng.z_article, z_predict_article)
-	
+
 		# Printing the optimal values
-		print("Optimal polynomial degree:")	
+		print("Optimal polynomial degree:")
 		print(min_pol)
-		print("Optimal lambda:")	
+		print("Optimal lambda:")
 		print(min_lamb)
-		print("Minimum RMSD:")
-		print(min_el)
 
 		# Printing scores
 		print("--------------------------------")
@@ -219,7 +217,7 @@ elif(task == "grid search"):
 		print(MSE_val)
 		print("Test R2:")
 		print(R2_val)
-	
+
 		# Printing scores for the article values
 		print("---------------- Article ----------------")
 		print("Scores:")
@@ -227,6 +225,9 @@ elif(task == "grid search"):
 		print(MSE_test)
 		print("Article R2:")
 		print(R2_test)
+
+		print("---------------- RMSD ----------------")
+		print(min_el)
 
 	if(analysis_type == "NN"):
 		# Setting matrices and arrays for the grid search
@@ -263,14 +264,14 @@ elif(task == "grid search"):
 				bind_eng.test_train_split(0.2)
 
 				NN = NeuralNetwork(
-					bind_eng.X_train, 
-					bind_eng.z_train, 
-					n_hidden_layers = n_hidd_layers, 
-					n_hidden_neurons = nodes_in_hidd_layers, 
-					epochs = n_epochs, 
-					batch_size = min_size, 
-					eta = eta_array[i], 
-					lmbd=lambda_array[j], 
+					bind_eng.X_train,
+					bind_eng.z_train,
+					n_hidden_layers = n_hidd_layers,
+					n_hidden_neurons = nodes_in_hidd_layers,
+					epochs = n_epochs,
+					batch_size = min_size,
+					eta = eta_array[i],
+					lmbd=lambda_array[j],
 					hidden_act_func=activation_function_hidd)
 				NN.train()
 
@@ -283,13 +284,13 @@ elif(task == "grid search"):
 				# Rescaling the data back
 				bind_eng.reset_test_and_train_back()
 				x_rescaled, y_rescaled, z_rescaled = bind_eng.data_rescaling_default(
-																			bind_eng.x_scaled, 
-																			bind_eng.y_scaled, 
+																			bind_eng.x_scaled,
+																			bind_eng.y_scaled,
 																			bind_eng.z_scaled)
 				x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(
-																			bind_eng.x_scaled, 
-																			bind_eng.y_scaled, 
-																			z_predict_total)		
+																			bind_eng.x_scaled,
+																			bind_eng.y_scaled,
+																			z_predict_total)
 				score = bind_eng.article_scores(z_rescaled, z_rescaled_predict)
 
 				# Tracking the optimal parameters
@@ -307,9 +308,9 @@ elif(task == "grid search"):
 					MSE_test = MSE(bind_eng.z_article, z_predict_article)
 
 		# Printing the scores
-		print("Optimal eta:")	
+		print("Optimal eta:")
 		print(min_eta)
-		print("Optimal lambda:")	
+		print("Optimal lambda:")
 		print(min_lamb)
 		print("Minimum RMSD:")
 		print(min_el)
@@ -325,7 +326,7 @@ elif(task == "grid search"):
 		print(MSE_val)
 		print("Test R2:")
 		print(R2_val)
-	
+
 		# Printing scores for the article values
 		print("---------------- Article ----------------")
 		print("Scores:")

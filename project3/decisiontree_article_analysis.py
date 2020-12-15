@@ -125,4 +125,4 @@ x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(bin
 
 # Printing scores for the article values
 print("---------------- RMSD ----------------")
-bind_eng.article_scores(z_rescaled, z_rescaled_predict)
+print(bind_eng.article_scores(z_rescaled, z_rescaled_predict))
