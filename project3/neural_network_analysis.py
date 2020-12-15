@@ -48,7 +48,7 @@ min_size = 100 	#size of each minibatch
 n_epochs = 1000	#number of epochs
 eta = 0.0001 	# learning rate
 
-study_option = "grid search" # "number of layers", "number of neurons", "grid search", "simple analysis"
+study_option = "simple analysis" # "number of layers", "number of neurons", "grid search", "simple analysis"
 activation_function_hidd = "sigmoid" # "tanh", "sigmoid"
 
 n_hidd_layers = 4
@@ -109,7 +109,7 @@ if(study_option == "number of layers"):
 		nodes_in_hidd_layers.append(50)	
 	f_1.close()
 	f_2.close()
-
+# ----------------------------------------------- number of neurons ---------------------------------------------
 elif(study_option == "number of neurons"):
 	# Setting files
 	filename_1 = "Files/NN_R2_neurons.txt"
@@ -160,12 +160,12 @@ elif(study_option == "grid search"):
 	R2_train = np.zeros((num_eta, num_lambda))
 	
 	# Opening the files for reading and writing
-	filename_1 = "Files/Grid_search_NN_sigmoid_R2_tot.txt"
+	filename_1 = "Files/Grid_search_NN_tanh_R2_tot.txt"
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   lambda  R2train  R2test\n")
 	f_1.close()
 	
-	filename_2 = "Files/Grid_search_NN_sigmoid_MSE_tot.txt"
+	filename_2 = "Files/Grid_search_NN_tanh_MSE_tot.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   lambda  MSEtrain  MSEtest\n")
 	f_2.close()
@@ -226,7 +226,8 @@ elif(study_option == "grid search"):
 	print(MSE_test[imin, jmin])
 	print("Test R2:")
 	print(R2_test[imin, jmin])
-
+# ----------------------------------------------- Simple analysis ---------------------------------------------
+# Performs a simple analysis of the scores with the parameters chosen in the beginning of the program
 elif(study_option == "simple analysis"):
 	NN = NeuralNetwork(
 			bind_eng.X_train, 

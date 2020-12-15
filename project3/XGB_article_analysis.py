@@ -15,7 +15,7 @@ from src.print_and_plot import *
 from src.neuralnetwork import NeuralNetwork
 from src.activation_functions import *
 
-""" 
+"""
 
 The folowing program performs the grid search linear regression analysis with XGBoost
 
@@ -88,7 +88,7 @@ for i, depth in enumerate(depth_values):
 				z_tilde = fit.z_tilde
 				z_plot = fit.z_plot
 
-	
+
 # Printing scores
 print("--------------------------------")
 print("Scores:")
@@ -124,4 +124,4 @@ x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(bin
 
 # Printing scores for the article values
 print("---------------- RMSD ----------------")
-bind_eng.article_scores(z_rescaled, z_rescaled_predict)
+print(bind_eng.article_scores(z_rescaled, z_rescaled_predict))

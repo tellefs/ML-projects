@@ -120,5 +120,5 @@ print("Test R2: ", R2_test[min_pol-1, imin])
 bind_eng.data_rescaling()
 
 # Uncomment if plot is needed
-#bind_eng.prepare_for_plotting()
-#surface_plot(bind_eng.x_mesh,bind_eng.y_mesh,bind_eng.z_mesh)
+bind_eng.prepare_for_plotting()
+surface_plot(bind_eng.x_mesh,bind_eng.y_mesh,bind_eng.z_mesh)
