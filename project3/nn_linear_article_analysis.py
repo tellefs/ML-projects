@@ -27,7 +27,7 @@ np.random.seed(2021)
 
 lamb = 0.001
 task = "grid search" # "simple analysis", "grid search"
-analysis_type = "NN" # "NN", "linear"
+analysis_type = "linear" # "NN", "linear"
 regression_method = "ridge" # "OLS", "ridge", "LASSO"
 
 # Setting up the dataset
