@@ -14,7 +14,7 @@ from src.statistical_functions import *
 Program to find the optimal parameters for the XGBoost method, by doing a gridsearch over the three included parameters;
 lambda, learning rate and max. depth.
 
-Last loop is uncommented, but is used to find all three optimal parameters. Then the oprimal learning rate is used to obtain
+Last loop is commented out, but is used to find all three optimal parameters. Then the optimal learning rate is used to obtain
 files for plotting.
 """
 

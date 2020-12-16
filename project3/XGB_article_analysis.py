@@ -17,7 +17,9 @@ from src.activation_functions import *
 
 """
 
-The folowing program performs the grid search linear regression analysis with XGBoost
+The folowing program performs the grid search linear regression analysis with XGBoost,
+using the total binding energy data, to compare with the results from the papers
+discussed in the report.
 
 """
 
@@ -122,6 +124,6 @@ bind_eng.reset_test_and_train_back()
 x_rescaled, y_rescaled, z_rescaled = bind_eng.data_rescaling_default(bind_eng.x_scaled, bind_eng.y_scaled, bind_eng.z_scaled)
 x_rescaled, y_rescaled, z_rescaled_predict = bind_eng.data_rescaling_default(bind_eng.x_scaled, bind_eng.y_scaled, z_predict_total)
 
-# Printing scores for the article values
+# Printing scores for the article values, sigma_{rms}:
 print("---------------- RMSD ----------------")
 print(bind_eng.article_scores(z_rescaled, z_rescaled_predict))

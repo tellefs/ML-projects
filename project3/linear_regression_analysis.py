@@ -14,7 +14,7 @@ from src.statistical_functions import *
 from src.print_and_plot import *
 
 
-""" 
+"""
 
 The folowing program performs the linear regression analysis with three options - OLS, Ridge and LASSO
 The user might selesct one of the options by varying the regression_method variable taking values "OLS", "Ridge", "LASSO"
@@ -77,12 +77,12 @@ for poly_deg in poly_deg_array:
 		# Choosing between two resampling methods
 		if(resampling_method == "cv"):
 			model.cross_validation(
-				11, seed, minimization_method, 
+				11, seed, minimization_method,
 				regression_method, poly_deg, lamb=lambda_array[i])
 
 		elif(resampling_method == "no resampling"):
 			model.no_resampling(
-				seed, minimization_method, 
+				seed, minimization_method,
 				regression_method, poly_deg, lamb=lambda_array[i])
 
 		# Filling up the matrices
@@ -105,20 +105,20 @@ f_1.close()
 f_2.close()
 
 # Printing the scores
-print("Optimal polynomial degree:")	
+print("Optimal polynomial degree:")
 print(min_pol)
-print("Optimal lambda:")	
+print("Optimal lambda:")
 print(min_lamb)
 print("--------------------------------")
 print("Scores:")
 print("Training MSE: ", MSE_train[min_pol-1, imin])
-print("Minimum test MSE: ", MSE_test[min_pol-1, imin])	
+print("Minimum test MSE: ", MSE_test[min_pol-1, imin])
 print("Training R2: ", R2_train[min_pol-1, imin])
-print("Test R2: ", R2_test[min_pol-1, imin])	
+print("Test R2: ", R2_test[min_pol-1, imin])
 
 # Rescaling the data back
 bind_eng.data_rescaling()
 
 # Uncomment if plot is needed
 bind_eng.prepare_for_plotting()
-surface_plot(bind_eng.x_mesh,bind_eng.y_mesh,bind_eng.z_mesh)
+#surface_plot(bind_eng.x_mesh,bind_eng.y_mesh,bind_eng.z_mesh)

@@ -312,8 +312,6 @@ elif(task == "grid search"):
 		print(min_eta)
 		print("Optimal lambda:")
 		print(min_lamb)
-		print("Minimum RMSD:")
-		print(min_el)
 
 		# Printing scores
 		print("--------------------------------")
@@ -334,3 +332,7 @@ elif(task == "grid search"):
 		print(MSE_test)
 		print("Article R2:")
 		print(R2_test)
+
+		#Printing sigma_{rms}
+		print("---------------- RMSD ----------------")
+		print(min_el)
