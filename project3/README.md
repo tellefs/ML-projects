@@ -15,5 +15,7 @@ An example run is included in the interactive **project3_testrun.ipynb** noteboo
 
 The programs **linear_regression_analysis.py**, **neural_network_analysis.py**, **decisiontree_analysis.py**, **XGB_analysis.py**, **nn_linear_article_analysis.py**, **decisiontree_article_analysis.py** and **XGB_article_analysis.py** were used for collecting the results for the project. These programs are run in the **project3_testrun.ipynb** jupyter notebook as an example run, with the current settings chosen in the programs:
 
-	1. decisiontree_analysis.py runs the decision tree method from SciKit-Learn using a max depth of 14 and lambda from 1e-1 to 1e-7.
-	3. ...
+	1. linear_regression_analysis.py runs the linear regression, with the current settings: method = Ridge regression using matrix inversion, no resampling, and performs a grid search over polynomial degree from 1 to 23 and over lambda from 0 to 1.
+	2. neural_network_analysis.py runs the FFNN with the current settings: activation function is sigmoid, minibatch size = 100, number of epochs = 1000, 4 hidden layers and performs a grid search over lambda from 0 to 1 and eta from 0.000001 to 0.0005.
+	3. decisiontree_analysis.py runs the decision tree method from SciKit-Learn using a max depth of 14 and lambda from 1e-1 to 1e-7.
+	4. XGB_analysis.py runs the XG Boost method from XGBoost using a learning rate eta of approximately 0.0776, and performs a grid search over maximum depth from 1-10 and over lambda from 1e-6 to 0.

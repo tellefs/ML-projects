@@ -15,10 +15,10 @@ from src.print_and_plot import *
 from src.neuralnetwork import NeuralNetwork
 from src.activation_functions import *
 
-""" 
+"""
 
-The folowing program performs the FFNN analysis by studying how the scores behave with the increasing number of 
-layers for a given number of neurons per layer (study_option == "number of layers"), number of neurons 
+The folowing program performs the FFNN analysis by studying how the scores behave with the increasing number of
+layers for a given number of neurons per layer (study_option == "number of layers"), number of neurons
 study_option == "number of neurons" and performs a grid search for the selected values of lambda and learning rate eta
 study_option == "grid search" or simple analysis for the chosen parameters for study_option == "simple analysis".
 Two options for the activation function are available (tanh and sigmoid).
@@ -48,7 +48,7 @@ min_size = 100 	#size of each minibatch
 n_epochs = 1000	#number of epochs
 eta = 0.0001 	# learning rate
 
-study_option = "simple analysis" # "number of layers", "number of neurons", "grid search", "simple analysis"
+study_option = "grid search" # "number of layers", "number of neurons", "grid search", "simple analysis"
 activation_function_hidd = "sigmoid" # "tanh", "sigmoid"
 
 n_hidd_layers = 4
@@ -74,7 +74,7 @@ if(study_option == "number of layers"):
 	f_1 = open(filename_1, "w")
 	f_1.write("layers   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_MSE_layers.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("layers   MSEtrain  MSEtest\n")
@@ -90,13 +90,13 @@ if(study_option == "number of layers"):
 	for i in range(20):
 		print(n_hidd_layers)
 		NN = NeuralNetwork(
-			bind_eng.X_train, 
-			bind_eng.z_train, 
-			n_hidden_layers = n_hidd_layers, 
-			n_hidden_neurons = nodes_in_hidd_layers, 
-			epochs = n_epochs, 
-			batch_size = min_size, 
-			eta = eta, 
+			bind_eng.X_train,
+			bind_eng.z_train,
+			n_hidden_layers = n_hidd_layers,
+			n_hidden_neurons = nodes_in_hidd_layers,
+			epochs = n_epochs,
+			batch_size = min_size,
+			eta = eta,
 			lmbd=lamb)
 		NN.train()
 		z_predict = np.ravel(NN.predict(bind_eng.X_test))
@@ -106,7 +106,7 @@ if(study_option == "number of layers"):
 		f_1.write("{0} {1} {2}\n".format(n_hidd_layers, R2(bind_eng.z_train, z_tilde), R2(bind_eng.z_test, z_predict)))
 		f_2.write("{0} {1} {2}\n".format(n_hidd_layers, MSE(bind_eng.z_train, z_tilde), MSE(bind_eng.z_test, z_predict)))
 		n_hidd_layers = n_hidd_layers+1
-		nodes_in_hidd_layers.append(50)	
+		nodes_in_hidd_layers.append(50)
 	f_1.close()
 	f_2.close()
 # ----------------------------------------------- number of neurons ---------------------------------------------
@@ -116,7 +116,7 @@ elif(study_option == "number of neurons"):
 	f_1 = open(filename_1, "w")
 	f_1.write("neurons   R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/NN_MSE_neurons.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("neurons   MSEtrain  MSEtest\n")
@@ -131,13 +131,13 @@ elif(study_option == "number of neurons"):
 
 	for i in range(9):
 		NN = NeuralNetwork(
-			bind_eng.X_train, 
-			bind_eng.z_train, 
-			n_hidden_layers = n_hidd_layers, 
-			n_hidden_neurons = nodes_in_hidd_layers, 
-			epochs = n_epochs, 
-			batch_size = min_size, 
-			eta = eta, 
+			bind_eng.X_train,
+			bind_eng.z_train,
+			n_hidden_layers = n_hidd_layers,
+			n_hidden_neurons = nodes_in_hidd_layers,
+			epochs = n_epochs,
+			batch_size = min_size,
+			eta = eta,
 			lmbd=lamb)
 		NN.train()
 		z_predict = np.ravel(NN.predict(bind_eng.X_test))
@@ -158,45 +158,45 @@ elif(study_option == "grid search"):
 	MSE_train = np.zeros((num_eta, num_lambda))
 	R2_test = np.zeros((num_eta, num_lambda))
 	R2_train = np.zeros((num_eta, num_lambda))
-	
+
 	# Opening the files for reading and writing
 	filename_1 = "Files/Grid_search_NN_tanh_R2_tot.txt"
 	f_1 = open(filename_1, "w")
 	f_1.write("eta   lambda  R2train  R2test\n")
 	f_1.close()
-	
+
 	filename_2 = "Files/Grid_search_NN_tanh_MSE_tot.txt"
 	f_2 = open(filename_2, "w")
 	f_2.write("eta   lambda  MSEtrain  MSEtest\n")
 	f_2.close()
-	
+
 	f_1 = open(filename_1, "a")
 	f_2 = open(filename_2, "a")
 
 	for i in range(num_eta):
 		for j in range(num_lambda):
 			NN = NeuralNetwork(
-					bind_eng.X_train, 
-					bind_eng.z_train, 
-					n_hidden_layers = n_hidd_layers, 
-					n_hidden_neurons = nodes_in_hidd_layers, 
-					epochs = n_epochs, 
-					batch_size = min_size, 
-					eta = eta_array[i], 
-					lmbd=lambda_array[j], 
+					bind_eng.X_train,
+					bind_eng.z_train,
+					n_hidden_layers = n_hidd_layers,
+					n_hidden_neurons = nodes_in_hidd_layers,
+					epochs = n_epochs,
+					batch_size = min_size,
+					eta = eta_array[i],
+					lmbd=lambda_array[j],
 					hidden_act_func=activation_function_hidd)
 			NN.train()
 
 			z_predict = np.ravel(NN.predict(bind_eng.X_test))
 			z_tilde = np.ravel(NN.predict(bind_eng.X_train))
 			z_plot = np.ravel(NN.predict(bind_eng.X))
-	
+
 			# Filling up the matrices
 			MSE_test[i, j] = MSE(bind_eng.z_test, z_predict)
 			MSE_train[i, j] = MSE(bind_eng.z_train, z_tilde)
 			R2_test[i, j] = R2(bind_eng.z_test, z_predict)
 			R2_train[i, j] = R2(bind_eng.z_train, z_tilde)
-	
+
 			f_1.write("{0} {1} {2} {3}\n".format(eta_array[i], lambda_array[j], R2(bind_eng.z_train, z_tilde), R2(bind_eng.z_test, z_predict)))
 			f_2.write("{0} {1} {2} {3}\n".format(eta_array[i], lambda_array[j], MSE(bind_eng.z_train, z_tilde), MSE(bind_eng.z_test, z_predict)))
 
@@ -212,9 +212,9 @@ elif(study_option == "grid search"):
 	f_2.close()
 
 	# Printing scores
-	print("Optimal eta:")	
+	print("Optimal eta:")
 	print(min_eta)
-	print("Optimal lambda:")	
+	print("Optimal lambda:")
 	print(min_lamb)
 	print("--------------------------------")
 	print("Scores:")
@@ -230,21 +230,21 @@ elif(study_option == "grid search"):
 # Performs a simple analysis of the scores with the parameters chosen in the beginning of the program
 elif(study_option == "simple analysis"):
 	NN = NeuralNetwork(
-			bind_eng.X_train, 
-			bind_eng.z_train, 
-			n_hidden_layers = n_hidd_layers, 
-			n_hidden_neurons = nodes_in_hidd_layers, 
-			epochs = n_epochs, 
-			batch_size = min_size, 
-			eta = eta, 
-			lmbd=lamb, 
+			bind_eng.X_train,
+			bind_eng.z_train,
+			n_hidden_layers = n_hidd_layers,
+			n_hidden_neurons = nodes_in_hidd_layers,
+			epochs = n_epochs,
+			batch_size = min_size,
+			eta = eta,
+			lmbd=lamb,
 			hidden_act_func=activation_function_hidd)
 	NN.train()
 
 	z_predict = np.ravel(NN.predict(bind_eng.X_test))
 	z_tilde = np.ravel(NN.predict(bind_eng.X_train))
 	z_plot = np.ravel(NN.predict(bind_eng.X))
-		
+
 	# Printing scores
 	print("--------------------------------")
 	print("Scores:")
