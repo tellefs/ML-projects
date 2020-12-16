@@ -227,27 +227,27 @@ def gridsearch_XGB():
 
     r21  = file[:,2]
     r21 = r21[:,np.newaxis]
-    r21=np.reshape(r21,(7,8))
+    r21=np.reshape(r21,(10,8))
 
     file = np.loadtxt("../Files/XGB_test_R2.txt", skiprows=1)
     r22  = file[:,2]
     r22 = r22[:,np.newaxis]
-    r22=np.reshape(r22,(7,8))
+    r22=np.reshape(r22,(10,8))
 
-    lambdas = lambda_values = np.hstack((np.array([0.0]), np.logspace(-4,2,7)))
-    y = np.linspace(1,7,7)
+    lambdas = np.hstack((np.array([0.0]), np.logspace(-6,0,7)))
+    y = np.linspace(1,10,10)
     x = lambdas
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
     sns.set(font_scale=1)
-    ax=sns.heatmap(r21, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt='.2g')
+    ax=sns.heatmap(r21, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno")
     axs[0].set_title("$R^2$ for the training set", fontsize=14)
     axs[0].set_xlabel(r"$\lambda$", fontsize=14)
     axs[0].set_ylabel("Depth", fontsize=14)
     axs[0].tick_params(axis="x", labelsize=12)
     axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
-    ax=sns.heatmap(r22, vmin=0.69, vmax=1, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", fmt='.2g')
+    ax=sns.heatmap(r22, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno")
     axs[1].set_title("$R^2$ for the test set", fontsize=14)
     axs[1].set_xlabel(r"$\lambda$", fontsize=14)
     axs[1].set_ylabel("Depth", fontsize=14)
@@ -260,24 +260,24 @@ def gridsearch_XGB():
     file = np.loadtxt("../Files/XGB_train_MSE.txt", skiprows=1)
     mse1  = file[:,2]
     mse1 = mse1[:,np.newaxis]
-    mse1=np.reshape(mse1,(7,8))
+    mse1=np.reshape(mse1,(10,8))
 
     file = np.loadtxt("../Files/XGB_test_MSE.txt", skiprows=1)
     mse2  = file[:,2]
     mse2 = mse2[:,np.newaxis]
-    mse2=np.reshape(mse2,(7,8))
+    mse2=np.reshape(mse2,(10,8))
 
     fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (7, 13))
     axs = axes.ravel()
     sns.set(font_scale=1)
-    ax=sns.heatmap(mse1, vmin = 0, vmax =0.1, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt='.1g')
+    ax=sns.heatmap(mse1, xticklabels=x, yticklabels=y, annot=True, ax=axs[0], cmap="inferno", fmt='.1g')
     axs[0].set_title("MSE for the training set", fontsize=14)
     axs[0].set_xlabel(r"$\lambda$", fontsize=14)
     axs[0].set_ylabel("Depth", fontsize=14)
     axs[0].tick_params(axis="x", labelsize=12)
     axs[0].tick_params(axis="y", labelsize=12,rotation=0)
 
-    ax=sns.heatmap(mse2, vmin = 0, vmax =0.3, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", fmt='.2g')
+    ax=sns.heatmap(mse2, xticklabels=x, yticklabels=y, annot=True, ax=axs[1], cmap="inferno", fmt='.1g')
     axs[1].set_title("MSE for the test set", fontsize=14)
     axs[1].set_xlabel(r"$\lambda$", fontsize=14)
     axs[1].set_ylabel("Depth", fontsize=14)
